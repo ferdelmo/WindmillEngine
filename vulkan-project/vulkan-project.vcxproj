@@ -156,9 +156,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Renderer\Buffer.cpp" />
+    <ClCompile Include="..\src\Renderer\StaticMesh.cpp" />
+    <ClCompile Include="..\src\Renderer\Utils\CopyBuffer.cpp" />
+    <ClCompile Include="..\src\VulkanInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Renderer\Buffer.h" />
+    <ClInclude Include="..\src\Renderer\StaticMesh.h" />
+    <ClInclude Include="..\src\Renderer\Utils\CopyBuffer.h" />
+    <ClInclude Include="..\src\Renderer\Vertex.h" />
     <ClInclude Include="..\src\VulkanApplication.h" />
+    <ClInclude Include="..\src\VulkanInstance.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

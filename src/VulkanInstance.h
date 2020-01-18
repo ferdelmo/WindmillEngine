@@ -93,7 +93,7 @@ public:
 	*/
 	void CleanUp();
 
-private:
+public:
 	/*
 		Initialize the GLFW window where the app will run
 	*/
@@ -174,5 +174,17 @@ private:
 		render commands, etc.
 	*/
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
+
+	/*
+		Debug utils for the validation layers
+	*/
+	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
+		const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+		const VkAllocationCallbacks* pAllocator,
+		VkDebugUtilsMessengerEXT* pDebugMessenger);
+
+	void DestroyDebugUtilsMessengerEXT(VkInstance instance, 
+		VkDebugUtilsMessengerEXT debugMessenger, 
+		const VkAllocationCallbacks* pAllocator);
 };
 
