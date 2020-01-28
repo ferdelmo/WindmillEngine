@@ -1,23 +1,23 @@
 #include "Buffer.h"
-#include <exception>
-#include <stdexcept>
 
-#include "../VulkanInstance.h"
-#include "Utils/CopyBuffer.h"
+
+Buffer::Buffer() {
+	_init = false;
+}
 
 Buffer::Buffer(VulkanInstance* vk) : _vk(vk) {
-
 }
 
 
 
 Buffer::~Buffer() {
+
 	vkDestroyBuffer(_vk->device, _buffer, nullptr);
 	vkFreeMemory(_vk->device, _bufferMemory, nullptr);
 }
 
 
-
+/*
 template <typename T>
 void Buffer::Initialize(const std::vector<T>& list,
 	VkBufferUsageFlags usage,
@@ -60,23 +60,23 @@ void Buffer::Initialize(const std::vector<T>& list,
 
 	Fill<T>(list);
 }
+*/
 
-
-
+/*
 template <typename T>
 void Buffer::Fill(std::vector<T> list) {
 	//Defensive programming for debug
-#ifndef NDEBUG
-	if (list.size() == 0) {
-		throw std::runtime_error("Buffer::Fill: try to initialize a buffer with an empty list");
-	}
-	if (!_init) {
-		throw std::runtime_error("Buffer::Fill: try to fill a non initialize buffer");
-	}
-	if (_size != sizeof(list[0]) * list.size()) {
-		throw std::runtime_error("Buffer::Fill: try to fill a buffer with different size of the initialized");
-	}
-#endif // DEBUG
+	#ifndef NDEBUG
+		if (list.size() == 0) {
+			throw std::runtime_error("Buffer::Fill: try to initialize a buffer with an empty list");
+		}
+		if (!_init) {
+			throw std::runtime_error("Buffer::Fill: try to fill a non initialize buffer");
+		}
+		if (_size != sizeof(list[0]) * list.size()) {
+			throw std::runtime_error("Buffer::Fill: try to fill a buffer with different size of the initialized");
+		}
+	#endif // DEBUG
 
 	if (_gpu) {
 		//copy the verteces to the buffer
@@ -101,16 +101,16 @@ void Buffer::Fill(std::vector<T> list) {
 		cp.Copy(stagingBuffer.GetBuffer(), _buffer, _size);
 	}
 }
+*/
 
 
-
-VkBuffer Buffer::GetBuffer() const {
+VkBuffer& Buffer::GetBuffer() {
 	return _buffer;
 }
 
 
 
-VkDeviceMemory Buffer::GetBufferMemory() const {
+VkDeviceMemory& Buffer::GetBufferMemory() {
 	return _bufferMemory;
 }
 
@@ -129,4 +129,8 @@ uint32_t Buffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags prope
 	}
 
 	throw std::runtime_error("Buffer::FindMemoryType: failed to find suitable memory type!");
+}
+
+void Buffer::SetVulkanInstance(VulkanInstance* vk) {
+	_vk = vk;
 }

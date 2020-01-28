@@ -37,9 +37,7 @@ void CopyBuffer::Initialize() {
 	allocInfo.commandPool = _commandPool;
 	allocInfo.commandBufferCount = 1;
 
-	//Allocate the command buffer
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(_vk->device, &allocInfo, &commandBuffer);
+	vkAllocateCommandBuffers(_vk->device, &allocInfo, &_commandBuffer);
 
 	_init = true;
 }
@@ -47,7 +45,7 @@ void CopyBuffer::Initialize() {
 
 
 
-void CopyBuffer::Copy(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void CopyBuffer::Copy(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size) {
 	if (!_init) {
 		Initialize();
 	}

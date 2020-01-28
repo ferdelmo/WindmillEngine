@@ -25,6 +25,6 @@ public:
 
 	~CopyBuffer();
 
-	void Copy(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void Copy(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size);
 };
 

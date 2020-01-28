@@ -6,7 +6,8 @@
 #include <iostream>
 #include <set>
 
-VulkanInstance::VulkanInstance() {}
+VulkanInstance::VulkanInstance() {
+}
 
 VulkanInstance::VulkanInstance(int width, int height, const std::vector<const char*>& validationLayers, const std::vector<const char*>& deviceExtensions) {
 	this->validationLayers = validationLayers;
@@ -19,6 +20,7 @@ void VulkanInstance::Initialize() {
 	CreateWindow(width, height);
 	CreateInstance();
 	SetupDebugMessenger();
+	CreateSurface();
 	PickPhysicalDevice();
 	CreateLogicalDevice();
 }
@@ -36,6 +38,16 @@ void VulkanInstance::CleanUp() {
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
+
+	delete instance;
+	delete debugMessenger;
+	delete surface;
+
+	delete physicalDevice;
+	delete device;
+	
+	delete graphicsQueue;
+	delete presentQueue;
 }
 
 

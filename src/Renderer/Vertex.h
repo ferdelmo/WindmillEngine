@@ -52,3 +52,13 @@ struct Vertex {
 		return attributeDescriptions;
 	}
 };
+
+/*
+	Uniform struct with the MVP transforms to pass the vertex shader
+*/
+
+struct UniformBufferObject {
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 proj;
+};

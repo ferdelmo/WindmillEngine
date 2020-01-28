@@ -157,15 +157,18 @@
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Renderer\Buffer.cpp" />
+    <ClCompile Include="..\src\Renderer\Camera.cpp" />
     <ClCompile Include="..\src\Renderer\StaticMesh.cpp" />
     <ClCompile Include="..\src\Renderer\Utils\CopyBuffer.cpp" />
     <ClCompile Include="..\src\VulkanInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Renderer\Buffer.h" />
+    <ClInclude Include="..\src\Renderer\Camera.h" />
     <ClInclude Include="..\src\Renderer\StaticMesh.h" />
     <ClInclude Include="..\src\Renderer\Utils\CopyBuffer.h" />
     <ClInclude Include="..\src\Renderer\Vertex.h" />
+    <ClInclude Include="..\src\VulkanApplication-1.h" />
     <ClInclude Include="..\src\VulkanApplication.h" />
     <ClInclude Include="..\src\VulkanInstance.h" />
   </ItemGroup>

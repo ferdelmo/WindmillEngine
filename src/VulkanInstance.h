@@ -34,6 +34,7 @@ public:
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
 
+	bool framebufferResized = false;
 
 	//Default validation layers
 	std::vector<const char*> validationLayers = {
