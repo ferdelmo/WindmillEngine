@@ -45,6 +45,9 @@
     <ClCompile Include="..\src\Renderer\Camera.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Renderer\Texture.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\VulkanInstance.h">
@@ -62,13 +65,13 @@
     <ClInclude Include="..\src\Renderer\Utils\CopyBuffer.h">
       <Filter>Header Files\Renderer\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\VulkanApplication-1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\VulkanApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Camera.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Texture.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>

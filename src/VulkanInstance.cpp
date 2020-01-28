@@ -180,6 +180,7 @@ void VulkanInstance::CreateLogicalDevice() {
 
 	//Device features
 	VkPhysicalDeviceFeatures deviceFeatures = {};
+	deviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	//Device info
 	VkDeviceCreateInfo createInfo = {};
@@ -306,6 +307,9 @@ bool VulkanInstance::IsDeviceSuitable(VkPhysicalDevice device) {
 	//check the extensions
 	bool extensionsSupported = CheckDeviceExtensionSupport(device);
 
+	VkPhysicalDeviceFeatures supportedFeatures;
+	vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
 	//check for swapceain support
 	bool swapChainAdequate = false;
 	if (extensionsSupported) {
@@ -313,7 +317,7 @@ bool VulkanInstance::IsDeviceSuitable(VkPhysicalDevice device) {
 		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
-	return indices.isComplete() && extensionsSupported && swapChainAdequate;
+	return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
 bool VulkanInstance::CheckDeviceExtensionSupport(VkPhysicalDevice device) {

@@ -26,7 +26,7 @@ const int WIDTH = 1920;
 const int HEIGHT = 1080;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
-
+/*
 const std::vector<Vertex> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
     {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
@@ -44,14 +44,26 @@ const std::vector<uint16_t> indices = {
     6, 5, 2, 5, 1, 2, 5, 4, 1, 4, 0, 1
 };
 
+*/
 const std::vector<Vertex> vertices1 = {
-    {{0.95f, 0.95f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-    {{0.0f, 0.95f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}
 };
 
 const std::vector<uint16_t> indices1 = {
-    0, 1, 2
+    0, 1, 2, 2, 3, 0
+};
+const std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+    {{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+    {{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}
+};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0
 };
 
 class VulkanApplication {
@@ -108,6 +120,7 @@ private:
         createGraphicsPipeline();
         createFramebuffers();
 
+        cam = Camera(glm::vec3(-2.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 60, 16 / 9.0f, 0.1f, 100.0f);
 
         mesh = new StaticMesh(&vk, vertices, indices, &descriptorSetLayout, &pipelineLayout);
         mesh1 = new StaticMesh(&vk, vertices1, indices1, &descriptorSetLayout, &pipelineLayout);
@@ -163,7 +176,7 @@ private:
         cleanupSwapChain();
 
         vkDestroyDescriptorSetLayout(vk.device, descriptorSetLayout, nullptr);
-        delete mesh;
+        //delete mesh;
         delete mesh1;
         /*
         vkDestroyBuffer(*vk.device, *indexBuffer.GetBuffer(), nullptr);
@@ -325,14 +338,21 @@ private:
         uboLayoutBinding.binding = 0;
         uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         uboLayoutBinding.descriptorCount = 1;
-
         uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
         uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
 
+        VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
+        samplerLayoutBinding.binding = 1;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
+        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
         VkDescriptorSetLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = 1;
-        layoutInfo.pBindings = &uboLayoutBinding;
+        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+        layoutInfo.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(vk.device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor set layout!");
@@ -501,7 +521,6 @@ private:
         }
     }
 
-
     void createCommandBuffers() {
         commandBuffers.resize(swapChainFramebuffers.size());
 
@@ -538,9 +557,9 @@ private:
 
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-            mesh->BindCommandsToBuffer(commandBuffers[i]);
+            mesh1->BindCommandsToBuffer(commandBuffers[i]);
 
-            //mesh1->BindCommandsToBuffer(commandBuffers[i]);
+            mesh->BindCommandsToBuffer(commandBuffers[i]);
 
             vkCmdEndRenderPass(commandBuffers[i]);
 

@@ -106,7 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -142,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -159,6 +159,7 @@
     <ClCompile Include="..\src\Renderer\Buffer.cpp" />
     <ClCompile Include="..\src\Renderer\Camera.cpp" />
     <ClCompile Include="..\src\Renderer\StaticMesh.cpp" />
+    <ClCompile Include="..\src\Renderer\Texture.cpp" />
     <ClCompile Include="..\src\Renderer\Utils\CopyBuffer.cpp" />
     <ClCompile Include="..\src\VulkanInstance.cpp" />
   </ItemGroup>
@@ -166,9 +167,9 @@
     <ClInclude Include="..\src\Renderer\Buffer.h" />
     <ClInclude Include="..\src\Renderer\Camera.h" />
     <ClInclude Include="..\src\Renderer\StaticMesh.h" />
+    <ClInclude Include="..\src\Renderer\Texture.h" />
     <ClInclude Include="..\src\Renderer\Utils\CopyBuffer.h" />
     <ClInclude Include="..\src\Renderer\Vertex.h" />
-    <ClInclude Include="..\src\VulkanApplication-1.h" />
     <ClInclude Include="..\src\VulkanApplication.h" />
     <ClInclude Include="..\src\VulkanInstance.h" />
   </ItemGroup>

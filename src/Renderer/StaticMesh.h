@@ -3,6 +3,7 @@
 #include <vector>
 #include "Buffer.h"
 #include "Camera.h"
+#include "Texture.h"
 
 class VulkanInstance;
 /**
@@ -22,6 +23,8 @@ private:
 
 	UniformBufferObject _ubo;
 	Buffer _uniformBuffer;
+
+	Texture _texture;
 
 	VkDescriptorSetLayout* _descriptorLayout;
 	VkPipelineLayout* _pipelineLayout;

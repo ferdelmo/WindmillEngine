@@ -9,7 +9,7 @@
 StaticMesh::StaticMesh(VulkanInstance* vk, const std::vector<Vertex>& vertices, const std::vector<Index>& indices,
 	VkDescriptorSetLayout* descriptorLayout, VkPipelineLayout* pipelineLayout)
 	: _vertices(vertices), _indices(indices), _vertexBuffer(vk), _indexBuffer(vk), _uniformBuffer(vk), 
-	_vk(vk), _descriptorLayout(descriptorLayout), _pipelineLayout(pipelineLayout) {
+	_vk(vk), _descriptorLayout(descriptorLayout), _pipelineLayout(pipelineLayout), _texture(vk) {
 	_ubo.model = glm::mat4(1.0f);
 }
 
@@ -32,6 +32,8 @@ void StaticMesh::Initialize() {
 	_uniformBuffer.Initialize(uniform, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
+	_texture.Initialize("../bin/textures/texture.jpg");
+
 	CreateDescriptorPool();
 	CreateDescriptoSet();
 }
@@ -40,7 +42,7 @@ void StaticMesh::Update(float deltaTime) {
 	static float rot = 0;
 	float actualRot = 90 * deltaTime;
 	rot += actualRot;
-	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 0.0f, 1.0f));
+	//_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 0.0f, 1.0f));
 	
 	std::vector<UniformBufferObject> uniform = { _ubo };
 	_uniformBuffer.Fill(uniform);
@@ -87,15 +89,16 @@ std::vector<Vertex> StaticMesh::GetVertices() {
 
 
 void StaticMesh::CreateDescriptorPool() {
-	VkDescriptorPoolSize poolSize = {};
-	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSize.descriptorCount = static_cast<uint32_t>(1);
+	std::array<VkDescriptorPoolSize, 2> poolSizes = {};
+	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSizes[0].descriptorCount = static_cast<uint32_t>(1);
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[1].descriptorCount = static_cast<uint32_t>(1);
 
 	VkDescriptorPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = 1;
-	poolInfo.pPoolSizes = &poolSize;
-
+	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(1);
 
 	if (vkCreateDescriptorPool(_vk->device, &poolInfo, nullptr, &_descriptorPool) != VK_SUCCESS) {
@@ -119,19 +122,33 @@ void StaticMesh::CreateDescriptoSet() {
 	bufferInfo.offset = 0;
 	bufferInfo.range = sizeof(UniformBufferObject);
 
-	VkWriteDescriptorSet descriptorWrite = {};
-	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	descriptorWrite.dstSet = _descriptorSet;
-	descriptorWrite.dstBinding = 0;
-	descriptorWrite.dstArrayElement = 0;
+	VkDescriptorImageInfo imageInfo = {};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = _texture.GetImageView();
+	imageInfo.sampler = _texture.GetImageSampler();
 
-	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorWrite.descriptorCount = 1;
+	std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
 
-	descriptorWrite.pBufferInfo = &bufferInfo;
-	descriptorWrite.pImageInfo = nullptr; // Optional
-	descriptorWrite.pTexelBufferView = nullptr; // Optional
+	descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrites[0].dstSet = _descriptorSet;
+	descriptorWrites[0].dstBinding = 0;
+	descriptorWrites[0].dstArrayElement = 0;
+	descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrites[0].descriptorCount = 1;
+	descriptorWrites[0].pBufferInfo = &bufferInfo;
+	descriptorWrites[0].pImageInfo = nullptr; // Optional
+	descriptorWrites[0].pTexelBufferView = nullptr; // Optional
 
-	vkUpdateDescriptorSets(_vk->device, 1, &descriptorWrite, 0, nullptr);
+	descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrites[1].dstSet = _descriptorSet;
+	descriptorWrites[1].dstBinding = 1;
+	descriptorWrites[1].dstArrayElement = 0;
+	descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	descriptorWrites[1].descriptorCount = 1;
+	descriptorWrites[1].pImageInfo = &imageInfo;
+	descriptorWrites[1].pTexelBufferView = nullptr; // Optional
+
+	vkUpdateDescriptorSets(_vk->device, static_cast<uint32_t>(descriptorWrites.size()), 
+		descriptorWrites.data(), 0, nullptr);
 
 }
