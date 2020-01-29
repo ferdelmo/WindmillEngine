@@ -6,10 +6,10 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 
-StaticMesh::StaticMesh(VulkanInstance* vk, const std::vector<Vertex>& vertices, const std::vector<Index>& indices,
+StaticMesh::StaticMesh(VulkanInstance* vk, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
 	VkDescriptorSetLayout* descriptorLayout, VkPipelineLayout* pipelineLayout)
-	: _vertices(vertices), _indices(indices), _vertexBuffer(vk), _indexBuffer(vk), _uniformBuffer(vk), 
-	_vk(vk), _descriptorLayout(descriptorLayout), _pipelineLayout(pipelineLayout), _texture(vk) {
+	: _vertices(vertices), _indices(indices), _vertexBuffer(vk), _indexBuffer(vk), _uniformBuffer(vk), _pathToTexture(texture), _texture(vk),
+	_vk(vk), _descriptorLayout(descriptorLayout), _pipelineLayout(pipelineLayout)  {
 	_ubo.model = glm::mat4(1.0f);
 }
 
@@ -32,7 +32,7 @@ void StaticMesh::Initialize() {
 	_uniformBuffer.Initialize(uniform, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-	_texture.Initialize("../bin/textures/texture.jpg");
+	_texture.Initialize(_pathToTexture);
 
 	CreateDescriptorPool();
 	CreateDescriptoSet();

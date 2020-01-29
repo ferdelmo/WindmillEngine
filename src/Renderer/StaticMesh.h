@@ -24,6 +24,7 @@ private:
 	UniformBufferObject _ubo;
 	Buffer _uniformBuffer;
 
+	std::string _pathToTexture;
 	Texture _texture;
 
 	VkDescriptorSetLayout* _descriptorLayout;
@@ -47,7 +48,7 @@ public:
 	/*
 		Constructor with a list of vertices and indices
 	*/
-	StaticMesh(VulkanInstance* vk, const std::vector<Vertex>& vertices, const std::vector<Index>& indices,
+	StaticMesh(VulkanInstance* vk, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
 		VkDescriptorSetLayout* _descriptorLayout, VkPipelineLayout* _pipelineLayout);
 
 	~StaticMesh();

@@ -122,8 +122,8 @@ private:
 
         cam = Camera(glm::vec3(-2.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 60, 16 / 9.0f, 0.1f, 100.0f);
 
-        mesh = new StaticMesh(&vk, vertices, indices, &descriptorSetLayout, &pipelineLayout);
-        mesh1 = new StaticMesh(&vk, vertices1, indices1, &descriptorSetLayout, &pipelineLayout);
+        mesh = new StaticMesh(&vk, vertices, indices, "../resources/textures/texture.jpg", &descriptorSetLayout, &pipelineLayout);
+        mesh1 = new StaticMesh(&vk, vertices1, indices1, "../resources/textures/texture.jpg", &descriptorSetLayout, &pipelineLayout);
 
         mesh->SetCamera(cam);
         mesh1->SetCamera(cam);
@@ -361,8 +361,8 @@ private:
     }
 
     void createGraphicsPipeline() {
-        auto vertShaderCode = readFile("../bin/shaders/vert.spv");
-        auto fragShaderCode = readFile("../bin/shaders/frag.spv");
+        auto vertShaderCode = readFile("../resources/shaders/vert.spv");
+        auto fragShaderCode = readFile("../resources/shaders/frag.spv");
         
         /*
             LOAD AND CREATE THE SHADER MODULES
