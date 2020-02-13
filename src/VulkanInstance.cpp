@@ -1,12 +1,14 @@
 #include "VulkanInstance.h"
 
 #include "GLFW/glfw3.h"
+#include <vulkan/vulkan.h>
 
 #include <stdexcept>
 #include <iostream>
 #include <set>
 
 VulkanInstance::VulkanInstance() {
+
 }
 
 VulkanInstance::VulkanInstance(int width, int height, const std::vector<const char*>& validationLayers, const std::vector<const char*>& deviceExtensions) {

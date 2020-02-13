@@ -17,22 +17,22 @@ class VulkanInstance
 {
 public:
 	//Pointer to the window where the app runs
-	GLFWwindow* window;
+	GLFWwindow* window = nullptr;
 	int width = 1080, height = 720;
 
 
 	//Vulkan instance
-	VkInstance instance;
-	VkDebugUtilsMessengerEXT debugMessenger;
-	VkSurfaceKHR surface;
+	VkInstance instance = VK_NULL_HANDLE;
+	VkDebugUtilsMessengerEXT debugMessenger = VK_NULL_HANDLE;
+	VkSurfaceKHR surface = VK_NULL_HANDLE;
 
 	//Physical and logical devices
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-	VkDevice device;
+	VkDevice device = VK_NULL_HANDLE;
 
 	//Queues of the device (graphics family and present famlily)
-	VkQueue graphicsQueue;
-	VkQueue presentQueue;
+	VkQueue graphicsQueue = VK_NULL_HANDLE;
+	VkQueue presentQueue = VK_NULL_HANDLE;
 
 	bool framebufferResized = false;
 
