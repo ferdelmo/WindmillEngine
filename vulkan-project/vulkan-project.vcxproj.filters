@@ -1,78 +1,145 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
+    <Filter Include="src">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="src\RenderEngine">
+      <UniqueIdentifier>{ac8cc95c-89ff-4668-b8c6-e80618c14f23}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer">
-      <UniqueIdentifier>{09d8f714-ecb5-4357-afdc-d5475bd00586}</UniqueIdentifier>
+    <Filter Include="src\RenderEngine\Renderer">
+      <UniqueIdentifier>{35d21dc4-b746-4d84-a8e2-8d7375533181}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Renderer">
-      <UniqueIdentifier>{47b3cdac-515e-4aa6-8027-544c1831fb82}</UniqueIdentifier>
+    <Filter Include="src\RenderEngine\Renderer\Utils">
+      <UniqueIdentifier>{d9b021da-45ae-4023-a566-b4024edffafa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Renderer\Utils">
-      <UniqueIdentifier>{4102379b-491f-4435-a8e3-70ae157ad351}</UniqueIdentifier>
+    <Filter Include="src\Engine">
+      <UniqueIdentifier>{57eb5116-0f1d-4a7c-b17a-59f723133f5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Utils">
-      <UniqueIdentifier>{adb28644-47b3-449c-96c6-c78a7c58cf42}</UniqueIdentifier>
+    <Filter Include="src\Core">
+      <UniqueIdentifier>{65fc1c1f-208f-4eca-8fc7-8635bee780ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\RenderEngine\RenderThread">
+      <UniqueIdentifier>{a3a09a82-bab2-4287-a453-7bd53c7cae7d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\RenderEngine\main.cpp">
+      <Filter>src\RenderEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\VulkanInstance.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\RenderEngine\VulkanInstance.cpp">
+      <Filter>src\RenderEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\StaticMesh.cpp">
-      <Filter>Source Files\Renderer</Filter>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Buffer.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Buffer.cpp">
-      <Filter>Source Files\Renderer</Filter>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Camera.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Utils\CopyBuffer.cpp">
-      <Filter>Source Files\Renderer\Utils</Filter>
+    <ClCompile Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Camera.cpp">
-      <Filter>Source Files\Renderer</Filter>
+    <ClCompile Include="..\src\RenderEngine\Renderer\GraphicsPipeline.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Texture.cpp">
-      <Filter>Source Files\Renderer</Filter>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Image.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\RenderPass.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Shader.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\StaticMesh.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Texture.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Utils\CopyBuffer.cpp">
+      <Filter>src\RenderEngine\Renderer\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine\GameObject.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Transform.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine\StaticMeshComponent.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine\World.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\RenderThread\RenderThread.cpp">
+      <Filter>src\RenderEngine\RenderThread</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\VulkanInstance.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\src\RenderEngine\VulkanApplication.h">
+      <Filter>src\RenderEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\Vertex.h">
-      <Filter>Header Files\Renderer</Filter>
+    <ClInclude Include="..\src\RenderEngine\VulkanApplication-1.h">
+      <Filter>src\RenderEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\StaticMesh.h">
-      <Filter>Header Files\Renderer</Filter>
+    <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
+      <Filter>src\RenderEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\Buffer.h">
-      <Filter>Header Files\Renderer</Filter>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Buffer.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\Utils\CopyBuffer.h">
-      <Filter>Header Files\Renderer\Utils</Filter>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Camera.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\VulkanApplication.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\Camera.h">
-      <Filter>Header Files\Renderer</Filter>
+    <ClInclude Include="..\src\RenderEngine\Renderer\GraphicsPipeline.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\Texture.h">
-      <Filter>Header Files\Renderer</Filter>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Image.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\RenderPass.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Shader.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\StaticMesh.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Texture.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Vertex.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Utils\CopyBuffer.h">
+      <Filter>src\RenderEngine\Renderer\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\GameObject.h">
+      <Filter>src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Transform.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Vector3.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\Component.h">
+      <Filter>src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\StaticMeshComponent.h">
+      <Filter>src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\World.h">
+      <Filter>src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\RenderThread\RenderThread.h">
+      <Filter>src\RenderEngine\RenderThread</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

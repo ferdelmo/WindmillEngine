@@ -18,6 +18,48 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Core\Transform.cpp" />
+    <ClCompile Include="..\src\Engine\GameObject.cpp" />
+    <ClCompile Include="..\src\Engine\StaticMeshComponent.cpp" />
+    <ClCompile Include="..\src\Engine\World.cpp" />
+    <ClCompile Include="..\src\RenderEngine\main.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Buffer.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Camera.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\GraphicsPipeline.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Image.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\RenderPass.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Shader.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\StaticMesh.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Texture.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Utils\CopyBuffer.cpp" />
+    <ClCompile Include="..\src\RenderEngine\RenderThread\RenderThread.cpp" />
+    <ClCompile Include="..\src\RenderEngine\VulkanInstance.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Core\Transform.h" />
+    <ClInclude Include="..\src\Core\Vector3.h" />
+    <ClInclude Include="..\src\Engine\Component.h" />
+    <ClInclude Include="..\src\Engine\GameObject.h" />
+    <ClInclude Include="..\src\Engine\StaticMeshComponent.h" />
+    <ClInclude Include="..\src\Engine\World.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Buffer.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Camera.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\GraphicsPipeline.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Image.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\RenderPass.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Shader.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\StaticMesh.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Texture.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Utils\CopyBuffer.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Vertex.h" />
+    <ClInclude Include="..\src\RenderEngine\RenderThread\RenderThread.h" />
+    <ClInclude Include="..\src\RenderEngine\VulkanApplication-1.h" />
+    <ClInclude Include="..\src\RenderEngine\VulkanApplication.h" />
+    <ClInclude Include="..\src\RenderEngine\VulkanInstance.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{CDBBE015-23E5-460C-A562-F438D2A0E0E8}</ProjectGuid>
@@ -106,7 +148,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\src;D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -142,7 +184,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\src;D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -154,25 +196,6 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Renderer\Buffer.cpp" />
-    <ClCompile Include="..\src\Renderer\Camera.cpp" />
-    <ClCompile Include="..\src\Renderer\StaticMesh.cpp" />
-    <ClCompile Include="..\src\Renderer\Texture.cpp" />
-    <ClCompile Include="..\src\Renderer\Utils\CopyBuffer.cpp" />
-    <ClCompile Include="..\src\VulkanInstance.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\Renderer\Buffer.h" />
-    <ClInclude Include="..\src\Renderer\Camera.h" />
-    <ClInclude Include="..\src\Renderer\StaticMesh.h" />
-    <ClInclude Include="..\src\Renderer\Texture.h" />
-    <ClInclude Include="..\src\Renderer\Utils\CopyBuffer.h" />
-    <ClInclude Include="..\src\Renderer\Vertex.h" />
-    <ClInclude Include="..\src\VulkanApplication.h" />
-    <ClInclude Include="..\src\VulkanInstance.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
