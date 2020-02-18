@@ -15,6 +15,8 @@ class RenderPass
 private:
 	VkRenderPass _renderPass;
 
+	Image* _depthImage;
+
 public:
 	RenderPass();
 
@@ -26,5 +28,7 @@ public:
 	void Initialize(VkFormat format, Image* depthImage);
 
 	VkRenderPass& GetRenderPass();
+
+	Image* GetDepthImage();
 };
 

@@ -148,16 +148,6 @@ private:
         scissor.offset = { 0, 0 };
         scissor.extent = swapChainExtent;
 
-        VkFormat depthFormat = depthImage->FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-            VK_IMAGE_TILING_OPTIMAL,
-            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
-
-        depthImage = Image::CreateImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, 
-            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
-
-        renderPass = new RenderPass();
-        renderPass->Initialize(swapChainImageFormat, depthImage);
-
         pipeline->Initialize(renderPass, vertex, fragment, swapChainImageFormat, viewport, scissor);
 
         createFramebuffers();

@@ -14,6 +14,8 @@ RenderPass::~RenderPass() {
 }
 
 void RenderPass::Initialize(VkFormat format, Image* depthImage) {
+    this->_depthImage = depthImage;
+
     /* Color attachment */
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = format;
@@ -76,4 +78,9 @@ void RenderPass::Initialize(VkFormat format, Image* depthImage) {
 
 VkRenderPass& RenderPass::GetRenderPass() {
     return _renderPass;
+}
+
+
+Image* RenderPass::GetDepthImage() {
+    return _depthImage;
 }

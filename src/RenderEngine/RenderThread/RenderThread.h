@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <thread>
 #include <vector>
+#include <atomic>
+
 #include "RenderEngine/Renderer/Renderizable.h"
 
 class VulkanInstance;
@@ -16,7 +18,6 @@ class RenderPass;
 class RenderThread
 {
 private:
-	VulkanInstance* _vk;
 
 	bool _initialized = false;
 
@@ -44,12 +45,11 @@ private:
 	std::vector<VkFence> imagesInFlight;
 	size_t currentFrame = 0;
 
-	Image* depthImage;
-
 	RenderPass* renderPass;
 
 	std::vector<Renderizable*> objects;
 
+	std::vector<Renderizable*> objectsToAdd;
 
 	static RenderThread* _instance;
 
@@ -71,6 +71,8 @@ private:
 
 	void CreateSyncObjects();
 
+	void CleanupSwapChain();
+
 	void RecreateSwapChain();
 
 public:
@@ -81,8 +83,11 @@ public:
 	/* Get the singleton */
 	static RenderThread& GetInstance();
 
+	/* Initializate swapchain, needed to call before using GetFormat, GetExtent*/
+	void InitializeSwapChain();
+
 	/* Initialize the window, vulkan and other things */
-	void Initizalize();
+	void Initialize(RenderPass* renderPass);
 
 	/* Start the render thread */
 	void StartThread();
@@ -90,6 +95,20 @@ public:
 	/* Stop the render thread */
 	void StopThread();
 
+	/* Re record the command buffers orders with the list */
 	void UpdateCommandBuffers();
+
+	/* Add renderizable to the render */
+	void AddObject(Renderizable* obj);
+	
+	VkFormat GetFormat() const {
+		return swapChainImageFormat;
+	}
+
+	VkExtent2D GetExtent() const {
+		return swapChainExtent;
+	}
+
+	std::atomic<int> frames;
 };
 

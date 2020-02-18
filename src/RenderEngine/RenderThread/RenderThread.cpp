@@ -7,7 +7,7 @@
 #include "RenderEngine/Renderer/Image.h"
 #include "RenderEngine/Renderer/RenderPass.h"
 
-RenderThread::RenderThread() : _initialized(false), _vk(&VulkanInstance::GetInstance()){
+RenderThread::RenderThread() : _initialized(false), objects(0), objectsToAdd() {
 	
 }
 
@@ -25,10 +25,21 @@ void RenderThread::MainLoop() {
 	while (_running) {
 		glfwPollEvents();
 		DrawFrame();
+        frames++;
 	}
 }
 
 void RenderThread::DrawFrame() {
+    if (objectsToAdd.size() > 0) {
+        for (int i = 0; i < objectsToAdd.size(); i++) {
+            objects.push_back(objectsToAdd[i]);
+        }
+
+        objectsToAdd.clear();
+
+        UpdateCommandBuffers();
+    }
+
     vkWaitForFences(VulkanInstance::GetInstance().device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
@@ -102,32 +113,26 @@ RenderThread& RenderThread::GetInstance() {
 	return *_instance;
 }
 
+void RenderThread::InitializeSwapChain() {
 
-void RenderThread::Initizalize() {
+    CreateSwapChain();
+    CreateImageViews();
+}
+
+void RenderThread::Initialize(RenderPass* renderPass) {
 	if (_initialized) {
 		throw std::runtime_error("RenderThread::Initizalize: Alredy initialized!");
 		return;
 	}
 
-    VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-        VK_IMAGE_TILING_OPTIMAL,
-        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
-
-    depthImage = Image::CreateImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
-        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
-
-    CreateSwapChain();
-    CreateImageViews();
-
-    renderPass = new RenderPass();
-    renderPass->Initialize(swapChainImageFormat, depthImage);
-
+    this->renderPass = renderPass;
 
     CreateFramebuffers();
     CreateCommandPool();
     CreateCommandBuffers();
     CreateSyncObjects();
 
+    _initialized = true;
 }
 
 void RenderThread::StartThread() {
@@ -150,13 +155,19 @@ void RenderThread::StopThread() {
 		throw std::runtime_error("RenderThread::StopThread: mainThread is not running");
 	}
 
-	_running = false;
+    _running = false;
+    _mainThread->join();
 	delete _mainThread;
 	_mainThread = nullptr;
 }
 
 void RenderThread::UpdateCommandBuffers() {
     for (size_t i = 0; i < commandBuffers.size(); i++) {
+
+        if (vkResetCommandBuffer(commandBuffers[i], 0)) {
+            throw std::runtime_error("failed to reset the command buffer!");
+        }
+
         VkCommandBufferBeginInfo beginInfo = {};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -279,7 +290,7 @@ void RenderThread::CreateFramebuffers() {
     for (size_t i = 0; i < swapChainImageViews.size(); i++) {
         std::array<VkImageView, 2> attachments = {
             swapChainImageViews[i],
-            depthImage->GetImageView()
+            renderPass->GetDepthImage()->GetImageView()
         };
 
         VkFramebufferCreateInfo framebufferInfo = {};
@@ -303,6 +314,7 @@ void RenderThread::CreateCommandPool() {
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
     if (vkCreateCommandPool(VulkanInstance::GetInstance().device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics command pool!");
@@ -345,7 +357,20 @@ void RenderThread::CreateSyncObjects() {
     }
 }
 
+void RenderThread::CleanupSwapChain() {
+    for (auto framebuffer : swapChainFramebuffers) {
+        vkDestroyFramebuffer(VulkanInstance::GetInstance().device, framebuffer, nullptr);
+    }
 
+    vkFreeCommandBuffers(VulkanInstance::GetInstance().device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+
+
+    for (auto imageView : swapChainImageViews) {
+        vkDestroyImageView(VulkanInstance::GetInstance().device, imageView, nullptr);
+    }
+
+    vkDestroySwapchainKHR(VulkanInstance::GetInstance().device, swapChain, nullptr);
+}
 
 void RenderThread::RecreateSwapChain() {
     int width = 0, height = 0;
@@ -357,10 +382,14 @@ void RenderThread::RecreateSwapChain() {
 
     vkDeviceWaitIdle(VulkanInstance::GetInstance().device);
 
-    //CleanupSwapChain();
+    CleanupSwapChain();
 
     CreateSwapChain();
     CreateImageViews();
     CreateFramebuffers();
     CreateCommandBuffers();
+}
+
+void RenderThread::AddObject(Renderizable* obj) {
+    objectsToAdd.push_back(obj);
 }
