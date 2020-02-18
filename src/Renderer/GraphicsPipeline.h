@@ -7,6 +7,8 @@ class VulkanInstance;
 class Shader;
 class RenderPass;
 class DescriptorSetLayout;
+class Image;
+
 /*
 	Class to generaliza a Graphic Pipeline an its configuration, to be used by materials and other render objects
 
@@ -15,8 +17,6 @@ class DescriptorSetLayout;
 class GraphicsPipeline
 {
 private:
-	VulkanInstance* _vk;
-
 	std::vector<Shader*> _shaders;
 
 	RenderPass* _renderPass;
@@ -28,7 +28,7 @@ private:
 	VkPipeline _graphicsPipeline;
 
 public:
-	GraphicsPipeline(VulkanInstance* vk);
+	GraphicsPipeline();
 
 	~GraphicsPipeline();
 
@@ -38,7 +38,7 @@ public:
 		TODO: more configuration
 	*/
 	void Initialize(Shader* vertex, Shader* fragment, VkFormat format,
-		VkViewport viewport, VkRect2D scissor);
+		VkViewport viewport, VkRect2D scissor, Image& depthImage);
 
 	RenderPass* GetRenderPass() {
 		return _renderPass;

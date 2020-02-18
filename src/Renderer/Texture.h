@@ -14,6 +14,8 @@ class VulkanInstance;
 		TODO: do this class more configurablee
 	-------------------------------------------------------------------------------------
 
+	CHANGE THIS CLASS FOR A TEXTURE WITH A IMAGE, TO REUTILIZE CODE
+
 *	@author Fernando del Molino
 */
 class Texture
@@ -32,9 +34,6 @@ private:
 	//texture sampler
 	VkSampler _imageSampler;
 
-	//vlikan instance
-	VulkanInstance* _vk;
-
 	//bool to check if the buffer is initialized
 	bool _init = false;
 
@@ -48,9 +47,6 @@ public:
 
 	//default constructor
 	Texture();
-
-	//constructor with the vulkan instance used
-	Texture(VulkanInstance* vk);
 
 	~Texture();
 

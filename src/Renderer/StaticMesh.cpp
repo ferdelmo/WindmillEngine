@@ -6,15 +6,15 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 
-StaticMesh::StaticMesh(VulkanInstance* vk, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
+StaticMesh::StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
 	VkDescriptorSetLayout* descriptorLayout, VkPipelineLayout* pipelineLayout)
-	: _vertices(vertices), _indices(indices), _vertexBuffer(vk), _indexBuffer(vk), _uniformBuffer(vk), _pathToTexture(texture), _texture(vk),
-	_vk(vk), _descriptorLayout(descriptorLayout), _pipelineLayout(pipelineLayout)  {
+	: _vertices(vertices), _indices(indices), _vertexBuffer(), _indexBuffer(), _uniformBuffer(), _pathToTexture(texture), _texture(),
+	_descriptorLayout(descriptorLayout), _pipelineLayout(pipelineLayout)  {
 	_ubo.model = glm::mat4(1.0f);
 }
 
 StaticMesh::~StaticMesh() {
-	vkDestroyDescriptorPool(_vk->device, _descriptorPool, nullptr);
+	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
 }
 
 /*
@@ -101,7 +101,7 @@ void StaticMesh::CreateDescriptorPool() {
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(1);
 
-	if (vkCreateDescriptorPool(_vk->device, &poolInfo, nullptr, &_descriptorPool) != VK_SUCCESS) {
+	if (vkCreateDescriptorPool(VulkanInstance::GetInstance().device, &poolInfo, nullptr, &_descriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool!");
 	}
 }
@@ -113,7 +113,7 @@ void StaticMesh::CreateDescriptoSet() {
 	allocInfo.descriptorSetCount = static_cast<uint32_t>(1);
 	allocInfo.pSetLayouts = _descriptorLayout;
 
-	if (vkAllocateDescriptorSets(_vk->device, &allocInfo, &_descriptorSet) != VK_SUCCESS) {
+	if (vkAllocateDescriptorSets(VulkanInstance::GetInstance().device, &allocInfo, &_descriptorSet) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 
@@ -148,7 +148,7 @@ void StaticMesh::CreateDescriptoSet() {
 	descriptorWrites[1].pImageInfo = &imageInfo;
 	descriptorWrites[1].pTexelBufferView = nullptr; // Optional
 
-	vkUpdateDescriptorSets(_vk->device, static_cast<uint32_t>(descriptorWrites.size()), 
+	vkUpdateDescriptorSets(VulkanInstance::GetInstance().device, static_cast<uint32_t>(descriptorWrites.size()),
 		descriptorWrites.data(), 0, nullptr);
 
 }

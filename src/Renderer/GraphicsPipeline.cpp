@@ -3,23 +3,24 @@
 #include "Shader.h"
 #include "Vertex.h"
 #include "DescriptorSetLayout.h"
+#include "Image.h"
 
 
-GraphicsPipeline::GraphicsPipeline(VulkanInstance* vk) : _vk(vk), _shaders(0) {
-	_renderPass = new RenderPass(vk);
+GraphicsPipeline::GraphicsPipeline() : _shaders(0) {
+	_renderPass = new RenderPass();
 }
 
 GraphicsPipeline::~GraphicsPipeline() {
 	delete _renderPass;
 
 
-    vkDestroyPipeline(_vk->device, _graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(_vk->device, _pipelineLayout, nullptr);
+    vkDestroyPipeline(VulkanInstance::GetInstance().device, _graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(VulkanInstance::GetInstance().device, _pipelineLayout, nullptr);
 }
 
 void GraphicsPipeline::Initialize(Shader* vertex, Shader* fragment,  VkFormat format, 
-    VkViewport viewport, VkRect2D scissor) {
-	_renderPass->Initialize(format);
+    VkViewport viewport, VkRect2D scissor, Image& depthImage) {
+	_renderPass->Initialize(format, depthImage);
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = vertex->GetStage();
@@ -92,7 +93,7 @@ void GraphicsPipeline::Initialize(Shader* vertex, Shader* fragment,  VkFormat fo
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
 
-    _descriptorSetLayout = new DescriptorSetLayout(_vk);
+    _descriptorSetLayout = new DescriptorSetLayout();
     std::vector<DescriptorSetLayoutBinding> bindings(0);
     std::vector<DescriptorSetLayoutBinding> vertexBindings = vertex->GetDescriptorSetLayoutBindings();
 
@@ -113,9 +114,25 @@ void GraphicsPipeline::Initialize(Shader* vertex, Shader* fragment,  VkFormat fo
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout->GetDescriptor();
 
-    if (vkCreatePipelineLayout(_vk->device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(VulkanInstance::GetInstance().device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("GraphicsPipeline::Initialize: failed to create pipeline layout!");
     }
+
+    //stencil info for the depth image
+    VkPipelineDepthStencilStateCreateInfo depthStencil = {};
+    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depthStencil.depthTestEnable = VK_TRUE;
+    depthStencil.depthWriteEnable = VK_TRUE;
+    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+
+    depthStencil.depthBoundsTestEnable = VK_FALSE;
+    depthStencil.minDepthBounds = 0.0f; // Optional
+    depthStencil.maxDepthBounds = 1.0f; // Optional
+
+    depthStencil.stencilTestEnable = VK_FALSE;
+    depthStencil.front = {}; // Optional
+    depthStencil.back = {}; // Optional
+
 
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -132,7 +149,9 @@ void GraphicsPipeline::Initialize(Shader* vertex, Shader* fragment,  VkFormat fo
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(_vk->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline) != VK_SUCCESS) {
+    pipelineInfo.pDepthStencilState = &depthStencil;
+
+    if (vkCreateGraphicsPipelines(VulkanInstance::GetInstance().device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 }

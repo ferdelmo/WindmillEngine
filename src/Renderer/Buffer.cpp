@@ -5,15 +5,12 @@ Buffer::Buffer() {
 	_init = false;
 }
 
-Buffer::Buffer(VulkanInstance* vk) : _vk(vk) {
-}
-
 
 
 Buffer::~Buffer() {
 
-	vkDestroyBuffer(_vk->device, _buffer, nullptr);
-	vkFreeMemory(_vk->device, _bufferMemory, nullptr);
+	vkDestroyBuffer(VulkanInstance::GetInstance().device, _buffer, nullptr);
+	vkFreeMemory(VulkanInstance::GetInstance().device, _bufferMemory, nullptr);
 }
 
 
@@ -119,7 +116,7 @@ VkDeviceMemory& Buffer::GetBufferMemory() {
 */
 uint32_t Buffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 	VkPhysicalDeviceMemoryProperties memProperties;
-	vkGetPhysicalDeviceMemoryProperties(_vk->physicalDevice, &memProperties);
+	vkGetPhysicalDeviceMemoryProperties(VulkanInstance::GetInstance().physicalDevice, &memProperties);
 
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
 		if ((typeFilter & (1 << i)) &&
@@ -129,8 +126,4 @@ uint32_t Buffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags prope
 	}
 
 	throw std::runtime_error("Buffer::FindMemoryType: failed to find suitable memory type!");
-}
-
-void Buffer::SetVulkanInstance(VulkanInstance* vk) {
-	_vk = vk;
 }

@@ -33,7 +33,6 @@ private:
 	VkDescriptorPool _descriptorPool;
 	VkDescriptorSet _descriptorSet;
 
-	VulkanInstance* _vk;
 	/*
 		Create the descriptorPool
 	*/
@@ -48,7 +47,7 @@ public:
 	/*
 		Constructor with a list of vertices and indices
 	*/
-	StaticMesh(VulkanInstance* vk, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
+	StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
 		VkDescriptorSetLayout* _descriptorLayout, VkPipelineLayout* _pipelineLayout);
 
 	~StaticMesh();

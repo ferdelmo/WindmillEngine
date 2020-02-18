@@ -7,13 +7,13 @@
 
 #include "../VulkanInstance.h"
 
-Shader::Shader(VulkanInstance* vk) : _vk(vk), _shaderModule(nullptr), _descriptorSetLayoutBindings(0)
+Shader::Shader() :  _shaderModule(nullptr), _descriptorSetLayoutBindings(0)
 {
 
 }
 
 Shader::~Shader() {
-    vkDestroyShaderModule(_vk->device, _shaderModule, nullptr);
+    vkDestroyShaderModule(VulkanInstance::GetInstance().device, _shaderModule, nullptr);
 }
 
 
@@ -35,7 +35,7 @@ void Shader::CreateShaderModule(const std::string& path) {
     createInfo.codeSize = code.size();
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-    if (vkCreateShaderModule(_vk->device, &createInfo, nullptr, &_shaderModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(VulkanInstance::GetInstance().device, &createInfo, nullptr, &_shaderModule) != VK_SUCCESS) {
         throw std::runtime_error("Shader::Initialize: failed to create shader module!");
     }
 }

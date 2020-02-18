@@ -16,8 +16,6 @@ class VulkanInstance;
 class Shader
 {
 private:
-    VulkanInstance* _vk;
-
 	VkShaderModule _shaderModule;
 
 	std::vector<DescriptorSetLayoutBinding> _descriptorSetLayoutBindings;
@@ -32,7 +30,7 @@ private:
 
 public:
 
-    Shader(VulkanInstance* vk);
+    Shader();
 
 	~Shader();
 

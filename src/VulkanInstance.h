@@ -77,12 +77,19 @@ public:
 		std::vector<VkPresentModeKHR> presentModes;
 	};
 
-public: 
+	static VulkanInstance* _instance;
+
+	/*
+		Should rethink this structure, as the isntance should be configurable. For now, to avoid
+		storing a pointer to the instance literally everywhere, use it like a singleton
+	*/
+
 	//Default constructor
 	VulkanInstance();
 
 	//Create a instance with the passed restrictions
 	VulkanInstance(int width, int height, const std::vector<const char*>& validationLayers, const std::vector<const char*>& deviceExtensions);
+public: 
 
 	/*
 		Initialize de instance, setup de debug messenger,  create a surface, pick the physical device and create the logical one
@@ -93,6 +100,11 @@ public:
 		Cleanup and destroy all the resources used
 	*/
 	void CleanUp();
+
+	/*
+		Acces the singleton
+	*/
+	static VulkanInstance& GetInstance();
 
 public:
 	/*

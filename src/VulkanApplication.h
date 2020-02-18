@@ -25,6 +25,7 @@
 #include "Renderer/Shader.h"
 #include "Renderer/DescriptorSetLayout.h"
 #include "Renderer/RenderPass.h"
+#include "Renderer/Image.h"
 
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
@@ -81,7 +82,10 @@ public:
     }
 
 private:
-    VulkanInstance vk;
+
+    /* for now this shouldnt exists, until the vulkan instance is more configurable and less hardcoded */
+
+    VulkanInstance* vk;
 
     VkSwapchainKHR swapChain;
     std::vector<VkImage> swapChainImages;
@@ -93,6 +97,9 @@ private:
     GraphicsPipeline* pipeline;
     Shader* vertex;
     Shader* fragment;
+
+    Image* depthImage;
+
     VkCommandPool commandPool;
 
     Camera cam;
@@ -109,19 +116,19 @@ private:
     size_t currentFrame = 0;
 
     void initVulkan() {
-        vk.Initialize();
+        vk = &VulkanInstance::GetInstance();
 
 
         createSwapChain();
         createImageViews();
 
-        pipeline = new GraphicsPipeline(&vk);
-        vertex = new Shader(&vk);
+        pipeline = new GraphicsPipeline();
+        vertex = new Shader();
         std::vector<DescriptorSetLayoutBinding> vertexDescriptor(0);
         vertexDescriptor.push_back(DescriptorSetLayoutBinding::GetUniform(0, 1, VK_SHADER_STAGE_VERTEX_BIT));
         vertex->Initialize("../resources/shaders/vert.spv", VK_SHADER_STAGE_VERTEX_BIT, vertexDescriptor);
 
-        fragment = new Shader(&vk);
+        fragment = new Shader();
         std::vector<DescriptorSetLayoutBinding> fragmentDescriptor(0);
         fragmentDescriptor.push_back(DescriptorSetLayoutBinding::GetImageSampler(1, 1, VK_SHADER_STAGE_FRAGMENT_BIT));
         fragment->Initialize("../resources/shaders/frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT, fragmentDescriptor);
@@ -139,15 +146,22 @@ private:
         scissor.offset = { 0, 0 };
         scissor.extent = swapChainExtent;
 
-        pipeline->Initialize(vertex, fragment, swapChainImageFormat, viewport, scissor);
+        VkFormat depthFormat = depthImage->FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+            VK_IMAGE_TILING_OPTIMAL,
+            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
+        depthImage = Image::CreateImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, 
+            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+        pipeline->Initialize(vertex, fragment, swapChainImageFormat, viewport, scissor, *depthImage);
 
         createFramebuffers();
 
         cam = Camera(glm::vec3(-2.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 60, 16 / 9.0f, 0.1f, 100.0f);
 
-        mesh = new StaticMesh(&vk, vertices, indices, "../resources/textures/texture.jpg", 
+        mesh = new StaticMesh(vertices, indices, "../resources/textures/texture.jpg", 
             &pipeline->GetDescriptorSetLayout()->GetDescriptor(), &(pipeline->GetPipelineLayout()));
-        mesh1 = new StaticMesh(&vk, vertices1, indices1, "../resources/textures/texture.jpg",
+        mesh1 = new StaticMesh(vertices1, indices1, "../resources/textures/texture.jpg",
             &pipeline->GetDescriptorSetLayout()->GetDescriptor(), &(pipeline->GetPipelineLayout()));
 
         mesh->SetCamera(cam);
@@ -165,7 +179,7 @@ private:
 
         auto startTime = std::chrono::high_resolution_clock::now();
         auto currentTime = std::chrono::high_resolution_clock::now();
-        while (!glfwWindowShouldClose(vk.window)) {
+        while (!glfwWindowShouldClose(VulkanInstance::GetInstance().window)) {
             glfwPollEvents();
             currentTime = std::chrono::high_resolution_clock::now(); 
             float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
@@ -176,22 +190,22 @@ private:
             
         }
 
-        vkDeviceWaitIdle(vk.device);
+        vkDeviceWaitIdle(VulkanInstance::GetInstance().device);
     }
 
     void cleanupSwapChain() {
         for (auto framebuffer : swapChainFramebuffers) {
-            vkDestroyFramebuffer(vk.device, framebuffer, nullptr);
+            vkDestroyFramebuffer(VulkanInstance::GetInstance().device, framebuffer, nullptr);
         }
 
-        vkFreeCommandBuffers(vk.device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+        vkFreeCommandBuffers(VulkanInstance::GetInstance().device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
 
         for (auto imageView : swapChainImageViews) {
-            vkDestroyImageView(vk.device, imageView, nullptr);
+            vkDestroyImageView(VulkanInstance::GetInstance().device, imageView, nullptr);
         }
 
-        vkDestroySwapchainKHR(vk.device, swapChain, nullptr);
+        vkDestroySwapchainKHR(VulkanInstance::GetInstance().device, swapChain, nullptr);
     }
 
     void cleanup() {
@@ -208,23 +222,23 @@ private:
         vkFreeMemory(*vk.device, *vertexBuffer.GetBufferMemory(), nullptr);
         */
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            vkDestroySemaphore(vk.device, renderFinishedSemaphores[i], nullptr);
-            vkDestroySemaphore(vk.device, imageAvailableSemaphores[i], nullptr);
-            vkDestroyFence(vk.device, inFlightFences[i], nullptr);
+            vkDestroySemaphore(VulkanInstance::GetInstance().device, renderFinishedSemaphores[i], nullptr);
+            vkDestroySemaphore(VulkanInstance::GetInstance().device, imageAvailableSemaphores[i], nullptr);
+            vkDestroyFence(VulkanInstance::GetInstance().device, inFlightFences[i], nullptr);
         }
 
-        vkDestroyCommandPool(vk.device, commandPool, nullptr);
+        vkDestroyCommandPool(VulkanInstance::GetInstance().device, commandPool, nullptr);
     }
 
     void recreateSwapChain() {
         int width = 0, height = 0;
-        glfwGetFramebufferSize(vk.window, &width, &height);
+        glfwGetFramebufferSize(VulkanInstance::GetInstance().window, &width, &height);
         while (width == 0 || height == 0) {
-            glfwGetFramebufferSize(vk.window, &width, &height);
+            glfwGetFramebufferSize(VulkanInstance::GetInstance().window, &width, &height);
             glfwWaitEvents();
         }
 
-        vkDeviceWaitIdle(vk.device);
+        vkDeviceWaitIdle(VulkanInstance::GetInstance().device);
 
         cleanupSwapChain();
 
@@ -235,7 +249,7 @@ private:
     }
 
     void createSwapChain() {
-        VulkanInstance::SwapChainSupportDetails swapChainSupport = vk.QuerySwapChainSupport(vk.physicalDevice);
+        VulkanInstance::SwapChainSupportDetails swapChainSupport = VulkanInstance::GetInstance().QuerySwapChainSupport(VulkanInstance::GetInstance().physicalDevice);
 
         VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
         VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -248,7 +262,7 @@ private:
 
         VkSwapchainCreateInfoKHR createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        createInfo.surface = vk.surface;
+        createInfo.surface = VulkanInstance::GetInstance().surface;
 
         createInfo.minImageCount = imageCount;
         createInfo.imageFormat = surfaceFormat.format;
@@ -257,7 +271,7 @@ private:
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        VulkanInstance::QueueFamilyIndices indices = vk.FindQueueFamilies(vk.physicalDevice);
+        VulkanInstance::QueueFamilyIndices indices = VulkanInstance::GetInstance().FindQueueFamilies(VulkanInstance::GetInstance().physicalDevice);
         uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
         if (indices.graphicsFamily != indices.presentFamily) {
@@ -274,13 +288,13 @@ private:
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
 
-        if (vkCreateSwapchainKHR(vk.device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+        if (vkCreateSwapchainKHR(VulkanInstance::GetInstance().device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
             throw std::runtime_error("failed to create swap chain!");
         }
 
-        vkGetSwapchainImagesKHR(vk.device, swapChain, &imageCount, nullptr);
+        vkGetSwapchainImagesKHR(VulkanInstance::GetInstance().device, swapChain, &imageCount, nullptr);
         swapChainImages.resize(imageCount);
-        vkGetSwapchainImagesKHR(vk.device, swapChain, &imageCount, swapChainImages.data());
+        vkGetSwapchainImagesKHR(VulkanInstance::GetInstance().device, swapChain, &imageCount, swapChainImages.data());
 
         swapChainImageFormat = surfaceFormat.format;
         swapChainExtent = extent;
@@ -305,7 +319,7 @@ private:
             createInfo.subresourceRange.baseArrayLayer = 0;
             createInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(vk.device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
+            if (vkCreateImageView(VulkanInstance::GetInstance().device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create image views!");
             }
         }
@@ -314,33 +328,34 @@ private:
         swapChainFramebuffers.resize(swapChainImageViews.size());
 
         for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-            VkImageView attachments[] = {
-                swapChainImageViews[i]
+            std::array<VkImageView, 2> attachments = {
+                swapChainImageViews[i],
+                depthImage->GetImageView()
             };
 
             VkFramebufferCreateInfo framebufferInfo = {};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = pipeline->GetRenderPass()->GetRenderPass();
-            framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = attachments;
+            framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+            framebufferInfo.pAttachments = attachments.data();
             framebufferInfo.width = swapChainExtent.width;
             framebufferInfo.height = swapChainExtent.height;
             framebufferInfo.layers = 1;
 
-            if (vkCreateFramebuffer(vk.device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+            if (vkCreateFramebuffer(VulkanInstance::GetInstance().device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create framebuffer!");
             }
         }
     }
 
     void createCommandPool() {
-        VulkanInstance::QueueFamilyIndices queueFamilyIndices = vk.FindQueueFamilies(vk.physicalDevice);
+        VulkanInstance::QueueFamilyIndices queueFamilyIndices = VulkanInstance::GetInstance().FindQueueFamilies(VulkanInstance::GetInstance().physicalDevice);
 
         VkCommandPoolCreateInfo poolInfo = {};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 
-        if (vkCreateCommandPool(vk.device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+        if (vkCreateCommandPool(VulkanInstance::GetInstance().device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create graphics command pool!");
         }
     }
@@ -354,7 +369,7 @@ private:
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
-        if (vkAllocateCommandBuffers(vk.device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+        if (vkAllocateCommandBuffers(VulkanInstance::GetInstance().device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate command buffers!");
         }
 
@@ -373,9 +388,13 @@ private:
             renderPassInfo.renderArea.offset = { 0, 0 };
             renderPassInfo.renderArea.extent = swapChainExtent;
 
-            VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-            renderPassInfo.clearValueCount = 1;
-            renderPassInfo.pClearValues = &clearColor;
+            /* Clear the 2 attachments, color and depth */
+            std::array<VkClearValue, 2> clearValues = {};
+            clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+            clearValues[1].depthStencil = { 1.0f, 0 };
+
+            renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+            renderPassInfo.pClearValues = clearValues.data();
 
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -407,19 +426,19 @@ private:
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            if (vkCreateSemaphore(vk.device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-                vkCreateSemaphore(vk.device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-                vkCreateFence(vk.device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+            if (vkCreateSemaphore(VulkanInstance::GetInstance().device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(VulkanInstance::GetInstance().device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(VulkanInstance::GetInstance().device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create synchronization objects for a frame!");
             }
         }
     }
 
     void drawFrame() {
-        vkWaitForFences(vk.device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+        vkWaitForFences(VulkanInstance::GetInstance().device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(vk.device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(VulkanInstance::GetInstance().device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
@@ -430,7 +449,7 @@ private:
         }
 
         if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
-            vkWaitForFences(vk.device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+            vkWaitForFences(VulkanInstance::GetInstance().device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
         }
         imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 
@@ -450,9 +469,9 @@ private:
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        vkResetFences(vk.device, 1, &inFlightFences[currentFrame]);
+        vkResetFences(VulkanInstance::GetInstance().device, 1, &inFlightFences[currentFrame]);
 
-        if (vkQueueSubmit(vk.graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
+        if (vkQueueSubmit(VulkanInstance::GetInstance().graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
 
@@ -468,10 +487,10 @@ private:
 
         presentInfo.pImageIndices = &imageIndex;
 
-        result = vkQueuePresentKHR(vk.presentQueue, &presentInfo);
+        result = vkQueuePresentKHR(VulkanInstance::GetInstance().presentQueue, &presentInfo);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || vk.framebufferResized) {
-            vk.framebufferResized = false;
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || VulkanInstance::GetInstance().framebufferResized) {
+            VulkanInstance::GetInstance().framebufferResized = false;
             recreateSwapChain();
         }
         else if (result != VK_SUCCESS) {
@@ -507,7 +526,7 @@ private:
         }
         else {
             int width, height;
-            glfwGetFramebufferSize(vk.window, &width, &height);
+            glfwGetFramebufferSize(VulkanInstance::GetInstance().window, &width, &height);
 
             VkExtent2D actualExtent = {
                 static_cast<uint32_t>(width),

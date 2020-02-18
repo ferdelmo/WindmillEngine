@@ -3,7 +3,7 @@
 #include "../../VulkanInstance.h"
 #include <stdexcept>
 
-CopyBuffer::CopyBuffer(VulkanInstance* vk) : _vk(vk) {
+CopyBuffer::CopyBuffer() {
 
 }
 
@@ -11,21 +11,21 @@ CopyBuffer::CopyBuffer(VulkanInstance* vk) : _vk(vk) {
 
 CopyBuffer::~CopyBuffer() {
 	if (_init) {
-		vkDestroyCommandPool(_vk->device, _commandPool, nullptr);
+		vkDestroyCommandPool(VulkanInstance::GetInstance().device, _commandPool, nullptr);
 	}
 }
 
 
 
 void CopyBuffer::Initialize() {
-	VulkanInstance::QueueFamilyIndices queueFamilyIndices = _vk->FindQueueFamilies(_vk->physicalDevice);
+	VulkanInstance::QueueFamilyIndices queueFamilyIndices = VulkanInstance::GetInstance().FindQueueFamilies(VulkanInstance::GetInstance().physicalDevice);
 
 	VkCommandPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	//Pool for graphics commands
 	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 
-	if (vkCreateCommandPool(_vk->device, &poolInfo, nullptr, &_commandPool) != VK_SUCCESS) {
+	if (vkCreateCommandPool(VulkanInstance::GetInstance().device, &poolInfo, nullptr, &_commandPool) != VK_SUCCESS) {
 		throw std::runtime_error("CopyBuffer::Initialize: failed to create command pool!");
 	}
 
@@ -43,7 +43,7 @@ void CopyBuffer::BeginSingleTimeCommand() {
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandPool = _commandPool;
 	allocInfo.commandBufferCount = 1;
-	vkAllocateCommandBuffers(_vk->device, &allocInfo, &_commandBuffer);
+	vkAllocateCommandBuffers(VulkanInstance::GetInstance().device, &allocInfo, &_commandBuffer);
 
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -60,10 +60,10 @@ void CopyBuffer::EndSingleTimeCommand() {
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &_commandBuffer;
 
-	vkQueueSubmit(_vk->graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(_vk->graphicsQueue);
+	vkQueueSubmit(VulkanInstance::GetInstance().graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(VulkanInstance::GetInstance().graphicsQueue);
 
-	vkFreeCommandBuffers(_vk->device, _commandPool, 1, &_commandBuffer);
+	vkFreeCommandBuffers(VulkanInstance::GetInstance().device, _commandPool, 1, &_commandBuffer);
 }
 
 

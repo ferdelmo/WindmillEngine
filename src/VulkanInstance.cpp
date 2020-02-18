@@ -53,6 +53,18 @@ void VulkanInstance::CleanUp() {
 }
 
 
+VulkanInstance* VulkanInstance::_instance = nullptr;
+
+VulkanInstance& VulkanInstance::GetInstance() {
+	if (_instance == nullptr) {
+		_instance = new VulkanInstance();
+		_instance->Initialize();
+	}
+
+	return *_instance;
+
+}
+
 void VulkanInstance::CreateWindow(int WIDTH, int HEIGHT) {
 	//initialize glfw
 	glfwInit();

@@ -2,6 +2,7 @@
 #include <vulkan/vulkan.h>
 
 class VulkanInstance;
+class Image;
 
 /*
 	Class to respresent a RenderPass. 
@@ -12,16 +13,17 @@ class VulkanInstance;
 class RenderPass
 {
 private:
-	VulkanInstance* _vk;
-
 	VkRenderPass _renderPass;
 
 public:
-	RenderPass(VulkanInstance* vk);
+	RenderPass();
 
 	~RenderPass();
 
-	void Initialize(VkFormat format);
+	/*
+		Initialize the renderPass with a format and a image to use as depth
+	*/
+	void Initialize(VkFormat format, Image& depthImage);
 
 	VkRenderPass& GetRenderPass();
 };

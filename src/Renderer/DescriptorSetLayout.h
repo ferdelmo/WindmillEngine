@@ -42,14 +42,12 @@ public:
 class DescriptorSetLayout
 {
 private:
-	VulkanInstance* _vk;
-
 	VkDescriptorSetLayout _descriptorSetLayout;
 
 public:
 
     const int MAX_LAYOUT_BINDINGS = 10;
-	DescriptorSetLayout(VulkanInstance* vk);
+	DescriptorSetLayout();
 
     ~DescriptorSetLayout();
     
@@ -68,7 +66,7 @@ public:
         layoutInfo.bindingCount = count;
         layoutInfo.pBindings = bindings;
 
-        if (vkCreateDescriptorSetLayout(_vk->device, &layoutInfo, nullptr, &_descriptorSetLayout) != VK_SUCCESS) {
+        if (vkCreateDescriptorSetLayout(VulkanInstance::GetInstance().device, &layoutInfo, nullptr, &_descriptorSetLayout) != VK_SUCCESS) {
             throw std::runtime_error("DescriptorSetLayout::Initialize: failed to create descriptor set layout!");
         }
 	}
