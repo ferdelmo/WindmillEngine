@@ -13,7 +13,7 @@ RenderPass::~RenderPass() {
     vkDestroyRenderPass(VulkanInstance::GetInstance().device, _renderPass, nullptr);
 }
 
-void RenderPass::Initialize(VkFormat format, Image& depthImage) {
+void RenderPass::Initialize(VkFormat format, Image* depthImage) {
     /* Color attachment */
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = format;
@@ -27,7 +27,7 @@ void RenderPass::Initialize(VkFormat format, Image& depthImage) {
 
     /* Attachment for the depth image */
     VkAttachmentDescription depthAttachment = {};
-    depthAttachment.format = depthImage.GetFormat();
+    depthAttachment.format = depthImage->GetFormat();
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;

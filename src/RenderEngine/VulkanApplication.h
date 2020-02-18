@@ -94,7 +94,9 @@ private:
     std::vector<VkImageView> swapChainImageViews;
     std::vector<VkFramebuffer> swapChainFramebuffers;
 
+    RenderPass* renderPass;
     GraphicsPipeline* pipeline;
+
     Shader* vertex;
     Shader* fragment;
 
@@ -153,16 +155,17 @@ private:
         depthImage = Image::CreateImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, 
             VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
 
-        pipeline->Initialize(vertex, fragment, swapChainImageFormat, viewport, scissor, *depthImage);
+        renderPass = new RenderPass();
+        renderPass->Initialize(swapChainImageFormat, depthImage);
+
+        pipeline->Initialize(renderPass, vertex, fragment, swapChainImageFormat, viewport, scissor);
 
         createFramebuffers();
 
         cam = Camera(glm::vec3(-2.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 60, 16 / 9.0f, 0.1f, 100.0f);
 
-        mesh = new StaticMesh(vertices, indices, "../resources/textures/texture.jpg", 
-            &pipeline->GetDescriptorSetLayout()->GetDescriptor(), &(pipeline->GetPipelineLayout()));
-        mesh1 = new StaticMesh(vertices1, indices1, "../resources/textures/texture.jpg",
-            &pipeline->GetDescriptorSetLayout()->GetDescriptor(), &(pipeline->GetPipelineLayout()));
+        mesh = new StaticMesh(vertices, indices, "../resources/textures/texture.jpg", pipeline);
+        mesh1 = new StaticMesh(vertices1, indices1, "../resources/textures/texture.jpg", pipeline);
 
         mesh->SetCamera(cam);
         mesh1->SetCamera(cam);
@@ -324,6 +327,7 @@ private:
             }
         }
     }
+
     void createFramebuffers() {
         swapChainFramebuffers.resize(swapChainImageViews.size());
 
@@ -335,7 +339,7 @@ private:
 
             VkFramebufferCreateInfo framebufferInfo = {};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebufferInfo.renderPass = pipeline->GetRenderPass()->GetRenderPass();
+            framebufferInfo.renderPass = renderPass->GetRenderPass();
             framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
             framebufferInfo.pAttachments = attachments.data();
             framebufferInfo.width = swapChainExtent.width;
@@ -383,7 +387,7 @@ private:
 
             VkRenderPassBeginInfo renderPassInfo = {};
             renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderPassInfo.renderPass = pipeline->GetRenderPass()->GetRenderPass();
+            renderPassInfo.renderPass = renderPass->GetRenderPass();
             renderPassInfo.framebuffer = swapChainFramebuffers[i];
             renderPassInfo.renderArea.offset = { 0, 0 };
             renderPassInfo.renderArea.extent = swapChainExtent;

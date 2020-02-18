@@ -23,7 +23,7 @@ public:
 	/*
 		Initialize the renderPass with a format and a image to use as depth
 	*/
-	void Initialize(VkFormat format, Image& depthImage);
+	void Initialize(VkFormat format, Image* depthImage);
 
 	VkRenderPass& GetRenderPass();
 };

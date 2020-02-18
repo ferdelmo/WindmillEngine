@@ -6,21 +6,19 @@
 #include "Image.h"
 
 
-GraphicsPipeline::GraphicsPipeline() : _shaders(0) {
-	_renderPass = new RenderPass();
+GraphicsPipeline::GraphicsPipeline() : _shaders(0), _descriptorSetLayout(nullptr){
+
 }
 
 GraphicsPipeline::~GraphicsPipeline() {
-	delete _renderPass;
-
 
     vkDestroyPipeline(VulkanInstance::GetInstance().device, _graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(VulkanInstance::GetInstance().device, _pipelineLayout, nullptr);
 }
 
-void GraphicsPipeline::Initialize(Shader* vertex, Shader* fragment,  VkFormat format, 
-    VkViewport viewport, VkRect2D scissor, Image& depthImage) {
-	_renderPass->Initialize(format, depthImage);
+
+void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader* fragment,  VkFormat format, 
+    VkViewport viewport, VkRect2D scissor) {
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = vertex->GetStage();
@@ -145,7 +143,7 @@ void GraphicsPipeline::Initialize(Shader* vertex, Shader* fragment,  VkFormat fo
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.layout = _pipelineLayout;
-    pipelineInfo.renderPass = _renderPass->GetRenderPass();
+    pipelineInfo.renderPass = renderPass->GetRenderPass();
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 

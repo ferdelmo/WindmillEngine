@@ -4,15 +4,17 @@
 #include "Buffer.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "Renderizable.h"
 
 class VulkanInstance;
+class GraphicsPipeline;
 /**
 * Represent a static mesh with a list of vertex. Initially once initialized, the list of vertex
 * should not change (TODO: fix that)
 * TODO: More than one descriptor set, only change with the image
 * @author Fernando del Molino
 */
-class StaticMesh
+class StaticMesh : public Renderizable
 {
 private:
 	std::vector<Vertex> _vertices;
@@ -27,8 +29,7 @@ private:
 	std::string _pathToTexture;
 	Texture _texture;
 
-	VkDescriptorSetLayout* _descriptorLayout;
-	VkPipelineLayout* _pipelineLayout;
+	GraphicsPipeline* _pipeline;
 
 	VkDescriptorPool _descriptorPool;
 	VkDescriptorSet _descriptorSet;
@@ -48,7 +49,7 @@ public:
 		Constructor with a list of vertices and indices
 	*/
 	StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
-		VkDescriptorSetLayout* _descriptorLayout, VkPipelineLayout* _pipelineLayout);
+		GraphicsPipeline* pipeline);
 
 	~StaticMesh();
 
@@ -86,7 +87,7 @@ public:
 	/*
 		Bind to a command the draw orders
 	*/
-	void BindCommandsToBuffer(VkCommandBuffer& cmd);
+	void BindCommandsToBuffer(VkCommandBuffer& cmd) override;
 
 	std::vector<Index> GetIndices();
 

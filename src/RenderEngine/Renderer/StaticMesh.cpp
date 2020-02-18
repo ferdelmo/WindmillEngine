@@ -6,10 +6,11 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 
-StaticMesh::StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
-	VkDescriptorSetLayout* descriptorLayout, VkPipelineLayout* pipelineLayout)
-	: _vertices(vertices), _indices(indices), _vertexBuffer(), _indexBuffer(), _uniformBuffer(), _pathToTexture(texture), _texture(),
-	_descriptorLayout(descriptorLayout), _pipelineLayout(pipelineLayout)  {
+#include "GraphicsPipeline.h"
+#include "DescriptorSetLayout.h"
+
+StaticMesh::StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture, GraphicsPipeline* pipeline)
+	: _vertices(vertices), _indices(indices), _vertexBuffer(), _indexBuffer(), _uniformBuffer(), _pathToTexture(texture), _texture(), _pipeline(pipeline)  {
 	_ubo.model = glm::mat4(1.0f);
 }
 
@@ -69,11 +70,13 @@ VkBuffer& StaticMesh::GetUniformBuffer() {
 void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 	VkDeviceSize offsets[] = { 0 };
 
+	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->GetPipeline());
+
 	vkCmdBindVertexBuffers(cmd, 0, 1, &_vertexBuffer.GetBuffer(), offsets);
 
 	vkCmdBindIndexBuffer(cmd, _indexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
 
-	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, *_pipelineLayout, 0, 1, &_descriptorSet, 0, nullptr);
+	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->GetPipelineLayout(), 0, 1, &_descriptorSet, 0, nullptr);
 
 	vkCmdDrawIndexed(cmd, static_cast<uint32_t>(_indices.size()), 1, 0, 0, 0);
 }
@@ -111,7 +114,7 @@ void StaticMesh::CreateDescriptoSet() {
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = _descriptorPool;
 	allocInfo.descriptorSetCount = static_cast<uint32_t>(1);
-	allocInfo.pSetLayouts = _descriptorLayout;
+	allocInfo.pSetLayouts = &_pipeline->GetDescriptorSetLayout()->GetDescriptor();
 
 	if (vkAllocateDescriptorSets(VulkanInstance::GetInstance().device, &allocInfo, &_descriptorSet) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets!");

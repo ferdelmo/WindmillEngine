@@ -19,8 +19,6 @@ class GraphicsPipeline
 private:
 	std::vector<Shader*> _shaders;
 
-	RenderPass* _renderPass;
-
 	DescriptorSetLayout* _descriptorSetLayout;
 
 	VkPipelineLayout _pipelineLayout;
@@ -35,14 +33,11 @@ public:
 	/*
 		Initialize a graphics pipeline with two vertex and a format. Shaders can be deleted after initialization.
 
+		It assumes that the renderPass has a depthImage configured
 		TODO: more configuration
 	*/
-	void Initialize(Shader* vertex, Shader* fragment, VkFormat format,
-		VkViewport viewport, VkRect2D scissor, Image& depthImage);
-
-	RenderPass* GetRenderPass() {
-		return _renderPass;
-	}
+	void Initialize(RenderPass* renderPass, Shader* vertex, Shader* fragment, VkFormat format,
+		VkViewport viewport, VkRect2D scissor);
 
 	DescriptorSetLayout* GetDescriptorSetLayout() {
 		return _descriptorSetLayout;
