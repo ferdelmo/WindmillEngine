@@ -5,7 +5,7 @@
 #include "Buffer.h"
 #include "Texture.h"
 
-typedef enum UniformTypes {
+typedef enum class UniformTypes {
 	UNIFORM,
 	TEXTURE
 };
@@ -17,7 +17,7 @@ struct UniformInterface {
 
 	virtual VkSampler* GetImageSampler() { return nullptr; };
 
-	virtual UniformTypes GetTypeUniform() { return UNIFORM; };
+	virtual UniformTypes GetTypeUniform() { return UniformTypes::UNIFORM; };
 
 	VkDeviceSize size;
 };
@@ -39,19 +39,19 @@ struct UniformType : public UniformInterface {
 	}
 
 	Buffer* GetUniformBuffer() override {
-		Buffer* b = new Buffer();
-		std::vector<T> aux = { obj };
-		b->Initialize(aux, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		Buffer* buf = new Buffer();
+		buf->Initialize(&obj, size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		return b;
+		return buf;
 	}
 
-	UniformTypes GetTypeUniform() override { return UNIFORM; }
+	UniformTypes GetTypeUniform() override { return UniformTypes::UNIFORM; }
 
 	T GetObject() {
 		return obj;
 	}
 };
+
 struct UniformTexture : public UniformInterface {
 	Texture* obj;
 
@@ -69,7 +69,7 @@ struct UniformTexture : public UniformInterface {
 
 	virtual VkSampler* GetImageSampler() { return &obj->GetImageSampler(); };
 
-	UniformTypes GetTypeUniform() override { return TEXTURE; }
+	UniformTypes GetTypeUniform() override { return UniformTypes::TEXTURE; }
 
 	Texture* GetTexture() {
 		return obj;
@@ -77,12 +77,29 @@ struct UniformTexture : public UniformInterface {
 };
 
 struct MVP {
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 proj;
+	alignas(16) glm::mat4 model;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
 
 	MVP(glm::mat4 _model = glm::mat4(1.0f), glm::mat4 _view = glm::mat4(1.0f), glm::mat4 _proj = glm::mat4(1.0f)) :
 		model(_model), view(_view), proj(_proj) {
+		//size = sizeof(*this);
+	}
+
+	/*
+	Buffer* GetUniformBuffer() override{
+		Buffer* b = new Buffer();
+		b->Initialize<MVP>(this, sizeof(*this), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		return b;
+	}
+	*/
+};
+
+struct UniformColor {
+	glm::vec3 color;
+
+	UniformColor(glm::vec3 _color = glm::vec3(0,1,0)) : color(_color) {
 		//size = sizeof(*this);
 	}
 

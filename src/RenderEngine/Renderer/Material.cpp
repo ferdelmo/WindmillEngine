@@ -97,7 +97,7 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 	std::map<std::string, Buffer*> resul;
 	for (auto entry : _uniforms) {
 
-		if (entry.second->obj->GetTypeUniform() == UNIFORM) {
+		if (entry.second->obj->GetTypeUniform() == UniformTypes::UNIFORM) {
 			VkWriteDescriptorSet aux = {};
 
 			std::pair<std::string, Buffer*> pair;
@@ -122,7 +122,7 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 			aux.pTexelBufferView = nullptr; // Optional
 			descriptorWrites.push_back(aux);
 		}
-		else if (entry.second->obj->GetTypeUniform() == TEXTURE) {
+		else if (entry.second->obj->GetTypeUniform() == UniformTypes::TEXTURE) {
 			VkDescriptorImageInfo imageInfo = {};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = *entry.second->obj->GetImageView();

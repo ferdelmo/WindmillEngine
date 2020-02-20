@@ -147,7 +147,6 @@ void RenderThread::StartThread() {
 		throw std::runtime_error("RenderThread::StartThread: mainThread alredy running");
 		return;
 	}
-
 	_running = true;
 	_mainThread = new std::thread(&RenderThread::MainLoop, this);
 }
@@ -160,6 +159,8 @@ void RenderThread::StopThread() {
     _running = false;
     _mainThread->join();
 	delete _mainThread;
+
+    _initialized = false;
 	_mainThread = nullptr;
 }
 
@@ -360,11 +361,12 @@ void RenderThread::CreateSyncObjects() {
 }
 
 void RenderThread::CleanupSwapChain() {
+
+    vkFreeCommandBuffers(VulkanInstance::GetInstance().device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+
     for (auto framebuffer : swapChainFramebuffers) {
         vkDestroyFramebuffer(VulkanInstance::GetInstance().device, framebuffer, nullptr);
     }
-
-    vkFreeCommandBuffers(VulkanInstance::GetInstance().device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
 
     for (auto imageView : swapChainImageViews) {

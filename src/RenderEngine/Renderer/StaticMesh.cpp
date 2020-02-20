@@ -35,13 +35,16 @@ void StaticMesh::Initialize() {
 
 void StaticMesh::Update(float deltaTime) {
 	static float rot = 0;
-	float actualRot = 90 * deltaTime;
+	float actualRot = -180 * deltaTime;
 	rot += actualRot;
-	//_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 0.0f, 1.0f));
-	/*
+	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 0.0f, 1.0f));
+	
 	std::vector<MVP> uniform = { _ubo };
-	_uniformBuffer.Fill(uniform);
-	*/
+	_uniforms.at("MVP")->Fill(uniform);
+
+	std::vector<UniformColor> uniformC = { UniformColor({1,1,1}) };
+
+	_uniforms.at("Color")->Fill(uniformC);
 }
 
 
@@ -84,60 +87,3 @@ std::vector<Index> StaticMesh::GetIndices() {
 std::vector<Vertex> StaticMesh::GetVertices() {
 	return _vertices;
 }
-
-
-/*
-void StaticMesh::CreateDescriptorPool() {
-	std::vector<VkDescriptorPoolSize> poolSizes = { {} };
-	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = static_cast<uint32_t>(1);
-
-	VkDescriptorPoolCreateInfo poolInfo = {};
-	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(1);
-
-	if (vkCreateDescriptorPool(VulkanInstance::GetInstance().device, &poolInfo, nullptr, &_descriptorPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor pool!");
-	}
-}
-
-void StaticMesh::CreateDescriptoSet() {
-	VkDescriptorSetAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = _descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(1);
-	allocInfo.pSetLayouts = &_pipeline->GetDescriptorSetLayout()->GetDescriptor();
-
-	if (vkAllocateDescriptorSets(VulkanInstance::GetInstance().device, &allocInfo, &_descriptorSet) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
-
-	VkDescriptorBufferInfo bufferInfo = {};
-	bufferInfo.buffer = _uniformBuffer.GetBuffer();
-	bufferInfo.offset = 0;
-	bufferInfo.range = sizeof(MVP);
-
-	VkDescriptorImageInfo imageInfo = {};
-	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = _texture.GetImageView();
-	imageInfo.sampler = _texture.GetImageSampler();
-
-	std::vector<VkWriteDescriptorSet> descriptorWrites = { {} };
-
-	descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	descriptorWrites[0].dstSet = _descriptorSet;
-	descriptorWrites[0].dstBinding = 0;
-	descriptorWrites[0].dstArrayElement = 0;
-	descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorWrites[0].descriptorCount = 1;
-	descriptorWrites[0].pBufferInfo = &bufferInfo;
-	descriptorWrites[0].pImageInfo = nullptr; // Optional
-	descriptorWrites[0].pTexelBufferView = nullptr; // Optional
-
-	vkUpdateDescriptorSets(VulkanInstance::GetInstance().device, static_cast<uint32_t>(descriptorWrites.size()),
-		descriptorWrites.data(), 0, nullptr);
-
-}
-*/
