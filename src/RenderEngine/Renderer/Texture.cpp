@@ -78,9 +78,7 @@ void Texture::Initialize(std::string pathTexture) {
 
 	CopyBuffer cp;
 
-	cp.TransitionImageLayout(_image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	cp.CopyBufferToImage(stagingBuffer.GetBuffer(), _image, static_cast<uint32_t>(_width), static_cast<uint32_t>(_height));
-	cp.TransitionImageLayout(_image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 
 	CreateImageView();

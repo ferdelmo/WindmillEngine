@@ -76,14 +76,11 @@
     <ClCompile Include="..\src\RenderEngine\RenderThread\RenderThread.cpp">
       <Filter>src\RenderEngine\RenderThread</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Material.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\RenderEngine\VulkanApplication.h">
-      <Filter>src\RenderEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\RenderEngine\VulkanApplication-1.h">
-      <Filter>src\RenderEngine</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
       <Filter>src\RenderEngine</Filter>
     </ClInclude>
@@ -140,6 +137,15 @@
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\RenderThread\RenderThread.h">
       <Filter>src\RenderEngine\RenderThread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Renderizable.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Uniform.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Material.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

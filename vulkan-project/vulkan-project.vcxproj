@@ -29,6 +29,7 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\GraphicsPipeline.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Image.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Material.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\RenderPass.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Shader.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\StaticMesh.cpp" />
@@ -49,15 +50,16 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\GraphicsPipeline.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Image.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Material.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Renderizable.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\RenderPass.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Shader.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\StaticMesh.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Texture.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Uniform.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Utils\CopyBuffer.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Vertex.h" />
     <ClInclude Include="..\src\RenderEngine\RenderThread\RenderThread.h" />
-    <ClInclude Include="..\src\RenderEngine\VulkanApplication-1.h" />
-    <ClInclude Include="..\src\RenderEngine\VulkanApplication.h" />
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -148,7 +150,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\src;D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(SolutionDir)\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -184,7 +186,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Fernando\Proyectos\vulkan-project\src;D:\Fernando\Proyectos\vulkan-project\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(SolutionDir)\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

@@ -41,16 +41,6 @@ void VulkanInstance::CleanUp() {
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
-
-	delete instance;
-	delete debugMessenger;
-	delete surface;
-
-	delete physicalDevice;
-	delete device;
-	
-	delete graphicsQueue;
-	delete presentQueue;
 }
 
 

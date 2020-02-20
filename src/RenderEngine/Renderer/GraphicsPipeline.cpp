@@ -13,6 +13,8 @@ GraphicsPipeline::GraphicsPipeline() : _shaders(0), _descriptorSetLayout(nullptr
 
 GraphicsPipeline::~GraphicsPipeline() {
 
+    delete _descriptorSetLayout;
+
     vkDestroyPipeline(VulkanInstance::GetInstance().device, _graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(VulkanInstance::GetInstance().device, _pipelineLayout, nullptr);
 }

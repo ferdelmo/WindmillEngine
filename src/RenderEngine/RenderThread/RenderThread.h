@@ -99,6 +99,9 @@ public:
 
 	/* Add renderizable to the render */
 	void AddObject(Renderizable* obj);
+
+	/* CleanUp all thre resources generated */
+	void CleanUp();
 	
 	VkFormat GetFormat() const {
 		return swapChainImageFormat;

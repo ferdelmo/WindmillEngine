@@ -15,8 +15,6 @@ private:
 	Shader _vert;
 	Shader _frag;
 
-	Texture _texture;
-
 	std::map<std::string, UniformInfo*> _uniforms;
 
 public: 

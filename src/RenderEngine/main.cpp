@@ -87,11 +87,12 @@ int main() {
     MVP aux;
     aux.proj = cam.GetProjection();
     aux.view = cam.GetView();
-    UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 1, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
     vertexDescriptor.push_back(vertexInfo);
 
     UniformColor auxColor;
-    UniformInfo* vertexInfo2 = UniformInfo::GenerateInfo(auxColor, "Color", 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    auxColor.color = glm::vec4(0, 1, 1, 1);
+    UniformInfo* vertexInfo2 = UniformInfo::GenerateInfo(auxColor, "Color", 1, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
     vertexDescriptor.push_back(vertexInfo2);
 
     std::vector<UniformInfo*> fragmentDescriptor(0);
@@ -108,16 +109,16 @@ int main() {
         Vertex::getBindingDescription(),
         Vertex::getAttributeDescriptions());
 
-    //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
+    StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
     StaticMesh* mesh1 = new StaticMesh(vertices1, indices1, mat);
 
-    //mesh->SetCamera(cam);
+    mesh->SetCamera(cam);
     mesh1->SetCamera(cam);
 
-    //mesh->Initialize();
+    mesh->Initialize();
     mesh1->Initialize();
 
-    //rt.AddObject(mesh);
+    rt.AddObject(mesh);
     rt.AddObject(mesh1);
     
     rt.UpdateCommandBuffers();
@@ -131,10 +132,16 @@ int main() {
     auto endFrame = std::chrono::high_resolution_clock::now();
     float time = 0;
     int logicTicks = 0;
+
+    mesh->Translate({ 2, 0, 0 });
+
     while (time < 5.0f) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame-currentTime).count();
         currentTime = std::chrono::high_resolution_clock::now();
+
+        mesh->Update(deltaTime);
         mesh1->Update(deltaTime);
+
         logicTicks++;
         endFrame = std::chrono::high_resolution_clock::now();
         time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
@@ -145,4 +152,14 @@ int main() {
     std::cout << "Logic Ticks per second: " << logicTicks / 5.0f << std::endl;
 
     rt.StopThread();
+
+    delete depthImage;
+    delete mesh;
+    delete mesh1;
+    delete mat;
+    delete renderPass;
+
+    rt.CleanUp();
+
+    VulkanInstance::GetInstance().CleanUp();
 }

@@ -2,6 +2,7 @@
 #include "RenderPass.h"
 #include "Uniform.h"
 #include "RenderEngine/RenderThread/RenderThread.h"
+#include <string>
 
 Material::Material() {
 
@@ -94,10 +95,12 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 	}
 
 	std::vector<VkWriteDescriptorSet> descriptorWrites = {};
+	std::vector<VkDescriptorBufferInfo*> descriptorWritesBufferInfo = {};
+
 	std::map<std::string, Buffer*> resul;
 	for (auto entry : _uniforms) {
 
-		if (entry.second->obj->GetTypeUniform() == UniformTypes::UNIFORM) {
+		if (entry.second->obj->GetTypeUniform() == UniformTypes::UNIFORM) { // && entry.second->name == "Color") {
 			VkWriteDescriptorSet aux = {};
 
 			std::pair<std::string, Buffer*> pair;
@@ -106,10 +109,12 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 
 			resul.insert(pair);
 
-			VkDescriptorBufferInfo bufferInfo = {};
-			bufferInfo.buffer = pair.second->GetBuffer();
-			bufferInfo.offset = 0;
-			bufferInfo.range = entry.second->obj->size;
+			VkDescriptorBufferInfo* bufferInfo = new VkDescriptorBufferInfo();
+			bufferInfo->buffer = pair.second->GetBuffer();
+			bufferInfo->offset = 0;
+			bufferInfo->range = entry.second->obj->size;
+
+			descriptorWritesBufferInfo.push_back(bufferInfo);
 
 			aux.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			aux.dstSet = descriptorSet;
@@ -117,7 +122,7 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 			aux.dstArrayElement = 0;
 			aux.descriptorType = entry.second->type;
 			aux.descriptorCount = entry.second->descriptorCount;
-			aux.pBufferInfo = &bufferInfo;
+			aux.pBufferInfo = descriptorWritesBufferInfo.back();
 			aux.pImageInfo = nullptr; // Optional
 			aux.pTexelBufferView = nullptr; // Optional
 			descriptorWrites.push_back(aux);
@@ -143,5 +148,10 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 
 	vkUpdateDescriptorSets(VulkanInstance::GetInstance().device, static_cast<uint32_t>(descriptorWrites.size()),
 		descriptorWrites.data(), 0, nullptr);
+
+	for (auto aux : descriptorWritesBufferInfo) {
+		delete aux;
+	}
+
 	return resul;
 }

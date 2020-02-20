@@ -6,11 +6,8 @@ class VulkanInstance;
 
 /**
 *	Class to copy a buffer in to another one, or to a image
-*	@author Fernando del Molino
-*/
 
-/*
-	TODO: maybe the class should operate as a class with static functions with only one commandpool created on the first call
+*	@author Fernando del Molino
 */
 class CopyBuffer
 {
@@ -22,19 +19,35 @@ private:
 
 	bool _init = false;
 
+
+	/*
+		Begin the command to copy
+	*/
+	void BeginSingleTimeCommand();
+
+	/*
+		End the command to copy
+	*/
+	void EndSingleTimeCommand();
+
+	/*
+		Operations needed to perform the buffer to image copy
+	*/
+	void TransitionImageLayout(VkImage& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
 public:
 	CopyBuffer();
 
 	~CopyBuffer();
 
+	/*
+		Copy srcBuffer size in to dstBuffer
+	*/
 	void Copy(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size);
 
-	void BeginSingleTimeCommand();
-
-	void EndSingleTimeCommand();
-
+	/*
+		Copy data from the buffer to the image
+	*/
 	void CopyBufferToImage(VkBuffer& buffer, VkImage& image, uint32_t width, uint32_t height);
-
-	void TransitionImageLayout(VkImage& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 };
 

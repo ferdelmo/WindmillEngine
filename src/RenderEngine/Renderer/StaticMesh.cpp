@@ -16,6 +16,10 @@ StaticMesh::StaticMesh(const std::vector<Vertex>& vertices, const std::vector<In
 }
 
 StaticMesh::~StaticMesh() {
+	for (auto entry : _uniforms) {
+		delete entry.second;
+	}
+
 	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
 }
 
@@ -31,6 +35,7 @@ void StaticMesh::Initialize() {
 		| VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	
 	_uniforms = _material->GenerateDescriptorSet(_descriptorPool, _descriptorSet);
+
 }
 
 void StaticMesh::Update(float deltaTime) {
@@ -41,12 +46,18 @@ void StaticMesh::Update(float deltaTime) {
 	
 	std::vector<MVP> uniform = { _ubo };
 	_uniforms.at("MVP")->Fill(uniform);
-
-	std::vector<UniformColor> uniformC = { UniformColor({1,1,1}) };
+	/*
+	std::vector<UniformColor> uniformC = { UniformColor(color) };
 
 	_uniforms.at("Color")->Fill(uniformC);
+	*/
 }
 
+void StaticMesh::Translate(glm::vec3 trans) {
+	_ubo.model = glm::translate(_ubo.model, glm::vec3(2, 0, 0));
+	std::vector<MVP> uniform = { _ubo };
+	_uniforms.at("MVP")->Fill(uniform);
+}
 
 void StaticMesh::SetCamera(const Camera& cam) {
 	_ubo.view = cam.GetView();

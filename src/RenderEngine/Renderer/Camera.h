@@ -5,6 +5,7 @@
 /**
 * Class to represent a camera. For now, it only has two matrix, view and projection, to represent it.
 * It has a constructor to generate the view and projection matrix. 
+
 * @author Fernando del Molino
 */
 class Camera

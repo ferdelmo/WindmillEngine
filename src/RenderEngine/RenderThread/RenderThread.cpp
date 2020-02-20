@@ -158,6 +158,9 @@ void RenderThread::StopThread() {
 
     _running = false;
     _mainThread->join();
+
+    vkDeviceWaitIdle(VulkanInstance::GetInstance().device);
+
 	delete _mainThread;
 
     _initialized = false;
@@ -392,6 +395,19 @@ void RenderThread::RecreateSwapChain() {
     CreateImageViews();
     CreateFramebuffers();
     CreateCommandBuffers();
+}
+
+
+void RenderThread::CleanUp() {
+    CleanupSwapChain();
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(VulkanInstance::GetInstance().device, renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(VulkanInstance::GetInstance().device, imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(VulkanInstance::GetInstance().device, inFlightFences[i], nullptr);
+    }
+
+    vkDestroyCommandPool(VulkanInstance::GetInstance().device, commandPool, nullptr);
 }
 
 void RenderThread::AddObject(Renderizable* obj) {

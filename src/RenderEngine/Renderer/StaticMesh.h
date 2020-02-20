@@ -63,6 +63,8 @@ public:
 	*/
 	void Update(float deltaTime);
 
+	void Translate(glm::vec3 trans);
+
 	/*
 		Set the active camera to change the MVP matrix
 	*/

@@ -242,6 +242,6 @@ public:
 	/*
 		Find types of memory suported to check in the buffer creation
 	*/
-	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+	static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 };
 

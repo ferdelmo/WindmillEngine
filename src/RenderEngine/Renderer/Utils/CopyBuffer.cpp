@@ -11,6 +11,7 @@ CopyBuffer::CopyBuffer() {
 
 CopyBuffer::~CopyBuffer() {
 	if (_init) {
+		// clena the commands if created
 		vkDestroyCommandPool(VulkanInstance::GetInstance().device, _commandPool, nullptr);
 	}
 }
@@ -18,6 +19,7 @@ CopyBuffer::~CopyBuffer() {
 
 
 void CopyBuffer::Initialize() {
+	// gets the queues
 	VulkanInstance::QueueFamilyIndices queueFamilyIndices = VulkanInstance::GetInstance().FindQueueFamilies(VulkanInstance::GetInstance().physicalDevice);
 
 	VkCommandPoolCreateInfo poolInfo = {};
@@ -25,6 +27,7 @@ void CopyBuffer::Initialize() {
 	//Pool for graphics commands
 	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 
+	// create the command pool
 	if (vkCreateCommandPool(VulkanInstance::GetInstance().device, &poolInfo, nullptr, &_commandPool) != VK_SUCCESS) {
 		throw std::runtime_error("CopyBuffer::Initialize: failed to create command pool!");
 	}
@@ -35,9 +38,13 @@ void CopyBuffer::Initialize() {
 
 void CopyBuffer::BeginSingleTimeCommand() {
 	if (!_init) {
+		//initialize if not init
 		Initialize();
 	}
 
+	/*
+		Allocate info for the command pool for one command buffer
+	*/
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -45,6 +52,9 @@ void CopyBuffer::BeginSingleTimeCommand() {
 	allocInfo.commandBufferCount = 1;
 	vkAllocateCommandBuffers(VulkanInstance::GetInstance().device, &allocInfo, &_commandBuffer);
 
+	/*
+		Begin the command buffer
+	*/
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
@@ -53,14 +63,24 @@ void CopyBuffer::BeginSingleTimeCommand() {
 }
 
 void CopyBuffer::EndSingleTimeCommand() {
+	/*
+		End the command buffer
+	*/
+
 	vkEndCommandBuffer(_commandBuffer);
 
+	/*
+		Submit the command recorded before
+	*/
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &_commandBuffer;
 
 	vkQueueSubmit(VulkanInstance::GetInstance().graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	/*
+		Wait until the command ends its execution and free the buffer
+	*/
 	vkQueueWaitIdle(VulkanInstance::GetInstance().graphicsQueue);
 
 	vkFreeCommandBuffers(VulkanInstance::GetInstance().device, _commandPool, 1, &_commandBuffer);
@@ -72,6 +92,9 @@ void CopyBuffer::Copy(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize siz
 	//Start recording commands
 	BeginSingleTimeCommand();
 
+	/*
+		Copy the buffer
+	*/
 	VkBufferCopy copyRegion = {};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(_commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
@@ -81,8 +104,14 @@ void CopyBuffer::Copy(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize siz
 
 
 void CopyBuffer::CopyBufferToImage(VkBuffer& buffer, VkImage& image, uint32_t width, uint32_t height) {
+
+	TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
 	BeginSingleTimeCommand();
 
+	/*
+		Copy buffer to image, expecifing width height and prof
+	*/
 	VkBufferImageCopy region = {};
 	region.bufferOffset = 0;
 	region.bufferRowLength = 0;
@@ -109,6 +138,7 @@ void CopyBuffer::CopyBufferToImage(VkBuffer& buffer, VkImage& image, uint32_t wi
 		&region
 	);
 	EndSingleTimeCommand();
+	TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void CopyBuffer::TransitionImageLayout(VkImage& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {

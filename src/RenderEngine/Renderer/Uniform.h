@@ -97,9 +97,9 @@ struct MVP {
 };
 
 struct UniformColor {
-	glm::vec3 color;
+	alignas(16) glm::vec4 color;
 
-	UniformColor(glm::vec3 _color = glm::vec3(0,1,0)) : color(_color) {
+	UniformColor(glm::vec4 _color = glm::vec4(0,1,0,1)) : color(_color) {
 		//size = sizeof(*this);
 	}
 
