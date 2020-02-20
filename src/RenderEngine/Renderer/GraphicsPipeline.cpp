@@ -4,6 +4,7 @@
 #include "Vertex.h"
 #include "DescriptorSetLayout.h"
 #include "Image.h"
+#include "Uniform.h"
 
 
 GraphicsPipeline::GraphicsPipeline() : _shaders(0), _descriptorSetLayout(nullptr){
@@ -92,14 +93,14 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader
     colorBlending.blendConstants[3] = 0.0f;
 
     _descriptorSetLayout = new DescriptorSetLayout();
-    std::vector<DescriptorSetLayoutBinding> bindings(0);
-    std::vector<DescriptorSetLayoutBinding> vertexBindings = vertex->GetDescriptorSetLayoutBindings();
+    std::vector<UniformInfo*> bindings(0);
+    std::vector<UniformInfo*> vertexBindings = vertex->GetDescriptorSetLayoutBindings();
 
     for (int i = 0; i < vertexBindings.size(); i++) {
         bindings.push_back(vertexBindings[i]);
     }
     
-    std::vector<DescriptorSetLayoutBinding> fragmentBindings = fragment->GetDescriptorSetLayoutBindings();
+    std::vector<UniformInfo*> fragmentBindings = fragment->GetDescriptorSetLayoutBindings();
 
     for (int i = 0; i < fragmentBindings.size(); i++) {
         bindings.push_back(fragmentBindings[i]);

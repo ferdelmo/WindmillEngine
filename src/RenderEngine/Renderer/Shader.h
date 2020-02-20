@@ -6,6 +6,7 @@
 
 
 class VulkanInstance;
+class UniformInfo;
 
 /*
 	Abstract class to implement a shader, configurable to be either fragment, vertex or whatever
@@ -18,7 +19,7 @@ class Shader
 private:
 	VkShaderModule _shaderModule;
 
-	std::vector<DescriptorSetLayoutBinding> _descriptorSetLayoutBindings;
+	std::vector<UniformInfo*> _descriptorSetLayoutBindings;
 
 	static std::vector<char> ReadFile(const std::string& path);
 
@@ -34,9 +35,9 @@ public:
 
 	~Shader();
 
-	void Initialize(const std::string path, VkShaderStageFlagBits stage, std::vector<DescriptorSetLayoutBinding> descriptorSetLayoutBindings);
+	void Initialize(const std::string path, VkShaderStageFlagBits stage, std::vector<UniformInfo*> descriptorSetLayoutBindings);
 
-	std::vector<DescriptorSetLayoutBinding>& GetDescriptorSetLayoutBindings();
+	std::vector<UniformInfo*>& GetDescriptorSetLayoutBindings();
 
 	VkShaderModule& GetShaderModule();
 

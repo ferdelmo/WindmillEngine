@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "../VulkanInstance.h"
+#include "Uniform.h"
 
 Shader::Shader() :  _shaderModule(nullptr), _descriptorSetLayoutBindings(0)
 {
@@ -17,13 +18,13 @@ Shader::~Shader() {
 }
 
 
-void Shader::Initialize(const std::string path, VkShaderStageFlagBits stage, std::vector<DescriptorSetLayoutBinding> descriptorSetLayoutBindings) {
+void Shader::Initialize(const std::string path, VkShaderStageFlagBits stage, std::vector<UniformInfo*> descriptorSetLayoutBindings) {
     CreateShaderModule(path);
     _descriptorSetLayoutBindings = descriptorSetLayoutBindings;
     _stage = stage;
 }
 
-std::vector<DescriptorSetLayoutBinding>& Shader::GetDescriptorSetLayoutBindings() {
+std::vector<UniformInfo*>& Shader::GetDescriptorSetLayoutBindings() {
     return _descriptorSetLayoutBindings;
 }
 

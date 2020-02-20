@@ -7,6 +7,8 @@
 #include "RenderEngine/Renderer/Image.h"
 #include "RenderEngine/Renderer/RenderPass.h"
 
+#include "RenderEngine/Renderer/Renderizable.h"
+
 RenderThread::RenderThread() : _initialized(false), objects(0), objectsToAdd() {
 	
 }

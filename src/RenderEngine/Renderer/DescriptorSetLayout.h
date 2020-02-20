@@ -3,6 +3,7 @@
 #include "../VulkanInstance.h"
 #include <exception>
 #include <stdexcept>
+#include "Uniform.h"
 
 
 
@@ -51,14 +52,14 @@ public:
 
     ~DescriptorSetLayout();
     
-	void Initialize(std::vector<DescriptorSetLayoutBinding> bindingsVector) {
+	void Initialize(std::vector<UniformInfo*> bindingsVector) {
         VkDescriptorSetLayoutBinding bindings[10];
         int count = bindingsVector.size();
         for (int i = 0; i < count; i++) {
-            bindings[i].binding = bindingsVector[i].binding;
-            bindings[i].descriptorType = bindingsVector[i].type;
-            bindings[i].descriptorCount = bindingsVector[i].descriptorCount;
-            bindings[i].stageFlags = bindingsVector[i].stageFlags;
+            bindings[i].binding = bindingsVector[i]->binding;
+            bindings[i].descriptorType = bindingsVector[i]->type;
+            bindings[i].descriptorCount = bindingsVector[i]->descriptorCount;
+            bindings[i].stageFlags = bindingsVector[i]->stageFlags;
             bindings[i].pImmutableSamplers = nullptr; // Optional
         }
         VkDescriptorSetLayoutCreateInfo layoutInfo = {};

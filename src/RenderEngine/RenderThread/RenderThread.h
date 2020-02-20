@@ -6,11 +6,10 @@
 #include <vector>
 #include <atomic>
 
-#include "RenderEngine/Renderer/Renderizable.h"
-
 class VulkanInstance;
 class Image;
 class RenderPass;
+class Renderizable;
 
 /*
 	Singleton to represent the render thread

@@ -5,9 +5,12 @@
 #include "Camera.h"
 #include "Texture.h"
 #include "Renderizable.h"
+#include "Uniform.h"
+#include <map>
 
 class VulkanInstance;
 class GraphicsPipeline;
+class Material;
 /**
 * Represent a static mesh with a list of vertex. Initially once initialized, the list of vertex
 * should not change (TODO: fix that)
@@ -23,13 +26,11 @@ private:
 	std::vector<Index> _indices;
 	Buffer _indexBuffer;
 
-	UniformBufferObject _ubo;
-	Buffer _uniformBuffer;
+	MVP _ubo;
 
-	std::string _pathToTexture;
-	Texture _texture;
+	std::map<std::string, Buffer*> _uniforms;
 
-	GraphicsPipeline* _pipeline;
+	Material* _material;
 
 	VkDescriptorPool _descriptorPool;
 	VkDescriptorSet _descriptorSet;
@@ -48,8 +49,7 @@ public:
 	/*
 		Constructor with a list of vertices and indices
 	*/
-	StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::string texture,
-		GraphicsPipeline* pipeline);
+	StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, Material* mat);
 
 	~StaticMesh();
 
@@ -93,6 +93,6 @@ public:
 
 	std::vector<Vertex> GetVertices();
 
-	UniformBufferObject& GetUniformObject();
+	MVP& GetUniformObject();
 };
 

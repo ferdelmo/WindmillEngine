@@ -3,7 +3,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <array>
+#include <vector>
 
 typedef uint16_t Index;
 
@@ -29,8 +29,8 @@ struct Vertex {
 	/*
 		describes how to extrat a vertex attribute from a chunk of vertex data
 	*/
-	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-		std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = {};
+	static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions() {
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions = { {}, {}, {} };
 
 		attributeDescriptions[0].binding = 0;
 		attributeDescriptions[0].location = 0;
@@ -58,14 +58,4 @@ struct Vertex {
 
 		return attributeDescriptions;
 	}
-};
-
-/*
-	Uniform struct with the MVP transforms to pass the vertex shader
-*/
-
-struct UniformBufferObject {
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 proj;
 };

@@ -1,10 +1,53 @@
 #include <iostream>
 
-#include "VulkanApplication.h"
 #include "RenderThread/RenderThread.h"
 #include "Renderer/GraphicsPipeline.h"
 #include "Renderer/Shader.h"
 #include "Renderer/StaticMesh.h"
+#include "Renderer/Image.h"
+#include "Renderer/Uniform.h"
+#include "Renderer/RenderPass.h"
+#include "Renderer/Material.h"
+
+/*
+const std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+    {{-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 0.0f}},
+    {{0.5f, -0.5f, 1.0f}, {0.0f, 1.0f, 1.0f}},
+    {{0.5f, 0.5f, 1.0f}, {1.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f, 1.0f}, {0.5f, 0.5f, 0.5f}}
+};
+
+const std::vector<uint16_t> indices = {
+    0, 2, 1, 3, 2, 0, 4, 5, 6, 6, 7, 4,
+    0, 4, 3, 4, 7, 3, 3, 7, 2, 7, 6, 2,
+    6, 5, 2, 5, 1, 2, 5, 4, 1, 4, 0, 1
+};
+
+*/
+const std::vector<Vertex> vertices1 = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}
+};
+
+const std::vector<uint16_t> indices1 = {
+    0, 1, 2, 2, 3, 0
+};
+const std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+    {{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+    {{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}
+};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0
+};
 
 int main() {
 	/*
@@ -25,30 +68,7 @@ int main() {
 
     rt.InitializeSwapChain();
 
-    GraphicsPipeline* pipeline = new GraphicsPipeline();
-    Shader* vertex = new Shader();
-    std::vector<DescriptorSetLayoutBinding> vertexDescriptor(0);
-    vertexDescriptor.push_back(DescriptorSetLayoutBinding::GetUniform(0, 1, VK_SHADER_STAGE_VERTEX_BIT));
-    vertex->Initialize("../resources/shaders/vert.spv", VK_SHADER_STAGE_VERTEX_BIT, vertexDescriptor);
-
-    Shader* fragment = new Shader();
-    std::vector<DescriptorSetLayoutBinding> fragmentDescriptor(0);
-    fragmentDescriptor.push_back(DescriptorSetLayoutBinding::GetImageSampler(1, 1, VK_SHADER_STAGE_FRAGMENT_BIT));
-    fragment->Initialize("../resources/shaders/frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT, fragmentDescriptor);
-
-
-    VkViewport viewport = {};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)rt.GetExtent().width;
-    viewport.height = (float)rt.GetExtent().height;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-
-    VkRect2D scissor = {};
-    scissor.offset = { 0, 0 };
-    scissor.extent = rt.GetExtent();
-
+    Camera cam = Camera(glm::vec3(-2.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 60, 16 / 9.0f, 0.1f, 100.0f);
 
     VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
         VK_IMAGE_TILING_OPTIMAL,
@@ -62,20 +82,36 @@ int main() {
 
     rt.Initialize(renderPass);
 
-    pipeline->Initialize(renderPass, vertex, fragment, rt.GetFormat(), viewport, scissor);
+    std::vector<UniformInfo*> vertexDescriptor(0);
+    MVP aux;
+    aux.proj = cam.GetProjection();
+    aux.view = cam.GetView();
+    UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    vertexDescriptor.push_back(vertexInfo);
+    std::vector<UniformInfo*> fragmentDescriptor(0);
 
-    Camera cam = Camera(glm::vec3(-2.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 60, 16 / 9.0f, 0.1f, 100.0f);
+    Texture tex;
+    tex.Initialize("../resources/textures/texture.jpg");
+    UniformInfo* fragmentInfo = UniformInfo::GenerateInfoTexture(&tex, "Texture", 1, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+    fragmentDescriptor.push_back(fragmentInfo);
 
-    StaticMesh* mesh = new StaticMesh(vertices, indices, "../resources/textures/texture.jpg", pipeline);
-    StaticMesh* mesh1 = new StaticMesh(vertices1, indices1, "../resources/textures/texture.jpg", pipeline);
+    Material* mat = new Material();
+    mat->Initialize("../resources/shaders/shader.vert.spv", vertexDescriptor,
+        "../resources/shaders/shader.frag.spv", fragmentDescriptor,
+        renderPass,
+        Vertex::getBindingDescription(),
+        Vertex::getAttributeDescriptions());
 
-    mesh->SetCamera(cam);
+    //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
+    StaticMesh* mesh1 = new StaticMesh(vertices1, indices1, mat);
+
+    //mesh->SetCamera(cam);
     mesh1->SetCamera(cam);
 
-    mesh->Initialize();
+    //mesh->Initialize();
     mesh1->Initialize();
 
-    rt.AddObject(mesh);
+    //rt.AddObject(mesh);
     rt.AddObject(mesh1);
     
     rt.UpdateCommandBuffers();
@@ -89,10 +125,8 @@ int main() {
         currentTime = std::chrono::high_resolution_clock::now();
         time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
     }
-
     std::cout << "Frames: " << rt.frames << std::endl;
     std::cout << "FPS: " << rt.frames / 5.0f << std::endl;
 
     rt.StopThread();
-
 }
