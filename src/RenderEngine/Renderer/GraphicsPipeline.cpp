@@ -21,6 +21,8 @@ GraphicsPipeline::~GraphicsPipeline() {
 
 
 void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader* fragment,  VkFormat format, 
+    VkVertexInputBindingDescription inputBind,
+    std::vector<VkVertexInputAttributeDescription> inputAttr,
     VkViewport viewport, VkRect2D scissor) {
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -42,8 +44,8 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    auto bindingDescription = Vertex::getBindingDescription();
-    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+    auto bindingDescription = inputBind;
+    auto attributeDescriptions = inputAttr;
 
     vertexInputInfo.vertexBindingDescriptionCount = 1;
     vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());

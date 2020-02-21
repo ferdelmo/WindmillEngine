@@ -20,7 +20,7 @@ class Material;
 class StaticMesh : public Renderizable
 {
 private:
-	std::vector<Vertex> _vertices;
+	std::vector<VertexNormal> _vertices;
 	Buffer _vertexBuffer;
 
 	std::vector<Index> _indices;
@@ -49,7 +49,7 @@ public:
 	/*
 		Constructor with a list of vertices and indices
 	*/
-	StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, Material* mat);
+	StaticMesh(const std::vector<VertexNormal>& vertices, const std::vector<Index>& indices, Material* mat);
 
 	~StaticMesh();
 
@@ -93,7 +93,7 @@ public:
 
 	std::vector<Index> GetIndices();
 
-	std::vector<Vertex> GetVertices();
+	std::vector<VertexNormal> GetVertices();
 
 	MVP& GetUniformObject();
 };

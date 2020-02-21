@@ -10,7 +10,7 @@
 #include "DescriptorSetLayout.h"
 #include "Material.h"
 
-StaticMesh::StaticMesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, Material* mat)
+StaticMesh::StaticMesh(const std::vector<VertexNormal>& vertices, const std::vector<Index>& indices, Material* mat)
 	: _vertices(vertices), _indices(indices), _vertexBuffer(), _indexBuffer(), _material(mat)  {
 	_ubo.model = glm::mat4(1.0f);
 }
@@ -95,6 +95,6 @@ std::vector<Index> StaticMesh::GetIndices() {
 	return _indices;
 }
 
-std::vector<Vertex> StaticMesh::GetVertices() {
+std::vector<VertexNormal> StaticMesh::GetVertices() {
 	return _vertices;
 }

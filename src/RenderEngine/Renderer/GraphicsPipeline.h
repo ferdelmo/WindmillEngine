@@ -37,6 +37,8 @@ public:
 		TODO: more configuration
 	*/
 	void Initialize(RenderPass* renderPass, Shader* vertex, Shader* fragment, VkFormat format,
+		VkVertexInputBindingDescription inputBind,
+		std::vector<VkVertexInputAttributeDescription> inputAttr,
 		VkViewport viewport, VkRect2D scissor);
 
 	DescriptorSetLayout* GetDescriptorSetLayout() {

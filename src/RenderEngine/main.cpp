@@ -11,7 +11,7 @@
 #include "Renderer/Material.h"
 
 
-const std::vector<Vertex> vertices = {
+const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
     {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f,0.0f}},
     {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f,1.0f}},
@@ -33,6 +33,13 @@ const std::vector<Vertex> vertices1 = {
     {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
     {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
     {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}
+};
+
+const std::vector<VertexNormal> verticesNormal1 = {
+    {{-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 0.0f}, {0.0f, 1.0f}, {0.0f,0.0f,1.0f}},
+    {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f,0.0f,1.0f}},
+    {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f,0.0f,1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f,0.0f,1.0f}}
 };
 
 const std::vector<uint16_t> indices1 = {
@@ -69,7 +76,7 @@ int main() {
 
     rt.InitializeSwapChain();
 
-    Camera cam = Camera(glm::vec3(-2.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 60, 16 / 9.0f, 0.1f, 100.0f);
+    Camera cam = Camera(glm::vec3(0.0f, -1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 100.0f);
 
     VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
         VK_IMAGE_TILING_OPTIMAL,
@@ -82,26 +89,21 @@ int main() {
     renderPass->Initialize(rt.GetFormat(), depthImage);
 
     rt.Initialize(renderPass);
-
+    
+    /*
     std::vector<UniformInfo*> vertexDescriptor(0);
     MVP aux;
     aux.proj = cam.GetProjection();
     aux.view = cam.GetView();
-    UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
     vertexDescriptor.push_back(vertexInfo);
 
     UniformColor auxColor;
     auxColor.color = glm::vec4(0, 1, 1, 1);
-    UniformInfo* vertexInfo2 = UniformInfo::GenerateInfo(auxColor, "Color", 1, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    UniformInfo* vertexInfo2 = UniformInfo::GenerateInfo(auxColor, "Color", 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
     vertexDescriptor.push_back(vertexInfo2);
 
     std::vector<UniformInfo*> fragmentDescriptor(0);
-
-    //Texture tex;
-    //tex.Initialize("../resources/textures/texture.jpg");
-    //UniformInfo* fragmentInfo = UniformInfo::GenerateInfoTexture(&tex, "Texture", 1, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-    //fragmentDescriptor.push_back(fragmentInfo);
-
     Material* mat = new Material();
     mat->Initialize("../resources/shaders/SolidColor.vert.spv", vertexDescriptor,
         "../resources/shaders/SolidColor.frag.spv", fragmentDescriptor,
@@ -109,16 +111,57 @@ int main() {
         Vertex::getBindingDescription(),
         Vertex::getAttributeDescriptions());
 
-    StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
-    StaticMesh* mesh1 = new StaticMesh(vertices1, indices1, mat);
+    */
 
-    mesh->SetCamera(cam);
+    std::vector<UniformInfo*> vertexDescriptor(0);
+    MVP aux;
+    aux.proj = cam.GetProjection();
+    aux.view = cam.GetView();
+    UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    vertexDescriptor.push_back(vertexInfo);
+
+
+    std::vector<UniformInfo*> fragmentDescriptor(0);
+    PointLight light;
+    light.color = glm::vec3(1, 1, 1);
+    light.position = glm::vec3(1, 0, 1);
+    light.power = 1;
+
+    PointLight light2;
+    light2.color = glm::vec3(1, 1, 1);
+    light2.position = glm::vec3(-1, 0, 1);
+    light2.power = 1;
+
+    Lights lights;
+    lights.lights[0] = light;
+    lights.lights[1] = light2;
+
+    UniformInfo* fragment1 = UniformInfo::GenerateInfo(lights, "Lights", 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
+    fragmentDescriptor.push_back(fragment1);
+
+    Texture* tex = new Texture();
+    tex->Initialize("../resources/textures/texture.jpg");
+    UniformInfo* texture = UniformInfo::GenerateInfoTexture(tex, "Texture", 2, VK_SHADER_STAGE_FRAGMENT_BIT);
+    fragmentDescriptor.push_back(texture);
+
+    Material* mat = new Material();
+    mat->Initialize("../resources/shaders/BasicLight.vert.spv", vertexDescriptor,
+        "../resources/shaders/BasicLight.frag.spv", fragmentDescriptor,
+        renderPass,
+        VertexNormal::getBindingDescription(),
+        VertexNormal::getAttributeDescriptions());
+
+
+    //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
+    StaticMesh* mesh1 = new StaticMesh(verticesNormal1, indices1, mat);
+
+   // mesh->SetCamera(cam);
     mesh1->SetCamera(cam);
 
-    mesh->Initialize();
+    //mesh->Initialize();
     mesh1->Initialize();
 
-    rt.AddObject(mesh);
+   // rt.AddObject(mesh);
     rt.AddObject(mesh1);
     
     rt.UpdateCommandBuffers();
@@ -133,14 +176,14 @@ int main() {
     float time = 0;
     int logicTicks = 0;
 
-    mesh->Translate({ 2, 0, 0 });
+    //mesh->Translate({ 2, 0, 0 });
 
-    while (time < 5.0f) {
+    while (time < 10.0f) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame-currentTime).count();
         currentTime = std::chrono::high_resolution_clock::now();
 
-        mesh->Update(deltaTime);
-        mesh1->Update(deltaTime);
+        //mesh->Update(deltaTime);
+        //mesh1->Update(deltaTime);
 
         logicTicks++;
         endFrame = std::chrono::high_resolution_clock::now();
@@ -154,8 +197,9 @@ int main() {
     rt.StopThread();
 
     delete depthImage;
-    delete mesh;
+    //delete mesh;
     delete mesh1;
+    delete tex;
     delete mat;
     delete renderPass;
 

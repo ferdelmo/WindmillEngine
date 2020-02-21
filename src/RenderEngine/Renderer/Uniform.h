@@ -27,28 +27,28 @@ struct UniformInterface {
 */
 template<typename T>
 struct UniformType : public UniformInterface {
-	T obj;
+	std::vector<T> objs;
 
 	UniformType() {
-		size = sizeof(T);
+		size = sizeof(objs[0]);
 	}
 
-	UniformType(T obj) {
-		size = sizeof(T);
-		this->obj = obj;
+	UniformType(std::vector<T> objs) {
+		size = sizeof(objs[0]);
+		this->objs = objs;
 	}
 
 	Buffer* GetUniformBuffer() override {
 		Buffer* buf = new Buffer();
-		buf->Initialize(&obj, size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		buf->Initialize(objs, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		return buf;
 	}
 
 	UniformTypes GetTypeUniform() override { return UniformTypes::UNIFORM; }
 
-	T GetObject() {
-		return obj;
+	std::vector<T> GetObject() {
+		return objs;
 	}
 };
 
@@ -85,32 +85,32 @@ struct MVP {
 		model(_model), view(_view), proj(_proj) {
 		//size = sizeof(*this);
 	}
-
-	/*
-	Buffer* GetUniformBuffer() override{
-		Buffer* b = new Buffer();
-		b->Initialize<MVP>(this, sizeof(*this), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		return b;
-	}
-	*/
 };
 
 struct UniformColor {
-	alignas(16) glm::vec4 color;
+	alignas(4) glm::vec4 color;
 
 	UniformColor(glm::vec4 _color = glm::vec4(0,1,0,1)) : color(_color) {
-		//size = sizeof(*this);
-	}
 
-	/*
-	Buffer* GetUniformBuffer() override{
-		Buffer* b = new Buffer();
-		b->Initialize<MVP>(this, sizeof(*this), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		return b;
 	}
-	*/
+};
+
+
+
+struct PointLight {
+	glm::vec3 position;
+	float power;
+	glm::vec3 color;
+	float aux; //used for aligment, but obiusly not the best option
+
+	PointLight(glm::vec3 _pos = glm::vec3(0), float _power = 10, glm::vec3 _color = glm::vec3(1)) :
+	position(_pos), power(_power), color(_color) {
+
+	}
+};
+
+struct Lights {
+	PointLight lights[2];
 };
 
 struct UniformInfo {
@@ -129,29 +129,42 @@ struct UniformInfo {
 
 
 	static UniformInfo* GenerateInfoTexture(Texture* obj, std::string name, uint16_t binding,
-		uint16_t descriptorCount,
-		VkDescriptorType type,
 		VkShaderStageFlags stageFlags) {
 		UniformInfo* info = new UniformInfo();
 		info->obj = new UniformTexture(obj);
 		info->name = name;
 		info->binding = binding;
-		info->type = type;
-		info->descriptorCount = descriptorCount;
+		info->type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		info->descriptorCount = 1;
 		info->stageFlags = stageFlags;
 		return info;
 	}
+
 	template<typename T>
 	static UniformInfo* GenerateInfo(T obj, std::string name, uint16_t binding,
-		uint16_t descriptorCount,
 		VkDescriptorType type,
 		VkShaderStageFlags stageFlags) {
 		UniformInfo* info = new UniformInfo();
-		info->obj = new UniformType<T>(obj);
+		std::vector<T> aux = { obj };
+		info->obj = new UniformType<T>(aux);
 		info->name = name;
 		info->binding = binding;
 		info->type = type;
-		info->descriptorCount = descriptorCount;
+		info->descriptorCount = 1;
+		info->stageFlags = stageFlags;
+		return info;
+	}
+
+	template<typename T>
+	static UniformInfo* GenerateInfoArray(std::vector<T> objs, std::string name, uint16_t binding,
+		VkDescriptorType type,
+		VkShaderStageFlags stageFlags) {
+		UniformInfo* info = new UniformInfo();
+		info->obj = new UniformType<T>(objs);
+		info->name = name;
+		info->binding = binding;
+		info->type = type;
+		info->descriptorCount = objs.size();
 		info->stageFlags = stageFlags;
 		return info;
 	}

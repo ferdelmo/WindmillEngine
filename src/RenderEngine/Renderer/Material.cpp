@@ -35,7 +35,7 @@ void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vert
 	scissor.offset = { 0, 0 };
 	scissor.extent = rt.GetExtent();
 
-	_pipeline.Initialize(renderPass, &_vert, &_frag, rt.GetFormat(), viewport, scissor);
+	_pipeline.Initialize(renderPass, &_vert, &_frag, rt.GetFormat(), inputBind, inputAttr, viewport, scissor);
 
 	//_texture.Initialize("../resources/textures/texture.jpg");
 
@@ -95,12 +95,13 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 	}
 
 	std::vector<VkWriteDescriptorSet> descriptorWrites = {};
-	std::vector<VkDescriptorBufferInfo*> descriptorWritesBufferInfo = {};
+	std::vector<std::vector<VkDescriptorBufferInfo>> descriptorWritesBufferInfo = {};
 
+	int index = 0;
 	std::map<std::string, Buffer*> resul;
 	for (auto entry : _uniforms) {
-
-		if (entry.second->obj->GetTypeUniform() == UniformTypes::UNIFORM) { // && entry.second->name == "Color") {
+		if (entry.second->obj->GetTypeUniform() == UniformTypes::UNIFORM) {
+			descriptorWritesBufferInfo.push_back(std::vector<VkDescriptorBufferInfo>());
 			VkWriteDescriptorSet aux = {};
 
 			std::pair<std::string, Buffer*> pair;
@@ -109,12 +110,14 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 
 			resul.insert(pair);
 
-			VkDescriptorBufferInfo* bufferInfo = new VkDescriptorBufferInfo();
-			bufferInfo->buffer = pair.second->GetBuffer();
-			bufferInfo->offset = 0;
-			bufferInfo->range = entry.second->obj->size;
+			for (int i = 0; i < entry.second->descriptorCount; i++) {
+				VkDescriptorBufferInfo bufferInfo;
+				bufferInfo.buffer = pair.second->GetBuffer();
+				bufferInfo.offset = i* entry.second->obj->size;
+				bufferInfo.range = entry.second->obj->size;
 
-			descriptorWritesBufferInfo.push_back(bufferInfo);
+				descriptorWritesBufferInfo[index].push_back(bufferInfo);
+			}
 
 			aux.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			aux.dstSet = descriptorSet;
@@ -122,10 +125,12 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 			aux.dstArrayElement = 0;
 			aux.descriptorType = entry.second->type;
 			aux.descriptorCount = entry.second->descriptorCount;
-			aux.pBufferInfo = descriptorWritesBufferInfo.back();
+			aux.pBufferInfo = descriptorWritesBufferInfo[index].data();
 			aux.pImageInfo = nullptr; // Optional
 			aux.pTexelBufferView = nullptr; // Optional
 			descriptorWrites.push_back(aux);
+
+			index++;
 		}
 		else if (entry.second->obj->GetTypeUniform() == UniformTypes::TEXTURE) {
 			VkDescriptorImageInfo imageInfo = {};
@@ -148,10 +153,10 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 
 	vkUpdateDescriptorSets(VulkanInstance::GetInstance().device, static_cast<uint32_t>(descriptorWrites.size()),
 		descriptorWrites.data(), 0, nullptr);
-
+	/*
 	for (auto aux : descriptorWritesBufferInfo) {
 		delete aux;
 	}
-
+	*/
 	return resul;
 }
