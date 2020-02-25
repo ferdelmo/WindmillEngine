@@ -9,7 +9,9 @@ Material::Material() {
 }
 
 Material::~Material() {
-
+	for (auto entry : _uniforms) {
+		delete entry.second;
+	}
 }
 
 void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vertBinds,

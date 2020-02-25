@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-typedef uint16_t Index;
+typedef uint32_t Index;
 
 /*
 	Data passed to the Vertex shader

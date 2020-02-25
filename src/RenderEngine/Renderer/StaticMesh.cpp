@@ -40,7 +40,7 @@ void StaticMesh::Initialize() {
 
 void StaticMesh::Update(float deltaTime) {
 	static float rot = 0;
-	float actualRot = -180 * deltaTime;
+	float actualRot = -45 * deltaTime;
 	rot += actualRot;
 	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 0.0f, 1.0f));
 	
@@ -53,8 +53,16 @@ void StaticMesh::Update(float deltaTime) {
 	*/
 }
 
+void StaticMesh::Rotate(float angle, glm::vec3 up) {
+	float actualRot = angle;
+	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), up);
+
+	std::vector<MVP> uniform = { _ubo };
+	_uniforms.at("MVP")->Fill(uniform);
+}
+
 void StaticMesh::Translate(glm::vec3 trans) {
-	_ubo.model = glm::translate(_ubo.model, glm::vec3(2, 0, 0));
+	_ubo.model = glm::translate(_ubo.model, trans);
 	std::vector<MVP> uniform = { _ubo };
 	_uniforms.at("MVP")->Fill(uniform);
 }
@@ -84,7 +92,7 @@ void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 
 	vkCmdBindVertexBuffers(cmd, 0, 1, &_vertexBuffer.GetBuffer(), offsets);
 
-	vkCmdBindIndexBuffer(cmd, _indexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(cmd, _indexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
 	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSet, 0, nullptr);
 

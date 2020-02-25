@@ -63,6 +63,8 @@ public:
 	*/
 	void Update(float deltaTime);
 
+	void Rotate(float angle, glm::vec3 up);
+
 	void Translate(glm::vec3 trans);
 
 	/*

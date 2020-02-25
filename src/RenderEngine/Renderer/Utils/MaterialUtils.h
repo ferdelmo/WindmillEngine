@@ -5,7 +5,7 @@
 #include "RenderEngine/Renderer/Camera.h"
 #include "RenderEngine/Renderer/Vertex.h"
 
-Material* GetBasicLightMaterial(const Camera& cam, RenderPass* renderPass) {
+Material* GetBasicLightMaterial(const Camera& cam, std::string texturePath,  RenderPass* renderPass) {
     std::vector<UniformInfo*> vertexDescriptor(0);
     MVP aux;
     aux.proj = cam.GetProjection();
@@ -17,23 +17,24 @@ Material* GetBasicLightMaterial(const Camera& cam, RenderPass* renderPass) {
     std::vector<UniformInfo*> fragmentDescriptor(0);
     PointLight light;
     light.color = glm::vec3(1, 1, 1);
-    light.position = glm::vec3(1, 0, 1);
-    light.power = 1;
+    light.position = glm::vec3(15, -5, 20);
+    light.power = 500;
 
     PointLight light2;
     light2.color = glm::vec3(1, 1, 1);
-    light2.position = glm::vec3(-1, 0, 1);
-    light2.power = 1;
+    light2.position = glm::vec3(-20, 0, 10);
+    light2.power = 500;
 
     Lights lights;
     lights.lights[0] = light;
-    lights.lights[1] = light2;
+    //lights.lights[1] = light2;
+    lights.num_lights = 1;
 
     UniformInfo* fragment1 = UniformInfo::GenerateInfo(lights, "Lights", 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
     fragmentDescriptor.push_back(fragment1);
 
     Texture* tex = new Texture();
-    tex->Initialize("../resources/textures/texture.jpg");
+    tex->Initialize(texturePath);
     UniformInfo* texture = UniformInfo::GenerateInfoTexture(tex, "Texture", 2, VK_SHADER_STAGE_FRAGMENT_BIT);
     fragmentDescriptor.push_back(texture);
 

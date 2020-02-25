@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\lib\objloader\tiny_obj_loader.cc" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
     <ClCompile Include="..\src\Engine\GameObject.cpp" />
     <ClCompile Include="..\src\Engine\StaticMeshComponent.cpp" />
@@ -30,6 +31,7 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\GraphicsPipeline.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Image.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Material.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Mesh.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\RenderPass.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Shader.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\StaticMesh.cpp" />
@@ -51,6 +53,7 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\GraphicsPipeline.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Image.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Material.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Mesh.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Renderizable.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\RenderPass.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Shader.h" />
@@ -152,7 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(SolutionDir)\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(SolutionDir)\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\objloader;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -188,7 +191,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(SolutionDir)\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(SolutionDir)\lib\stb;C:\VulkanSDK\1.1.121.2\Include;$(SolutionDir)\lib\objloader;$(SolutionDir)\lib\glm;$(SolutionDir)\lib\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

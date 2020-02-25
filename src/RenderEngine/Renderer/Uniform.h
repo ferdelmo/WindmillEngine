@@ -5,6 +5,8 @@
 #include "Buffer.h"
 #include "Texture.h"
 
+#define MAX_LIGHTS 10
+
 typedef enum class UniformTypes {
 	UNIFORM,
 	TEXTURE
@@ -64,6 +66,9 @@ struct UniformTexture : public UniformInterface {
 		this->obj = obj;
 	}
 
+	~UniformTexture() {
+		delete obj;
+	}
 
 	virtual VkImageView *GetImageView() { return &obj->GetImageView(); };
 
@@ -103,14 +108,15 @@ struct PointLight {
 	glm::vec3 color;
 	float aux; //used for aligment, but obiusly not the best option
 
-	PointLight(glm::vec3 _pos = glm::vec3(0), float _power = 10, glm::vec3 _color = glm::vec3(1)) :
+	PointLight(glm::vec3 _pos = glm::vec3(0), float _power = 0, glm::vec3 _color = glm::vec3(1)) :
 	position(_pos), power(_power), color(_color) {
 
 	}
 };
 
 struct Lights {
-	PointLight lights[2];
+	PointLight lights[MAX_LIGHTS];
+	int num_lights = 2;
 };
 
 struct UniformInfo {

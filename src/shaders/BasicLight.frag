@@ -14,7 +14,8 @@ struct PointLight{
 };
 
 layout(binding = 1) uniform Lights{
-	PointLight[2] lights;
+	PointLight[10] lights;
+	int num_lights;
 } lightsStruct;
 
 
@@ -25,11 +26,11 @@ layout(location = 0) out vec4 outColor;
 void main() {
 	vec3 norm = normalize(normal);
 	
-	PointLight[2] lights = lightsStruct.lights;
+	PointLight[10] lights = lightsStruct.lights;
 
 	vec3 texColor = texture(texSampler, fragTexCoord).rgb;
 	vec3 lightColor = vec3(0,0,0);
-	for(int i=0; i<2;i++){
+	for(int i=0; i<lightsStruct.num_lights;i++){
 
 		vec3 lightDir = normalize(lights[i].position-worldPos);
 		float diff = max(dot(norm, lightDir), 0.0);

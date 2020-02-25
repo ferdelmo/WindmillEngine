@@ -79,6 +79,10 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\Material.cpp">
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Mesh.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\objloader\tiny_obj_loader.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
@@ -148,6 +152,9 @@
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\Utils\MaterialUtils.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Mesh.h">
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
