@@ -21,15 +21,22 @@ layout(binding = 1) uniform Lights{
 
 layout(binding = 2) uniform sampler2D texSampler;
 
+layout(binding = 3) uniform AmbientLight{
+	vec3 color;
+	float coef;
+} ambientLight;
+
 layout(location = 0) out vec4 outColor;
 
 void main() {
+
+
 	vec3 norm = normalize(normal);
-	
+
 	PointLight[10] lights = lightsStruct.lights;
 
 	vec3 texColor = texture(texSampler, fragTexCoord).rgb;
-	vec3 lightColor = vec3(0,0,0);
+	vec3 lightColor = ambientLight.color*ambientLight.coef;
 	for(int i=0; i<lightsStruct.num_lights;i++){
 
 		vec3 lightDir = normalize(lights[i].position-worldPos);
@@ -38,7 +45,7 @@ void main() {
 		float dist = distance(worldPos, lights[i].position);
 		float distCof = min(lights[i].power/(dist*dist),1.0);
 
-		lightColor+= lights[i].color * diff * distCof;
+		lightColor+= (lights[i].color * diff * distCof);
 	}
 
     outColor = vec4(lightColor * texColor, 1.0);

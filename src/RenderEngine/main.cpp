@@ -78,7 +78,7 @@ int main() {
 
     rt.InitializeSwapChain();
 
-    Camera cam = Camera(glm::vec3(0, -30, 15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 100.0f);
+    Camera cam = Camera(glm::vec3(2, -25, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 100.0f);
 
     VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
         VK_IMAGE_TILING_OPTIMAL,
@@ -115,9 +115,29 @@ int main() {
 
     */
 
-    Material* mat = GetBasicLightMaterial(cam, "../resources/textures/chalet.jpg", renderPass);
+    PointLight light;
+    light.color = glm::vec3(1, 1, 1);
+    light.position = glm::vec3(15, -20, 15.0f);
+    light.power = 500;
 
-    Mesh* chalet = Mesh::LoadMesh("../resources/objs/chalet.obj",15);
+    PointLight light2;
+    light2.color = glm::vec3(0, 0, 1);
+    light2.position = glm::vec3(-20, -10, 10);
+    light2.power = 500;
+
+    Lights lights;
+    lights.lights[0] = light;
+    lights.lights[1] = light2;
+
+    lights.num_lights = 1;
+
+    AmbientLight ambient = { {1,1,1}, .1f };
+
+    Texture* tex = new Texture();
+    tex->Initialize("../resources/textures/texture.jpg");
+    Material* mat = GetBasicLightMaterial(cam, tex, lights, ambient, renderPass);
+
+    Mesh* chalet = Mesh::LoadMesh("../resources/objs/Cube.obj",15);
     //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
     StaticMesh* mesh1 = new StaticMesh(chalet->vertices, chalet->indices, mat);
 
@@ -144,7 +164,12 @@ int main() {
 
     //mesh1->Translate({ 0, 2, 0 });
 
+    //mesh1->Rotate(-90, { 1,0,0 });
+
+    //mesh1->Rotate(180, { 0,0,1 });
+
     while (time < 10.0f) {
+        glfwPollEvents();
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame-currentTime).count();
         currentTime = std::chrono::high_resolution_clock::now();
 
@@ -166,6 +191,7 @@ int main() {
     delete chalet;
     delete mesh1;
     delete mat;
+    delete tex;
     delete renderPass;
 
     rt.CleanUp();

@@ -25,7 +25,6 @@ void RenderThread::MainLoop() {
 	auto startTime = std::chrono::high_resolution_clock::now();
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	while (_running) {
-		glfwPollEvents();
 		DrawFrame();
         frames++;
 	}

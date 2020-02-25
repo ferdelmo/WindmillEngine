@@ -81,6 +81,9 @@ struct UniformTexture : public UniformInterface {
 	}
 };
 
+/*
+	Struct to store the model, view, projection matrix
+*/
 struct MVP {
 	alignas(16) glm::mat4 model;
 	alignas(16) glm::mat4 view;
@@ -92,6 +95,9 @@ struct MVP {
 	}
 };
 
+/*
+	struct for a uniform color
+*/
 struct UniformColor {
 	alignas(4) glm::vec4 color;
 
@@ -101,7 +107,9 @@ struct UniformColor {
 };
 
 
-
+/*
+	Struct to represent a point light
+*/
 struct PointLight {
 	glm::vec3 position;
 	float power;
@@ -114,9 +122,16 @@ struct PointLight {
 	}
 };
 
+/* Struct to represent the lights in the scene */
 struct Lights {
 	PointLight lights[MAX_LIGHTS];
-	int num_lights = 2;
+	alignas(4) int num_lights = 0;
+};
+
+/* Struct to represent ambient light*/
+struct AmbientLight{
+	glm::vec3 color = { 0,0,0 };
+	float coef = 0.0f;
 };
 
 struct UniformInfo {

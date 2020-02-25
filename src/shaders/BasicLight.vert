@@ -17,11 +17,10 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
 layout(location = 2) out vec3 normalFrag;
 layout(location = 3) out vec3 worldPos;
-
 void main() {
     gl_Position = mvp.proj * mvp.view * mvp.model * vec4(position, 1.0);
     fragColor = inColor;
     fragTexCoord = inTexCoord;
-    normalFrag = normal;
+    normalFrag = (mvp.model * vec4(normal, 0.0)).xyz;
     worldPos =  (mvp.model * vec4(position, 1.0)).xyz;
 }
