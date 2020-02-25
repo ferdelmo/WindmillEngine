@@ -58,6 +58,7 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\Texture.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Uniform.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Utils\CopyBuffer.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Utils\MaterialUtils.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Vertex.h" />
     <ClInclude Include="..\src\RenderEngine\RenderThread\RenderThread.h" />
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h" />

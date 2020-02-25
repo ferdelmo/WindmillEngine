@@ -147,5 +147,8 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\Material.h">
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Utils\MaterialUtils.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
