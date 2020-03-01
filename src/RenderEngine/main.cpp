@@ -137,7 +137,7 @@ int main() {
     tex->Initialize("../resources/textures/texture.jpg");
     Material* mat = GetBasicLightMaterial(cam, tex, lights, ambient, renderPass);
 
-    Mesh* chalet = Mesh::LoadMesh("../resources/objs/Cube.obj",15);
+    Mesh* chalet = Mesh::LoadMesh("../resources/objs/Ball.obj",10);
     //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
     StaticMesh* mesh1 = new StaticMesh(chalet->vertices, chalet->indices, mat);
 
