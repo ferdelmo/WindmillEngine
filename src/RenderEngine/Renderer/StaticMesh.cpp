@@ -40,9 +40,9 @@ void StaticMesh::Initialize() {
 
 void StaticMesh::Update(float deltaTime) {
 	static float rot = 0;
-	float actualRot = -100000 * deltaTime;
+	float actualRot = -45 * deltaTime;
 	rot += actualRot;
-	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 0.0f, 1.0f));
+	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 1.0f, 0.0f));
 	
 	std::vector<MVP> uniform = { _ubo };
 	_uniforms.at("MVP")->Fill(uniform);

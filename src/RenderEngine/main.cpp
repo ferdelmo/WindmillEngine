@@ -12,6 +12,8 @@
 #include "Renderer/Utils/MaterialUtils.h"
 #include "Renderer/Mesh.h"
 
+#include "Input/InputManager.h"
+
 
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
@@ -59,6 +61,10 @@ const std::vector<uint16_t> indices = {
     0, 1, 2, 2, 3, 0
 };*/
 
+const float executionTime = 30.0f;
+
+using namespace Input;
+
 int main() {
 	/*
 	VulkanApplication app;
@@ -74,11 +80,42 @@ int main() {
 	return EXIT_SUCCESS;
 	*/
 
+    /* Try input */
+
+    bool end = false;
+    KeyboardCallback quit = [&end](CallbackAction ca) {
+        std::cout << "Q PULSADA" << std::endl;
+        end = true;
+    };
+
+    MousePositionCallback mouse = [](double x, double y) {
+        std::cout << x << " " << y << std::endl;
+    };
+
+    MouseButtonCallback mouseButton = [](CallbackAction ca) {
+        std::cout << "LEFT BUTTON MOUSE PRESSED" << std::endl;
+    };
+
+    MouseButtonCallback mouseButtonR = [](CallbackAction ca) {
+        std::cout << "RIGHT BUTTON MOUSE PRESSED" << std::endl;
+    };
+
+    InputManager::GetInstance().SetWindow(VulkanInstance::GetInstance().window);
+
+    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_Q, CallbackAction::KEY_PRESSED, quit);
+
+    InputManager::GetInstance().RegisterMousePositionCallback(mouse);
+
+    InputManager::GetInstance().RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, CallbackAction::KEY_PRESSED, mouseButton);
+
+
+    InputManager::GetInstance().RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, CallbackAction::KEY_RELEASED, mouseButtonR);
+
 	RenderThread& rt = RenderThread::GetInstance();
 
     rt.InitializeSwapChain();
 
-    Camera cam = Camera(glm::vec3(2, -25, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 100.0f);
+    Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 100.0f);
 
     VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
         VK_IMAGE_TILING_OPTIMAL,
@@ -129,15 +166,15 @@ int main() {
     lights.lights[0] = light;
     lights.lights[1] = light2;
 
-    lights.num_lights = 1;
+    lights.num_lights = 2;
 
     AmbientLight ambient = { {1,1,1}, .1f };
 
     Texture* tex = new Texture();
-    tex->Initialize("../resources/textures/texture.jpg");
+    tex->Initialize("../resources/textures/Building_Cinema.png");
     Material* mat = GetBasicLightMaterial(cam, tex, lights, ambient, renderPass);
 
-    Mesh* chalet = Mesh::LoadMesh("../resources/objs/Ball.obj",10);
+    Mesh* chalet = Mesh::LoadMesh("../resources/objs/Building_Cinema.obj",1);
     //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
     StaticMesh* mesh1 = new StaticMesh(chalet->vertices, chalet->indices, mat);
 
@@ -164,26 +201,34 @@ int main() {
 
     //mesh1->Translate({ 0, 2, 0 });
 
-    //mesh1->Rotate(-90, { 1,0,0 });
+    mesh1->Rotate(-90, { 1,0,0 });
 
-    //mesh1->Rotate(180, { 0,0,1 });
+    mesh1->Rotate(180, { 0,0,1 });
 
-    while (time < 10.0f) {
-        glfwPollEvents();
+    float realTimeExecuted = 0;
+
+    auto realStartTime = std::chrono::high_resolution_clock::now();
+    while (!end) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame-currentTime).count();
         currentTime = std::chrono::high_resolution_clock::now();
+        glfwPollEvents();
 
         //mesh->Update(deltaTime);
         mesh1->Update(deltaTime);
 
         logicTicks++;
         endFrame = std::chrono::high_resolution_clock::now();
-        time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
     }
+
+
+    realTimeExecuted = std::chrono::duration<float, std::chrono::seconds::period>(
+        std::chrono::high_resolution_clock::now() - startTime).count();
+
+    std::cout << "Time in execution: " << realTimeExecuted << std::endl;
     std::cout << "Frames: " << rt.frames << std::endl;
-    std::cout << "FPS: " << rt.frames / 5.0f << std::endl;
+    std::cout << "FPS: " << rt.frames / realTimeExecuted << std::endl;
     std::cout << "Logic Ticks: " << logicTicks << std::endl;
-    std::cout << "Logic Ticks per second: " << logicTicks / 5.0f << std::endl;
+    std::cout << "Logic Ticks per second: " << logicTicks / realTimeExecuted << std::endl;
 
     rt.StopThread();
 
