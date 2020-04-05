@@ -80,6 +80,16 @@ namespace Input {
 		*/
 		void UnregisterCallback(IdCallback id);
 
+		/*
+			Check if a key or mouse button is pressed (use GLFW sintax
+		*/
+		bool IsKeyPressed(int keyButton);
+
+		/*
+			Return the last mouse position
+		*/
+		void GetMousePosition(double& x, double& y);
+
 	private:
 		struct KeyboardCallbackInfo {
 			IdCallback id;
@@ -123,6 +133,11 @@ namespace Input {
 
 		//map to store the callbacks for mouse buttons
 		std::map<int, std::vector<MouseButtonCallbackInfo>> _mouseButton;
+
+		// map to store the state of keys/buttons
+		std::map<int, bool> _keys;
+
+		double _mousePosition[2] = { 0, 0 };
 	};
 }
 

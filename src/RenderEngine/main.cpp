@@ -14,6 +14,9 @@
 
 #include "Input/InputManager.h"
 
+#include "Engine/World.h"
+#include "Engine/GameObject.h"
+#include "Engine/StaticMeshComponent.h"
 
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
@@ -81,11 +84,15 @@ int main() {
 	*/
 
     /* Try input */
-
+#if 0
     bool end = false;
     KeyboardCallback quit = [&end](CallbackAction ca) {
         std::cout << "Q PULSADA" << std::endl;
         end = true;
+    };
+
+    KeyboardCallback mant = [](CallbackAction ca) {
+        std::cout << "TECLA MANTENIDA" << std::endl;
     };
 
     MousePositionCallback mouse = [](double x, double y) {
@@ -103,6 +110,8 @@ int main() {
     InputManager::GetInstance().SetWindow(VulkanInstance::GetInstance().window);
 
     InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_Q, CallbackAction::KEY_PRESSED, quit);
+
+    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_P, CallbackAction::KEY_REPEATED, mant);
 
     InputManager::GetInstance().RegisterMousePositionCallback(mouse);
 
@@ -173,6 +182,8 @@ int main() {
     Texture* tex = new Texture();
     tex->Initialize("../resources/textures/Building_Cinema.png");
     Material* mat = GetBasicLightMaterial(cam, tex, lights, ambient, renderPass);
+    //Material* mat = GetBasicColorMaterial(cam, glm::vec4(1, 0, 1, 1), lights, ambient, renderPass);
+
 
     Mesh* chalet = Mesh::LoadMesh("../resources/objs/Building_Cinema.obj",1);
     //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
@@ -216,6 +227,10 @@ int main() {
         //mesh->Update(deltaTime);
         mesh1->Update(deltaTime);
 
+        if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_K)) {
+            std::cout << "K IS BEING PRESSED" << std::endl;
+        }
+
         logicTicks++;
         endFrame = std::chrono::high_resolution_clock::now();
     }
@@ -237,6 +252,145 @@ int main() {
     delete mesh1;
     delete mat;
     delete tex;
+    delete renderPass;
+
+    rt.CleanUp();
+
+    VulkanInstance::GetInstance().CleanUp();
+#endif
+
+    /*
+        Initialize render thread
+    */
+    RenderThread& rt = RenderThread::GetInstance();
+
+    rt.InitializeSwapChain();
+    VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+        VK_IMAGE_TILING_OPTIMAL,
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
+    Image* depthImage = Image::CreateImage(rt.GetExtent().width, rt.GetExtent().height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
+        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+    RenderPass* renderPass = new RenderPass();
+    renderPass->Initialize(rt.GetFormat(), depthImage);
+
+    rt.Initialize(renderPass);
+
+    /*
+        Keyboard Callbacks
+    */
+    bool end = false;
+    KeyboardCallback quit = [&end](CallbackAction ca) {
+        std::cout << "Q PULSADA" << std::endl;
+        end = true;
+    };
+
+    InputManager::GetInstance().SetWindow(VulkanInstance::GetInstance().window);
+
+    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_Q, CallbackAction::KEY_PRESSED, quit);
+
+    /*
+        Initialize world
+    */
+    PointLight light;
+    light.color = glm::vec3(1, 1, 1);
+    light.position = glm::vec3(15, -20, 15.0f);
+    light.power = 500;
+
+    PointLight light2;
+    light2.color = glm::vec3(0, 0, 1);
+    light2.position = glm::vec3(-20, -10, 10);
+    light2.power = 500;
+
+    Lights lights;
+    lights.lights[0] = light;
+    lights.lights[1] = light2;
+
+    lights.num_lights = 2;
+
+    AmbientLight ambient = { {1,1,1}, .1f };
+
+    SceneLight l = { lights, ambient };
+    World world;
+
+    world.SetLights(l);
+
+    Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 100.0f);
+
+    world.SetCamera(cam);
+
+    GameObject* go = new GameObject;
+
+    world.AddObject(go);
+
+    go->AddComponent(new StaticMeshComponent("../resources/objs/Cube.obj"));
+
+    world.Initialize();
+
+    world.Start();
+
+    float realTimeExecuted = 0;
+
+    auto realStartTime = std::chrono::high_resolution_clock::now();
+
+    rt.StartThread();
+
+    auto startTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::high_resolution_clock::now();
+
+
+    auto endFrame = std::chrono::high_resolution_clock::now();
+    int logicTicks = 0;
+    go->transform.scale = glm::vec3(20, 20, 20);
+
+    glm::vec3 position(0);
+
+    float vel = 15;
+
+    while (!end) {
+        float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame - currentTime).count();
+        currentTime = std::chrono::high_resolution_clock::now();
+        glfwPollEvents();
+
+        if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_W)) {
+            position.y += vel*1 * deltaTime;
+        }
+        else if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_S)) {
+            position.y -= vel * 1 * deltaTime;
+        }
+        else if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_A)) {
+            position.x -= vel * 1 * deltaTime;
+        }
+        else if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_D)) {
+            position.x += vel * 1 * deltaTime;
+        }
+
+        go->transform.position = position;
+
+        world.Update(deltaTime);
+
+
+        logicTicks++;
+        endFrame = std::chrono::high_resolution_clock::now();
+    }
+
+    world.End();
+
+    realTimeExecuted = std::chrono::duration<float, std::chrono::seconds::period>(
+        std::chrono::high_resolution_clock::now() - startTime).count();
+
+    std::cout << "Time in execution: " << realTimeExecuted << std::endl;
+    std::cout << "Frames: " << rt.frames << std::endl;
+    std::cout << "FPS: " << rt.frames / realTimeExecuted << std::endl;
+    std::cout << "Logic Ticks: " << logicTicks << std::endl;
+    std::cout << "Logic Ticks per second: " << logicTicks / realTimeExecuted << std::endl;
+
+    rt.StopThread();
+
+    delete go;
+
+    delete depthImage;
     delete renderPass;
 
     rt.CleanUp();

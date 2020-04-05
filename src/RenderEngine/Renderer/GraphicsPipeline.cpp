@@ -96,7 +96,7 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
 
-    _descriptorSetLayout = new DescriptorSetLayout();
+
     std::vector<UniformInfo*> bindings(0);
     std::vector<UniformInfo*> vertexBindings = vertex->GetDescriptorSetLayoutBindings();
 
@@ -109,6 +109,8 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader
     for (int i = 0; i < fragmentBindings.size(); i++) {
         bindings.push_back(fragmentBindings[i]);
     }
+
+    _descriptorSetLayout = new DescriptorSetLayout();
 
     _descriptorSetLayout->Initialize(bindings);
 

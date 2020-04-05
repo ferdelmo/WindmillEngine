@@ -97,6 +97,6 @@ public:
 
 	std::vector<VertexNormal> GetVertices();
 
-	MVP& GetUniformObject();
+	MVP& GetMVP();
 };
 

@@ -8,7 +8,10 @@ World::~World() {
 }
 
 void World::AddObject(GameObject* go) {
-	_objects.push_back(go);
+	if (go != nullptr) {
+		go->SetWorld(this);
+		_objects.push_back(go);
+	}
 }
 
 void World::RemoveObject(GameObject* go) {
@@ -23,4 +26,45 @@ void World::RemoveObject(GameObject* go) {
 
 std::vector<GameObject*>& World::GetObjects() {
 	return _objects;
+}
+
+
+void World::SetLights(const SceneLight& l) {
+	_lights = l;
+}
+
+SceneLight& World::GetLights() {
+	return _lights;
+}
+
+void World::SetCamera(const Camera& cam) {
+	_camera = cam;
+}
+
+Camera& World::GetCamera() {
+	return _camera;
+}
+
+void World::Initialize() {
+	for (auto& go : _objects) {
+		go->Initialize();
+	}
+}
+
+void World::Start() {
+	for (auto& go : _objects) {
+		go->Start();
+	}
+}
+
+void World::Update(float deltaTime) {
+	for (auto& go : _objects) {
+		go->Update(deltaTime);
+	}
+}
+
+void World::End() {
+	for (auto& go : _objects) {
+		go->End();
+	}
 }

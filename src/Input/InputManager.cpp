@@ -28,7 +28,10 @@ void InputManager::SetWindow(GLFWwindow* window) {
 
 
 void InputManager::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	for (auto& entry : _instance->_functions[key]) {
+	InputManager& instance = GetInstance();
+
+	// invoke callbacks
+	for (auto& entry : instance._functions[key]) {
 		if (action == GLFW_PRESS && int(entry.actions & CallbackAction::KEY_PRESSED)) {
 			entry.function(CallbackAction::KEY_PRESSED);
 		}
@@ -40,6 +43,14 @@ void InputManager::KeyCallback(GLFWwindow* window, int key, int scancode, int ac
 		else if (action == GLFW_REPEAT && int(entry.actions & CallbackAction::KEY_REPEATED)) {
 			entry.function(CallbackAction::KEY_REPEATED);
 		}
+	}
+
+	// update maps
+	if (action == GLFW_PRESS) {
+		instance._keys[key] = true;
+	}
+	else if (action == GLFW_RELEASE) {
+		instance._keys[key] = false;
 	}
 }
 
@@ -60,6 +71,10 @@ void InputManager::MousePositionCallbackIntern(GLFWwindow* window, double xpos, 
 	for (auto& entry : _instance->_mousePos) {
 		entry.function(xpos, ypos);
 	}
+
+	_instance->_mousePosition[0] = xpos;
+	_instance->_mousePosition[1] = ypos;
+
 }
 
 IdCallback InputManager::RegisterMousePositionCallback(MousePositionCallback mouseCal) {
@@ -72,13 +87,22 @@ IdCallback InputManager::RegisterMousePositionCallback(MousePositionCallback mou
 
 
 void InputManager::MouseButtonCallbackIntern(GLFWwindow* window, int button, int action, int mods){
-	for (auto& entry : _instance->_mouseButton[button]) {
+	InputManager& instance = GetInstance();
+	for (auto& entry : instance._mouseButton[button]) {
 		if (action == GLFW_PRESS && int(entry.actions & CallbackAction::KEY_PRESSED)) {
 			entry.function(CallbackAction::KEY_PRESSED);
 		}
 		else if (action == GLFW_RELEASE && int(entry.actions & CallbackAction::KEY_RELEASED)) {
 			entry.function(CallbackAction::KEY_RELEASED);
 		}
+	}
+
+	// update maps
+	if (action == GLFW_PRESS) {
+		instance._keys[button] = true;
+	}
+	else if (action == GLFW_RELEASE) {
+		instance._keys[button] = false;
 	}
 }
 
@@ -137,4 +161,20 @@ void InputManager::UnregisterCallback(IdCallback id) {
 			return;
 		}
 	}
+}
+
+
+bool InputManager::IsKeyPressed(int keyButton) {
+	if (_keys.find(keyButton) == _keys.end()) {
+		// No entry in the map
+		_keys[keyButton] = false;
+	}
+
+	return _keys[keyButton];
+}
+
+
+void InputManager::GetMousePosition(double& x, double& y) {
+	x = _mousePosition[0];
+	y = _mousePosition[1];
 }

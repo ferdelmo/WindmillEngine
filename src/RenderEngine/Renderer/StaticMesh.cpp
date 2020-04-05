@@ -39,18 +39,8 @@ void StaticMesh::Initialize() {
 }
 
 void StaticMesh::Update(float deltaTime) {
-	static float rot = 0;
-	float actualRot = -45 * deltaTime;
-	rot += actualRot;
-	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), glm::vec3(0.0f, 1.0f, 0.0f));
-	
 	std::vector<MVP> uniform = { _ubo };
 	_uniforms.at("MVP")->Fill(uniform);
-	/*
-	std::vector<UniformColor> uniformC = { UniformColor(color) };
-
-	_uniforms.at("Color")->Fill(uniformC);
-	*/
 }
 
 void StaticMesh::Rotate(float angle, glm::vec3 up) {
@@ -105,4 +95,8 @@ std::vector<Index> StaticMesh::GetIndices() {
 
 std::vector<VertexNormal> StaticMesh::GetVertices() {
 	return _vertices;
+}
+
+MVP& StaticMesh::GetMVP() {
+	return _ubo;
 }

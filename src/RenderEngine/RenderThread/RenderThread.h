@@ -111,6 +111,10 @@ public:
 		return swapChainExtent;
 	}
 
+	RenderPass* GetRenderPass() const {
+		return renderPass;
+	}
+
 	std::atomic<int> frames;
 };
 
