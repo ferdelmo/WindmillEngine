@@ -293,9 +293,10 @@ void RenderThread::CreateFramebuffers() {
     swapChainFramebuffers.resize(swapChainImageViews.size());
 
     for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-        std::array<VkImageView, 2> attachments = {
-            swapChainImageViews[i],
-            renderPass->GetDepthImage()->GetImageView()
+        std::array<VkImageView, 3> attachments = {
+            renderPass->GetColorImage()->GetImageView(),
+            renderPass->GetDepthImage()->GetImageView(),
+            swapChainImageViews[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo = {};

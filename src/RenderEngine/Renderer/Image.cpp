@@ -108,7 +108,8 @@ void Image::CreateImage(const int width, const int height, VkFormat format, VkIm
 }
 
 Image* Image::CreateImage(const int width, const int height, VkFormat format, VkImageTiling tiling,
-	VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImageAspectFlags aspectFlags) {
+	VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImageAspectFlags aspectFlags,
+	VkSampleCountFlagBits numSample) {
 	Image* resul = new Image();
 
 	resul->_format = format;
@@ -125,7 +126,7 @@ Image* Image::CreateImage(const int width, const int height, VkFormat format, Vk
 	imageInfo.tiling = tiling;
 	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageInfo.usage = usage;
-	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageInfo.samples = numSample;
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateImage(VulkanInstance::GetInstance().device, &imageInfo, nullptr, &resul->_image) != VK_SUCCESS) {

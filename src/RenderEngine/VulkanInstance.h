@@ -79,6 +79,9 @@ public:
 
 	static VulkanInstance* _instance;
 
+
+	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
+
 	/*
 		Should rethink this structure, as the isntance should be configurable. For now, to avoid
 		storing a pointer to the instance literally everywhere, use it like a singleton
@@ -187,6 +190,11 @@ public:
 		render commands, etc.
 	*/
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
+
+	/*
+		Get the max usable samples for MSAA
+	*/
+	VkSampleCountFlagBits GetMaxUsableSampleCount();
 
 	/*
 		Debug utils for the validation layers

@@ -58,7 +58,8 @@ public:
 		Maybe externalize this function to create an image in any site
 	*/
 	static Image* CreateImage(const int width, const int height, VkFormat format, VkImageTiling tiling,
-		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImageAspectFlags aspectFlags);
+		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImageAspectFlags aspectFlags, 
+		VkSampleCountFlagBits numSample = VK_SAMPLE_COUNT_1_BIT);
 
 };
 

@@ -17,6 +17,9 @@ private:
 
 	Image* _depthImage;
 
+	// Used for MSAA
+	Image* _colorImage;
+
 public:
 	RenderPass();
 
@@ -25,10 +28,16 @@ public:
 	/*
 		Initialize the renderPass with a format and a image to use as depth
 	*/
-	void Initialize(VkFormat format, Image* depthImage);
+	void Initialize();
 
 	VkRenderPass& GetRenderPass();
 
 	Image* GetDepthImage();
+
+	Image* GetColorImage();
+
+	void CreateDepthResources();
+
+	void CreateMSAAResources();
 };
 

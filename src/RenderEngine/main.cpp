@@ -265,15 +265,10 @@ int main() {
     RenderThread& rt = RenderThread::GetInstance();
 
     rt.InitializeSwapChain();
-    VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-        VK_IMAGE_TILING_OPTIMAL,
-        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
-    Image* depthImage = Image::CreateImage(rt.GetExtent().width, rt.GetExtent().height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
-        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
 
     RenderPass* renderPass = new RenderPass();
-    renderPass->Initialize(rt.GetFormat(), depthImage);
+    renderPass->Initialize();
 
     rt.Initialize(renderPass);
 
@@ -390,7 +385,6 @@ int main() {
 
     delete go;
 
-    delete depthImage;
     delete renderPass;
 
     rt.CleanUp();
