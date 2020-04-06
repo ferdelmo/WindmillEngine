@@ -311,7 +311,8 @@ int main() {
 
     world.SetLights(l);
 
-    Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 100.0f);
+    Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), 
+        glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 1000.0f);
 
     world.SetCamera(cam);
 
@@ -319,7 +320,9 @@ int main() {
 
     world.AddObject(go);
 
-    go->AddComponent(new StaticMeshComponent("../resources/objs/Cube.obj"));
+    StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj");
+
+    go->AddComponent(mesh);
 
     world.Initialize();
 
@@ -341,7 +344,18 @@ int main() {
 
     glm::vec3 position(0);
 
-    float vel = 15;
+    float vel = 40;
+
+    bool add = false;
+    KeyboardCallback show = [&mesh, &add, &world, &go](CallbackAction ca) {
+        //mesh->SetVisibility(add);
+        //add = !add;
+        world.RemoveObject(go);
+        delete go;
+        go = nullptr;
+    };
+
+    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_T, CallbackAction::KEY_PRESSED, show);
 
     while (!end) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame - currentTime).count();
@@ -361,7 +375,9 @@ int main() {
             position.x += vel * 1 * deltaTime;
         }
 
-        go->transform.position = position;
+        if (go != nullptr) {
+            go->transform.position = position;
+        }
 
         world.Update(deltaTime);
 
@@ -382,8 +398,9 @@ int main() {
     std::cout << "Logic Ticks per second: " << logicTicks / realTimeExecuted << std::endl;
 
     rt.StopThread();
-
-    delete go;
+    if (go != nullptr) {
+        delete go;
+    }
 
     delete renderPass;
 

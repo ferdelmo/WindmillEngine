@@ -10,7 +10,7 @@ class UniformInfo;
 
 /*
 	Abstract class to implement a shader, configurable to be either fragment, vertex or whatever
-	maybe information about the description layour should be here
+	maybe information about the description layout should be here
 
 	@author Fernando del Molino
 */

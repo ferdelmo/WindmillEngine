@@ -29,6 +29,8 @@ public:
 
 	virtual void End() override;
 
+	void SetVisibility(bool activate);
+
 private:
 
 	std::string _pathMesh;

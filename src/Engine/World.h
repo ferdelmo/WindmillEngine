@@ -30,8 +30,16 @@ public:
 	World();
 	~World(); 
 
+	/*
+		Add an object to the scene
+		// render and call ticks
+	*/
 	void AddObject(GameObject* go);
 
+
+	/*
+		Remove de object from the world
+	*/
 	void RemoveObject(GameObject* go);
 
 	std::vector<GameObject*>& GetObjects();

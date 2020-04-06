@@ -10,7 +10,7 @@
 #include "RenderEngine/Renderer/Renderizable.h"
 
 RenderThread::RenderThread() : _initialized(false), objects(0), objectsToAdd() {
-	
+    updateCommands = std::vector<bool>();
 }
 
 RenderThread::~RenderThread() {
@@ -31,6 +31,12 @@ void RenderThread::MainLoop() {
 }
 
 void RenderThread::DrawFrame() {
+
+    bool needUpdate = false;
+    /*
+        Check objects to add to render
+    */
+    add_mutex.lock();
     if (objectsToAdd.size() > 0) {
         for (int i = 0; i < objectsToAdd.size(); i++) {
             objects.push_back(objectsToAdd[i]);
@@ -38,8 +44,49 @@ void RenderThread::DrawFrame() {
 
         objectsToAdd.clear();
 
-        UpdateCommandBuffers();
+        for (int auxi = 0; auxi < updateCommands.size(); auxi++) {
+            updateCommands[auxi] = true;
+        }
     }
+    add_mutex.unlock();
+
+    /*
+        Check objects to remove from render
+    */
+    remove_mutex.lock();
+    if (objectsToRemove.size() > 0) {
+
+        while (objectsToRemove.size()>0) {
+
+            std::vector<Renderizable*>::iterator iter;
+
+            bool find = false;
+            for (iter = objects.begin(); iter != objects.end(); iter++) {
+                if (*(iter) == objectsToRemove.back()) {
+                    objectsToRemove.pop_back();
+                    find = true;
+                    break;
+                }
+            }
+
+            if (find) {
+                objects.erase(iter);
+            }
+            else {
+                // the object does not exist
+                objectsToRemove.pop_back();
+            }
+        }
+        objectsToRemove.clear();
+
+        for (int auxi = 0; auxi < updateCommands.size(); auxi++) {
+            updateCommands[auxi] = true;
+        }
+    }
+    remove_mutex.unlock();
+
+
+
 
     vkWaitForFences(VulkanInstance::GetInstance().device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -67,6 +114,33 @@ void RenderThread::DrawFrame() {
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
+
+    /*
+        Update command buffer if needed
+    */
+    if (updateCommands[imageIndex]) {
+        UpdateCommandBuffer(imageIndex);
+        updateCommands[imageIndex] = false;
+
+        // call the delegates when is safe
+        std::vector<DeleteInfo>::iterator iter = deleteInfoVector.begin();
+        while(iter != deleteInfoVector.end()){
+
+            (*iter).check[imageIndex] = true;
+            bool clean = true;
+            for (int i = 0; i < (*iter).check.size() && clean;i++) {
+                clean &= (*iter).check[i];
+            }
+
+            if (clean) {
+                (*iter).func();
+                iter = deleteInfoVector.erase(iter);
+            }
+            else {
+                ++iter;
+            }
+        }
+    }
 
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
@@ -166,46 +240,43 @@ void RenderThread::StopThread() {
 	_mainThread = nullptr;
 }
 
-void RenderThread::UpdateCommandBuffers() {
-    for (size_t i = 0; i < commandBuffers.size(); i++) {
+void RenderThread::UpdateCommandBuffer(size_t i) {
+    if (vkResetCommandBuffer(commandBuffers[i], 0)) {
+        throw std::runtime_error("failed to reset the command buffer!");
+    }
 
-        if (vkResetCommandBuffer(commandBuffers[i], 0)) {
-            throw std::runtime_error("failed to reset the command buffer!");
-        }
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        VkCommandBufferBeginInfo beginInfo = {};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
 
-        if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
+    VkRenderPassBeginInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = renderPass->GetRenderPass();
+    renderPassInfo.framebuffer = swapChainFramebuffers[i];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = swapChainExtent;
 
-        VkRenderPassBeginInfo renderPassInfo = {};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass->GetRenderPass();
-        renderPassInfo.framebuffer = swapChainFramebuffers[i];
-        renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = swapChainExtent;
+    /* Clear the 2 attachments, color and depth */
+    std::array<VkClearValue, 2> clearValues = {};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
 
-        /* Clear the 2 attachments, color and depth */
-        std::array<VkClearValue, 2> clearValues = {};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-        clearValues[1].depthStencil = { 1.0f, 0 };
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
 
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
+    vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    for (auto obj : objects) {
+        obj->BindCommandsToBuffer(commandBuffers[i]);
+    }
 
-        for (auto obj : objects) {
-            obj->BindCommandsToBuffer(commandBuffers[i]);
-        }
+    vkCmdEndRenderPass(commandBuffers[i]);
 
-        vkCmdEndRenderPass(commandBuffers[i]);
-
-        if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+    if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
     }
 }
 
@@ -330,6 +401,8 @@ void RenderThread::CreateCommandPool() {
 void RenderThread::CreateCommandBuffers() {
     commandBuffers.resize(swapChainFramebuffers.size());
 
+    updateCommands = std::vector<bool>(swapChainFramebuffers.size(), true);
+
     VkCommandBufferAllocateInfo allocInfo = {};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = commandPool;
@@ -411,5 +484,15 @@ void RenderThread::CleanUp() {
 }
 
 void RenderThread::AddObject(Renderizable* obj) {
+    add_mutex.lock();
     objectsToAdd.push_back(obj);
+    add_mutex.unlock();
+}
+
+
+void RenderThread::RemoveObject(Renderizable* obj, std::function<void()> func) {
+    remove_mutex.lock();
+    objectsToRemove.push_back(obj);
+    deleteInfoVector.push_back({std::vector<bool>(swapChainFramebuffers.size(),false),func });
+    remove_mutex.unlock();
 }

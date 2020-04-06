@@ -1,5 +1,7 @@
 #include "World.h"
 
+#include "StaticMeshComponent.h"
+
 World::World() : _objects(0){
 
 }

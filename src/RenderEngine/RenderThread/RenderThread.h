@@ -5,6 +5,8 @@
 #include <thread>
 #include <vector>
 #include <atomic>
+#include <mutex>
+#include <functional>
 
 class VulkanInstance;
 class Image;
@@ -36,6 +38,12 @@ private:
 
 	VkCommandPool commandPool;
 
+	struct DeleteInfo {
+		std::vector<bool> check;
+		std::function<void()> func;
+	};
+
+	std::vector<bool> updateCommands;
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -48,7 +56,15 @@ private:
 
 	std::vector<Renderizable*> objects;
 
+	std::mutex add_mutex;
+
+	std::mutex remove_mutex;
+
 	std::vector<Renderizable*> objectsToAdd;
+
+	std::vector<Renderizable*> objectsToRemove;
+
+	std::vector<DeleteInfo> deleteInfoVector;
 
 	static RenderThread* _instance;
 
@@ -95,10 +111,13 @@ public:
 	void StopThread();
 
 	/* Re record the command buffers orders with the list */
-	void UpdateCommandBuffers();
+	void UpdateCommandBuffer(size_t i);
 
 	/* Add renderizable to the render */
 	void AddObject(Renderizable* obj);
+
+	/* Add renderizable to the render */
+	void RemoveObject(Renderizable* obj, std::function<void()> func = NULL);
 
 	/* CleanUp all thre resources generated */
 	void CleanUp();

@@ -29,7 +29,7 @@ public:
 	void AddComponent(Component* component);
 	
 	template <typename T>
-	T GetComponent() {
+	T* GetComponent() {
 		for (auto& entry : _components) {
 			if ((T*)entry != nullptr) {
 				return (T*)entry;

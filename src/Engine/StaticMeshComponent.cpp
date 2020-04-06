@@ -18,9 +18,18 @@ StaticMeshComponent::StaticMeshComponent(std::string mesh, Material* mat) : _pat
 }
 
 StaticMeshComponent::~StaticMeshComponent() {
+
+	StaticMesh* staticMesh = _staticMesh;
+	Material* material = _material;
+
+	std::function<void()> cleanup = [staticMesh, material]() {
+		delete staticMesh;
+		delete material;
+	};
+
+	RenderThread::GetInstance().RemoveObject(_staticMesh, cleanup);
+
 	delete _mesh;
-	delete _staticMesh;
-	delete _material;
 }
 
 
@@ -63,4 +72,13 @@ void StaticMeshComponent::Update(float deltaTime) {
 
 void StaticMeshComponent::End() {
 
+}
+
+void StaticMeshComponent::SetVisibility(bool activate) {
+	if (activate) {
+		RenderThread::GetInstance().AddObject(_staticMesh);
+	}
+	else {
+		RenderThread::GetInstance().RemoveObject(_staticMesh);
+	}
 }
