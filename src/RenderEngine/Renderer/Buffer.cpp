@@ -1,5 +1,6 @@
 #include "Buffer.h"
 
+#include <iostream>
 
 Buffer::Buffer() {
 	_init = false;
@@ -8,7 +9,7 @@ Buffer::Buffer() {
 
 
 Buffer::~Buffer() {
-
+	//std::cout << "DELETING VKBUFFER: " << _buffer << std::endl;
 	vkDestroyBuffer(VulkanInstance::GetInstance().device, _buffer, nullptr);
 	vkFreeMemory(VulkanInstance::GetInstance().device, _bufferMemory, nullptr);
 }

@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <optional>
+#include <mutex>
 
 /*
 	Class to store the vulkan instance, window, surface, the devices and the queues asociated to that devices
@@ -33,6 +34,8 @@ public:
 	//Queues of the device (graphics family and present famlily)
 	VkQueue graphicsQueue = VK_NULL_HANDLE;
 	VkQueue presentQueue = VK_NULL_HANDLE;
+
+	VkQueue graphicsRenderThread = VK_NULL_HANDLE;
 
 	bool framebufferResized = false;
 

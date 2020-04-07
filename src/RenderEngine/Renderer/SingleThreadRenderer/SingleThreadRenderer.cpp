@@ -1,4 +1,5 @@
-#include "RenderThread.h"
+#include "SingleThreadRenderer.h"
+
 #include <array>
 #include <iostream>
 #include <stdexcept>
@@ -10,34 +11,29 @@
 
 #include "RenderEngine/Renderer/Renderizable.h"
 
-RenderThread::RenderThread() : _initialized(false), objects(0), objectsToAdd() {
+SingleThreadRenderer::SingleThreadRenderer() : _initialized(false), objects(0), objectsToAdd() {
     updateCommands = std::vector<bool>();
 }
 
-RenderThread::~RenderThread() {
+SingleThreadRenderer::~SingleThreadRenderer() {
 
 }
 
-RenderThread* RenderThread::_instance = nullptr;
+SingleThreadRenderer* SingleThreadRenderer::_instance = nullptr;
 
-
-
-void RenderThread::MainLoop() {
-	auto startTime = std::chrono::high_resolution_clock::now();
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	while (_running) {
-		DrawFrame();
-        frames++;
-	}
+SingleThreadRenderer& SingleThreadRenderer::GetInstance() {
+    if (_instance == nullptr) {
+        _instance = new SingleThreadRenderer();
+    }
+    return *_instance;
 }
 
-void RenderThread::DrawFrame() {
+void SingleThreadRenderer::DrawFrame() {
 
     bool needUpdate = false;
     /*
         Check objects to add to render
     */
-    add_mutex.lock();
     if (objectsToAdd.size() > 0) {
         for (int i = 0; i < objectsToAdd.size(); i++) {
             objects.push_back(objectsToAdd[i]);
@@ -49,15 +45,13 @@ void RenderThread::DrawFrame() {
             updateCommands[auxi] = true;
         }
     }
-    add_mutex.unlock();
 
     /*
         Check objects to remove from render
     */
-    remove_mutex.lock();
     if (objectsToRemove.size() > 0) {
 
-        while (objectsToRemove.size()>0) {
+        while (objectsToRemove.size() > 0) {
 
             std::vector<Renderizable*>::iterator iter;
 
@@ -83,7 +77,6 @@ void RenderThread::DrawFrame() {
             }
         }
     }
-    remove_mutex.unlock();
 
 
 
@@ -125,8 +118,6 @@ void RenderThread::DrawFrame() {
     /*
        Update command buffer if needed
    */
-    add_mutex.lock();
-    remove_mutex.lock();
     if (updateCommands[imageIndex]) {
         updateCommands[imageIndex] = false;
         UpdateCommandBuffer(imageIndex);
@@ -163,14 +154,12 @@ void RenderThread::DrawFrame() {
             ++iter;
         }
     }
-    remove_mutex.unlock();
-    add_mutex.unlock();
 
 
     vkResetFences(VulkanInstance::GetInstance().device, 1, &inFlightFences[currentFrame]);
 
     VkResult submit = vkQueueSubmit(VulkanInstance::GetInstance().graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]);
-    if( submit  != VK_SUCCESS) {
+    if (submit != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
@@ -199,25 +188,17 @@ void RenderThread::DrawFrame() {
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-RenderThread& RenderThread::GetInstance() {
-	if (_instance == nullptr) {
-		_instance = new RenderThread();
-	}
-
-	return *_instance;
-}
-
-void RenderThread::InitializeSwapChain() {
+void SingleThreadRenderer::InitializeSwapChain() {
 
     CreateSwapChain();
     CreateImageViews();
 }
 
-void RenderThread::Initialize(RenderPass* renderPass) {
-	if (_initialized) {
-		throw std::runtime_error("RenderThread::Initizalize: Alredy initialized!");
-		return;
-	}
+void SingleThreadRenderer::Initialize(RenderPass* renderPass) {
+    if (_initialized) {
+        throw std::runtime_error("RenderThread::Initizalize: Alredy initialized!");
+        return;
+    }
 
     this->renderPass = renderPass;
 
@@ -229,37 +210,7 @@ void RenderThread::Initialize(RenderPass* renderPass) {
     _initialized = true;
 }
 
-void RenderThread::StartThread() {
-	if (!_initialized) {
-		throw std::runtime_error("RenderThread::StartThread: the mainThread is not initialized");
-		return;
-	}
-
-	if (_mainThread != nullptr) {
-		throw std::runtime_error("RenderThread::StartThread: mainThread alredy running");
-		return;
-	}
-	_running = true;
-	_mainThread = new std::thread(&RenderThread::MainLoop, this);
-}
-
-void RenderThread::StopThread() {
-	if (!_running || _mainThread == nullptr) {
-		throw std::runtime_error("RenderThread::StopThread: mainThread is not running");
-	}
-
-    _running = false;
-    _mainThread->join();
-
-    vkDeviceWaitIdle(VulkanInstance::GetInstance().device);
-
-	delete _mainThread;
-
-    _initialized = false;
-	_mainThread = nullptr;
-}
-
-void RenderThread::UpdateCommandBuffer(size_t i) {
+void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
     if (vkResetCommandBuffer(commandBuffers[i], 0)) {
         throw std::runtime_error("failed to reset the command buffer!");
     }
@@ -302,7 +253,7 @@ void RenderThread::UpdateCommandBuffer(size_t i) {
 }
 
 
-void RenderThread::CreateSwapChain() {
+void SingleThreadRenderer::CreateSwapChain() {
 
     VulkanInstance::SwapChainSupportDetails swapChainSupport = VulkanInstance::GetInstance().QuerySwapChainSupport(VulkanInstance::GetInstance().physicalDevice);
 
@@ -355,7 +306,7 @@ void RenderThread::CreateSwapChain() {
     swapChainExtent = extent;
 }
 
-void RenderThread::CreateImageViews() {
+void SingleThreadRenderer::CreateImageViews() {
     swapChainImageViews.resize(swapChainImages.size());
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
@@ -381,7 +332,7 @@ void RenderThread::CreateImageViews() {
 }
 
 
-void RenderThread::CreateFramebuffers() {
+void SingleThreadRenderer::CreateFramebuffers() {
     swapChainFramebuffers.resize(swapChainImageViews.size());
 
     for (size_t i = 0; i < swapChainImageViews.size(); i++) {
@@ -406,7 +357,7 @@ void RenderThread::CreateFramebuffers() {
     }
 }
 
-void RenderThread::CreateCommandPool() {
+void SingleThreadRenderer::CreateCommandPool() {
     VulkanInstance::QueueFamilyIndices queueFamilyIndices = VulkanInstance::GetInstance().FindQueueFamilies(VulkanInstance::GetInstance().physicalDevice);
 
     VkCommandPoolCreateInfo poolInfo = {};
@@ -419,7 +370,7 @@ void RenderThread::CreateCommandPool() {
     }
 }
 
-void RenderThread::CreateCommandBuffers() {
+void SingleThreadRenderer::CreateCommandBuffers() {
     commandBuffers.resize(swapChainFramebuffers.size());
 
     updateCommands = std::vector<bool>(swapChainFramebuffers.size(), true);
@@ -435,7 +386,7 @@ void RenderThread::CreateCommandBuffers() {
     }
 }
 
-void RenderThread::CreateSyncObjects() {
+void SingleThreadRenderer::CreateSyncObjects() {
     imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -457,7 +408,7 @@ void RenderThread::CreateSyncObjects() {
     }
 }
 
-void RenderThread::CleanupSwapChain() {
+void SingleThreadRenderer::CleanupSwapChain() {
 
     vkFreeCommandBuffers(VulkanInstance::GetInstance().device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
@@ -473,7 +424,7 @@ void RenderThread::CleanupSwapChain() {
     vkDestroySwapchainKHR(VulkanInstance::GetInstance().device, swapChain, nullptr);
 }
 
-void RenderThread::RecreateSwapChain() {
+void SingleThreadRenderer::RecreateSwapChain() {
     int width = 0, height = 0;
     glfwGetFramebufferSize(VulkanInstance::GetInstance().window, &width, &height);
     while (width == 0 || height == 0) {
@@ -492,7 +443,10 @@ void RenderThread::RecreateSwapChain() {
 }
 
 
-void RenderThread::CleanUp() {
+void SingleThreadRenderer::CleanUp() {
+
+    vkDeviceWaitIdle(VulkanInstance::GetInstance().device);
+
     CleanupSwapChain();
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -502,23 +456,22 @@ void RenderThread::CleanUp() {
     }
 
     vkDestroyCommandPool(VulkanInstance::GetInstance().device, commandPool, nullptr);
+
+    for (auto& entry : deleteInfoVector) {
+        entry.func();
+    }
 }
 
-void RenderThread::AddObject(Renderizable* obj) {
-    add_mutex.lock();
+void SingleThreadRenderer::AddObject(Renderizable* obj) {
     objectsToAdd.push_back(obj);
-    add_mutex.unlock();
 }
 
 
-void RenderThread::RemoveObject(Renderizable* obj, std::function<void()> func) {
-    remove_mutex.lock();
+void SingleThreadRenderer::RemoveObject(Renderizable* obj, std::function<void()> func) {
+
     objectsToRemove.push_back(obj);
-    if (_running && func != NULL) {
+    if (func != NULL) {
         deleteInfoVector.push_back({ obj, std::vector<bool>(swapChainFramebuffers.size(),false),func });
     }
-    else if (func != NULL){
-        func();
-    }
-    remove_mutex.unlock();
+
 }

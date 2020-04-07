@@ -1,7 +1,7 @@
 #include "Material.h"
 #include "RenderPass.h"
 #include "Uniform.h"
-#include "RenderEngine/RenderThread/RenderThread.h"
+#include "SingleThreadRenderer/SingleThreadRenderer.h"
 #include <string>
 
 Material::Material() {
@@ -23,7 +23,7 @@ void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vert
 	_vert.Initialize(vert, VK_SHADER_STAGE_VERTEX_BIT, vertBinds);
 	_frag.Initialize(frag, VK_SHADER_STAGE_FRAGMENT_BIT, fragBinds);
 
-	RenderThread& rt = RenderThread::GetInstance();
+	SingleThreadRenderer& rt = SingleThreadRenderer::GetInstance();
 
 	VkViewport viewport = {};
 	viewport.x = 0.0f;

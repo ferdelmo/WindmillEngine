@@ -4,16 +4,19 @@
 #include "RenderEngine/Renderer/StaticMesh.h"
 #include "RenderEngine/Renderer/Material.h"
 #include "RenderEngine/Renderer/Utils/MaterialUtils.h"
-#include "RenderEngine/RenderThread/RenderThread.h"
+#include "RenderEngine/Renderer/SingleThreadRenderer/SingleThreadRenderer.h"
 
 #include "World.h"
 
-#include <glm/glm.hpp>
-#define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 
 StaticMeshComponent::StaticMeshComponent(std::string mesh, Material* mat) : _pathMesh(mesh), 
-	_mesh(nullptr), _material(mat) {
+	_mesh(nullptr), _material(mat), color(glm::vec4(1)), _staticMesh(nullptr) {
+
+}
+
+StaticMeshComponent::StaticMeshComponent(std::string mesh, glm::vec4 color) : _pathMesh(mesh),
+	_mesh(nullptr), _material(nullptr), color(color), _staticMesh(nullptr) {
 
 }
 
@@ -27,7 +30,7 @@ StaticMeshComponent::~StaticMeshComponent() {
 		delete material;
 	};
 
-	RenderThread::GetInstance().RemoveObject(_staticMesh, cleanup);
+	SingleThreadRenderer::GetInstance().RemoveObject(_staticMesh, cleanup);
 
 	delete _mesh;
 }
@@ -38,14 +41,14 @@ void StaticMeshComponent::Initialize() {
 
 	if (_material == nullptr) {
 		World* world = _owner->GetWorld();
-		_material = GetBasicColorMaterial(world->GetCamera(), glm::vec4(1, 1, 1, 1),
-			world->GetLights().lights, world->GetLights().ambient, RenderThread::GetInstance().GetRenderPass());
+		_material = GetBasicColorMaterial(world->GetCamera(), color,
+			world->GetLights().lights, world->GetLights().ambient, SingleThreadRenderer::GetInstance().GetRenderPass());
 	}
 
 	_staticMesh = new StaticMesh(_mesh->vertices, _mesh->indices, _material);
 	_staticMesh->Initialize();
 
-	RenderThread::GetInstance().AddObject(_staticMesh);
+	SingleThreadRenderer::GetInstance().AddObject(_staticMesh);
 }
 
 
@@ -76,9 +79,9 @@ void StaticMeshComponent::End() {
 
 void StaticMeshComponent::SetVisibility(bool activate) {
 	if (activate) {
-		RenderThread::GetInstance().AddObject(_staticMesh);
+		SingleThreadRenderer::GetInstance().AddObject(_staticMesh);
 	}
 	else {
-		RenderThread::GetInstance().RemoveObject(_staticMesh);
+		SingleThreadRenderer::GetInstance().RemoveObject(_staticMesh);
 	}
 }

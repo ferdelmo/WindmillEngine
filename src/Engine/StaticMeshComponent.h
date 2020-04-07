@@ -3,6 +3,9 @@
 
 #include <string>
 
+#include <glm/glm.hpp>
+#define GLM_FORCE_RADIANS
+
 
 class Mesh;
 class StaticMesh;
@@ -18,6 +21,8 @@ class StaticMeshComponent : public Component
 
 public:
 	StaticMeshComponent(std::string mesh, Material* mat = nullptr);
+
+	StaticMeshComponent(std::string mesh, glm::vec4 color);
 
 	virtual ~StaticMeshComponent() override;
 
@@ -38,6 +43,8 @@ private:
 
 	StaticMesh* _staticMesh;
 	Material* _material;
+
+	glm::vec4 color;
 
 };
 

@@ -14,6 +14,7 @@ class CopyBuffer
 private:
 	VkCommandPool _commandPool = nullptr;
 	VkCommandBuffer _commandBuffer = nullptr;
+	VkFence _wait;
 
 	void Initialize();
 

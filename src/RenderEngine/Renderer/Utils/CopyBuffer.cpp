@@ -2,6 +2,7 @@
 
 #include "../../VulkanInstance.h"
 #include <stdexcept>
+#include <iostream>
 
 CopyBuffer::CopyBuffer() {
 
@@ -11,6 +12,7 @@ CopyBuffer::CopyBuffer() {
 
 CopyBuffer::~CopyBuffer() {
 	if (_init) {
+		vkDestroyFence(VulkanInstance::GetInstance().device, _wait, nullptr);
 		// clena the commands if created
 		vkDestroyCommandPool(VulkanInstance::GetInstance().device, _commandPool, nullptr);
 	}
@@ -32,6 +34,13 @@ void CopyBuffer::Initialize() {
 		throw std::runtime_error("CopyBuffer::Initialize: failed to create command pool!");
 	}
 
+	VkFenceCreateInfo fenceInfo = {};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+	if (vkCreateFence(VulkanInstance::GetInstance().device, &fenceInfo, nullptr, &_wait) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create synchronization objects for a CopyBuffer!");
+	}
 	_init = true;
 }
 
@@ -76,12 +85,18 @@ void CopyBuffer::EndSingleTimeCommand() {
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &_commandBuffer;
+	
 
-	vkQueueSubmit(VulkanInstance::GetInstance().graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkResetFences(VulkanInstance::GetInstance().device, 1, &_wait);
+
+	vkQueueSubmit(VulkanInstance::GetInstance().graphicsQueue, 1, &submitInfo, _wait);
+
 	/*
 		Wait until the command ends its execution and free the buffer
 	*/
 	vkQueueWaitIdle(VulkanInstance::GetInstance().graphicsQueue);
+
+	vkWaitForFences(VulkanInstance::GetInstance().device, 1, &_wait, VK_TRUE, UINT64_MAX);
 
 	vkFreeCommandBuffers(VulkanInstance::GetInstance().device, _commandPool, 1, &_commandBuffer);
 }
@@ -91,6 +106,9 @@ void CopyBuffer::EndSingleTimeCommand() {
 void CopyBuffer::Copy(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size) {
 	//Start recording commands
 	BeginSingleTimeCommand();
+
+	//std::cout << srcBuffer << " copy to " << dstBuffer << std::endl;
+	//std::cout << "Using command buffer: " << _commandBuffer << std::endl;
 
 	/*
 		Copy the buffer

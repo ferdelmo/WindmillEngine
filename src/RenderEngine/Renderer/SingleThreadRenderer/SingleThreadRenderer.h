@@ -13,22 +13,15 @@ class Image;
 class RenderPass;
 class Renderizable;
 
+
 /*
-	Singleton to represent the render thread
-
-	Renderthread is actually not working, there are problems with the initialization of buffers. Its posible to add
-	and erase objects from render if there are previusly initializated. Initialize buffers while the render thread is running gives problems
-	need to be revisited.
+	Renderer to use in a single thread program, does not use mutex or other sync objects
 */
-class RenderThread
+class SingleThreadRenderer
 {
+
 private:
-
 	bool _initialized = false;
-
-	bool _running = false;
-
-	std::thread* _mainThread = nullptr;
 
 	/*
 		Swapchain an the other things needed, that include the frame buffer and the image views
@@ -61,23 +54,15 @@ private:
 
 	std::vector<Renderizable*> objects;
 
-	std::mutex add_mutex;
-
-	std::mutex remove_mutex;
-
 	std::vector<Renderizable*> objectsToAdd;
 
 	std::vector<Renderizable*> objectsToRemove;
 
 	std::vector<DeleteInfo> deleteInfoVector;
 
-	static RenderThread* _instance;
+	static SingleThreadRenderer* _instance;
 
-	RenderThread();
-
-	void MainLoop();
-
-	void DrawFrame();
+	SingleThreadRenderer();
 
 	void CreateSwapChain();
 
@@ -98,10 +83,11 @@ private:
 public:
 	const int MAX_FRAMES_IN_FLIGHT = 5;
 
-	~RenderThread();
+	static SingleThreadRenderer& GetInstance();
+
+	~SingleThreadRenderer();
 
 	/* Get the singleton */
-	static RenderThread& GetInstance();
 
 	/* Initializate swapchain, needed to call before using GetFormat, GetExtent*/
 	void InitializeSwapChain();
@@ -109,11 +95,8 @@ public:
 	/* Initialize the window, vulkan and other things */
 	void Initialize(RenderPass* renderPass);
 
-	/* Start the render thread */
-	void StartThread();
-
-	/* Stop the render thread */
-	void StopThread();
+	/* Draw a Frame, this should be call in the main loop */
+	void DrawFrame();
 
 	/* Re record the command buffers orders with the list */
 	void UpdateCommandBuffer(size_t i);
@@ -126,7 +109,7 @@ public:
 
 	/* CleanUp all thre resources generated */
 	void CleanUp();
-	
+
 	VkFormat GetFormat() const {
 		return swapChainImageFormat;
 	}
@@ -141,4 +124,3 @@ public:
 
 	std::atomic<int> frames;
 };
-

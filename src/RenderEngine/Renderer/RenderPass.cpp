@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include "Image.h"
 #include <array>
-#include "RenderEngine/RenderThread/RenderThread.h"
+#include "SingleThreadRenderer/SingleThreadRenderer.h"
 
 RenderPass::RenderPass() : _renderPass(nullptr) {
 
@@ -43,7 +43,7 @@ void RenderPass::Initialize() {
     depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkAttachmentDescription colorAttachmentResolve = {};
-    colorAttachmentResolve.format = RenderThread::GetInstance().GetFormat();
+    colorAttachmentResolve.format = SingleThreadRenderer::GetInstance().GetFormat();
     colorAttachmentResolve.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachmentResolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachmentResolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -114,15 +114,15 @@ void RenderPass::CreateDepthResources() {
         VK_IMAGE_TILING_OPTIMAL,
         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
-    _depthImage = Image::CreateImage(RenderThread::GetInstance().GetExtent().width, RenderThread::GetInstance().GetExtent().height, depthFormat, 
+    _depthImage = Image::CreateImage(SingleThreadRenderer::GetInstance().GetExtent().width, SingleThreadRenderer::GetInstance().GetExtent().height, depthFormat,
         VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
         VK_IMAGE_ASPECT_DEPTH_BIT, VulkanInstance::GetInstance().msaaSamples);
 }
 
 void RenderPass::CreateMSAAResources() {
-    VkFormat format = RenderThread::GetInstance().GetFormat();
+    VkFormat format = SingleThreadRenderer::GetInstance().GetFormat();
 
-    _colorImage = Image::CreateImage(RenderThread::GetInstance().GetExtent().width, RenderThread::GetInstance().GetExtent().height, format,
+    _colorImage = Image::CreateImage(SingleThreadRenderer::GetInstance().GetExtent().width, SingleThreadRenderer::GetInstance().GetExtent().height, format,
         VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, 
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, VulkanInstance::GetInstance().msaaSamples);
 }

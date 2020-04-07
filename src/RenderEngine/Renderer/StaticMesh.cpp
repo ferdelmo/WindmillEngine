@@ -10,6 +10,8 @@
 #include "DescriptorSetLayout.h"
 #include "Material.h"
 
+#include <iostream>
+
 StaticMesh::StaticMesh(const std::vector<VertexNormal>& vertices, const std::vector<Index>& indices, Material* mat)
 	: _vertices(vertices), _indices(indices), _vertexBuffer(), _indexBuffer(), _material(mat)  {
 	_ubo.model = glm::mat4(1.0f);
@@ -78,6 +80,7 @@ VkBuffer& StaticMesh::GetUniformBuffer() {
 void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 	VkDeviceSize offsets[] = { 0 };
 
+
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->GetPipeline().GetPipeline());
 
 	vkCmdBindVertexBuffers(cmd, 0, 1, &_vertexBuffer.GetBuffer(), offsets);
@@ -87,6 +90,9 @@ void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSet, 0, nullptr);
 
 	vkCmdDrawIndexed(cmd, static_cast<uint32_t>(_indices.size()), 1, 0, 0, 0);
+
+	//std::cout << "USING VERTEX: " << _vertexBuffer.GetBuffer() << std::endl;
+	//std::cout << "USING INDEX: " << _indexBuffer.GetBuffer() << std::endl;
 }
 
 std::vector<Index> StaticMesh::GetIndices() {

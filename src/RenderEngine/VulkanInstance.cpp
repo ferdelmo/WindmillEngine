@@ -171,9 +171,11 @@ void VulkanInstance::CreateLogicalDevice() {
 	QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value(), 
+		indices.presentFamily.value() };
 
 	float queuePriority = 1.0f;
+	float queuePriorityGraphics[2] = { .1f, .9f };
 	//add the queues to the createinfo structs
 	for (uint32_t queueFamily : uniqueQueueFamilies) {
 		VkDeviceQueueCreateInfo queueCreateInfo = {};
@@ -181,6 +183,11 @@ void VulkanInstance::CreateLogicalDevice() {
 		queueCreateInfo.queueFamilyIndex = queueFamily;
 		queueCreateInfo.queueCount = 1;
 		queueCreateInfo.pQueuePriorities = &queuePriority;
+		if (queueFamily == indices.graphicsFamily.value()) {
+			queueCreateInfo.queueCount = 2;
+			queueCreateInfo.pQueuePriorities = queuePriorityGraphics;
+		}
+
 		queueCreateInfos.push_back(queueCreateInfo);
 	}
 
@@ -218,6 +225,9 @@ void VulkanInstance::CreateLogicalDevice() {
 	//Get the queues created
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+
+
+	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 1, &graphicsRenderThread);
 }
 
 
@@ -370,11 +380,11 @@ VulkanInstance::QueueFamilyIndices VulkanInstance::FindQueueFamilies(VkPhysicalD
 			indices.presentFamily = i;
 		}
 
+		i++;
+
 		if (indices.isComplete()) {
 			break;
 		}
-
-		i++;
 	}
 
 	return indices;

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "RenderThread/RenderThread.h"
+#include "Renderer/SingleThreadRenderer/SingleThreadRenderer.h"
 #include <GLFW/glfw3.h>
 #include "Renderer/GraphicsPipeline.h"
 #include "Renderer/Shader.h"
@@ -262,15 +262,15 @@ int main() {
     /*
         Initialize render thread
     */
-    RenderThread& rt = RenderThread::GetInstance();
+    SingleThreadRenderer& renderer = SingleThreadRenderer::GetInstance();
 
-    rt.InitializeSwapChain();
+    renderer.InitializeSwapChain();
 
 
     RenderPass* renderPass = new RenderPass();
     renderPass->Initialize();
 
-    rt.Initialize(renderPass);
+    renderer.Initialize(renderPass);
 
     /*
         Keyboard Callbacks
@@ -316,13 +316,6 @@ int main() {
 
     world.SetCamera(cam);
 
-    GameObject* go = new GameObject;
-
-    world.AddObject(go);
-
-    StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj");
-
-    go->AddComponent(mesh);
 
     world.Initialize();
 
@@ -332,57 +325,91 @@ int main() {
 
     auto realStartTime = std::chrono::high_resolution_clock::now();
 
-    rt.StartThread();
-
     auto startTime = std::chrono::high_resolution_clock::now();
     auto currentTime = std::chrono::high_resolution_clock::now();
 
 
     auto endFrame = std::chrono::high_resolution_clock::now();
     int logicTicks = 0;
-    go->transform.scale = glm::vec3(20, 20, 20);
 
     glm::vec3 position(0);
 
     float vel = 40;
 
     bool add = false;
-    KeyboardCallback show = [&mesh, &add, &world, &go](CallbackAction ca) {
-        //mesh->SetVisibility(add);
-        //add = !add;
-        world.RemoveObject(go);
-        delete go;
-        go = nullptr;
-    };
 
-    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_T, CallbackAction::KEY_PRESSED, show);
+    std::vector<GameObject*> objs = std::vector<GameObject*>(5, nullptr);
+    
+    int keys[5] = { GLFW_KEY_W, GLFW_KEY_E, GLFW_KEY_R, GLFW_KEY_T, GLFW_KEY_Y };
 
+    glm::vec4 colors[5] = { {1,1,1,1}, {1,0,0,1}, {0,1,0,1}, {0,0,1,1}, {1,0,1,1} };
+
+    bool show[5] = { false, false, false, false, false };
+
+    KeyboardCallback callbacks[5];
+    /*
+    for (int i = 0; i < 5; i++) {
+        // create
+        objs[i] = new GameObject();
+
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", colors[i]);
+
+        objs[i]->AddComponent(mesh);
+
+        objs[i]->transform.scale = glm::vec3(10, 10, 10);
+
+        objs[i]->transform.position = glm::vec3(-40 + i * 20, 0, 0);
+        world.AddObject(objs[i]);
+
+        mesh->Initialize();
+        callbacks[i] = [&world, &objs, i, &colors, mesh, &show](CallbackAction ca) {
+            mesh->SetVisibility(show[i]);
+            show[i] = !show[i];
+        };
+        InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);
+    }
+    */
+
+    for (int i = 0; i < 5; i++) {
+        // create
+        callbacks[i] = [&world, &objs, i, &colors, &show](CallbackAction ca) {
+            if (objs[i] == nullptr) {
+                objs[i] = new GameObject();
+
+                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", colors[i]);
+
+                objs[i]->AddComponent(mesh);
+
+                objs[i]->transform.scale = glm::vec3(10, 10, 10);
+
+                objs[i]->transform.position = glm::vec3(-40 + i * 20, 0, 0);
+                world.AddObject(objs[i]);
+
+                mesh->Initialize();
+            }
+            else {
+                world.RemoveObject(objs[i]);
+                delete objs[i];
+                objs[i] = nullptr;
+            }
+        };
+        InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);
+    }
+
+    int i = 0;
     while (!end) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame - currentTime).count();
+
         currentTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
 
-        if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_W)) {
-            position.y += vel*1 * deltaTime;
-        }
-        else if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_S)) {
-            position.y -= vel * 1 * deltaTime;
-        }
-        else if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_A)) {
-            position.x -= vel * 1 * deltaTime;
-        }
-        else if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_D)) {
-            position.x += vel * 1 * deltaTime;
-        }
-
-        if (go != nullptr) {
-            go->transform.position = position;
-        }
-
         world.Update(deltaTime);
+        //callbacks[i](CallbackAction::KEY_PRESSED);
 
-
+        i = (i + 1) % 5;
         logicTicks++;
+
+        renderer.DrawFrame();
         endFrame = std::chrono::high_resolution_clock::now();
     }
 
@@ -392,19 +419,23 @@ int main() {
         std::chrono::high_resolution_clock::now() - startTime).count();
 
     std::cout << "Time in execution: " << realTimeExecuted << std::endl;
-    std::cout << "Frames: " << rt.frames << std::endl;
-    std::cout << "FPS: " << rt.frames / realTimeExecuted << std::endl;
+    std::cout << "Frames: " << renderer.frames << std::endl;
+    std::cout << "FPS: " << renderer.frames / realTimeExecuted << std::endl;
     std::cout << "Logic Ticks: " << logicTicks << std::endl;
     std::cout << "Logic Ticks per second: " << logicTicks / realTimeExecuted << std::endl;
 
-    rt.StopThread();
-    if (go != nullptr) {
-        delete go;
+    //rt.StopThread();
+
+   
+
+    for (auto& entry : objs) {
+        delete entry;
     }
 
-    delete renderPass;
 
-    rt.CleanUp();
+    renderer.CleanUp();
+
+    delete renderPass;
 
     VulkanInstance::GetInstance().CleanUp();
 }
