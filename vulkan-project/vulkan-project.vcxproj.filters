@@ -23,6 +23,12 @@
     <Filter Include="src\RenderEngine\RenderThread">
       <UniqueIdentifier>{a3a09a82-bab2-4287-a453-7bd53c7cae7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Input">
+      <UniqueIdentifier>{2e4016f8-e5d9-4b99-ad65-8cef79a8379f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\RenderEngine\SingleThreadRenderer">
+      <UniqueIdentifier>{cc20b3b3-a158-43ad-b792-7ef9bacc1725}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -83,6 +89,15 @@
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\lib\objloader\tiny_obj_loader.cc" />
+    <ClCompile Include="..\src\Input\InputManager.cpp">
+      <Filter>src\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Utils\MaterialUtils.cpp">
+      <Filter>src\RenderEngine\Renderer\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.cpp">
+      <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
@@ -151,11 +166,17 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\Material.h">
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\RenderEngine\Renderer\Utils\MaterialUtils.h">
-      <Filter>src\RenderEngine\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\Mesh.h">
       <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Input\InputManager.h">
+      <Filter>src\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Utils\MaterialUtils.h">
+      <Filter>src\RenderEngine\Renderer\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.h">
+      <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
