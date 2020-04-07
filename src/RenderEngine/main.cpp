@@ -17,6 +17,8 @@
 #include "Engine/World.h"
 #include "Engine/GameObject.h"
 #include "Engine/StaticMeshComponent.h"
+#include "Game/Colliders/SphereCollider.h"
+#include "Game/Colliders/CapsuleCollider.h"
 
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
@@ -69,19 +71,19 @@ const float executionTime = 30.0f;
 using namespace Input;
 
 int main() {
-	/*
-	VulkanApplication app;
+    /*
+    VulkanApplication app;
 
-	try {
-		app.run();
-	}
-	catch (const std::exception & e) {
-		std::cerr << e.what() << std::endl;
-		return EXIT_FAILURE;
-	}
+    try {
+        app.run();
+    }
+    catch (const std::exception & e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
-	return EXIT_SUCCESS;
-	*/
+    return EXIT_SUCCESS;
+    */
 
     /* Try input */
 #if 0
@@ -120,7 +122,7 @@ int main() {
 
     InputManager::GetInstance().RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, CallbackAction::KEY_RELEASED, mouseButtonR);
 
-	RenderThread& rt = RenderThread::GetInstance();
+    RenderThread& rt = RenderThread::GetInstance();
 
     rt.InitializeSwapChain();
 
@@ -137,7 +139,7 @@ int main() {
     renderPass->Initialize(rt.GetFormat(), depthImage);
 
     rt.Initialize(renderPass);
-    
+
     /*
     std::vector<UniformInfo*> vertexDescriptor(0);
     MVP aux;
@@ -185,7 +187,7 @@ int main() {
     //Material* mat = GetBasicColorMaterial(cam, glm::vec4(1, 0, 1, 1), lights, ambient, renderPass);
 
 
-    Mesh* chalet = Mesh::LoadMesh("../resources/objs/Building_Cinema.obj",1);
+    Mesh* chalet = Mesh::LoadMesh("../resources/objs/Building_Cinema.obj", 1);
     //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
     StaticMesh* mesh1 = new StaticMesh(chalet->vertices, chalet->indices, mat);
 
@@ -195,9 +197,9 @@ int main() {
     //mesh->Initialize();
     mesh1->Initialize();
 
-   // rt.AddObject(mesh);
+    // rt.AddObject(mesh);
     rt.AddObject(mesh1);
-    
+
     rt.UpdateCommandBuffers();
 
     rt.StartThread();
@@ -220,7 +222,7 @@ int main() {
 
     auto realStartTime = std::chrono::high_resolution_clock::now();
     while (!end) {
-        float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame-currentTime).count();
+        float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame - currentTime).count();
         currentTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
 
@@ -311,7 +313,7 @@ int main() {
 
     world.SetLights(l);
 
-    Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), 
+    Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 1000.0f);
 
     world.SetCamera(cam);
@@ -339,7 +341,7 @@ int main() {
     bool add = false;
 
     std::vector<GameObject*> objs = std::vector<GameObject*>(5, nullptr);
-    
+
     int keys[5] = { GLFW_KEY_W, GLFW_KEY_E, GLFW_KEY_R, GLFW_KEY_T, GLFW_KEY_Y };
 
     glm::vec4 colors[5] = { {1,1,1,1}, {1,0,0,1}, {0,1,0,1}, {0,0,1,1}, {1,0,1,1} };
@@ -347,30 +349,9 @@ int main() {
     bool show[5] = { false, false, false, false, false };
 
     KeyboardCallback callbacks[5];
-    /*
-    for (int i = 0; i < 5; i++) {
-        // create
-        objs[i] = new GameObject();
 
-        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", colors[i]);
 
-        objs[i]->AddComponent(mesh);
-
-        objs[i]->transform.scale = glm::vec3(10, 10, 10);
-
-        objs[i]->transform.position = glm::vec3(-40 + i * 20, 0, 0);
-        world.AddObject(objs[i]);
-
-        mesh->Initialize();
-        callbacks[i] = [&world, &objs, i, &colors, mesh, &show](CallbackAction ca) {
-            mesh->SetVisibility(show[i]);
-            show[i] = !show[i];
-        };
-        InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);
-    }
-    */
-
-    for (int i = 0; i < 5; i++) {
+    /*for (int i = 0; i < 5; i++) {
         // create
         callbacks[i] = [&world, &objs, i, &colors, &show](CallbackAction ca) {
             if (objs[i] == nullptr) {
@@ -394,7 +375,114 @@ int main() {
             }
         };
         InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);
+    }*/
+
+    /* ======================================================================================================== */
+
+
+    /* MY TEST */
+
+    GameObject* sphere = new GameObject();
+
+    world.AddObject(sphere);
+
+    StaticMeshComponent* smSphere = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+    SphereCollider* collider = new SphereCollider(7.0f);
+
+    sphere->AddComponent(collider);
+
+    sphere->AddComponent(smSphere);
+
+    smSphere->Initialize();
+
+    sphere->transform.scale = glm::vec3(1.0f) * collider->GetRadius();
+
+
+    GameObject* sphere2 = new GameObject();
+
+    world.AddObject(sphere2);
+
+    StaticMeshComponent* smSphere2 = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+    sphere2->AddComponent(smSphere2);
+
+    smSphere2->Initialize();
+
+    sphere2->transform.position = glm::vec3(0.0f, 0.0f, 5.0f);
+
+    sphere2->transform.scale = glm::vec3(7.0f);
+
+    GameObject* sphere3 = new GameObject();
+
+    world.AddObject(sphere3);
+
+    StaticMeshComponent* smSphere3 = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+    sphere3->AddComponent(smSphere3);
+
+    smSphere3->Initialize();
+
+    sphere3->transform.position = glm::vec3(0.0f, 0.0f, -5.0f);
+
+    sphere3->transform.scale = glm::vec3(7.0f);
+
+    GameObject* capsule = new GameObject();
+
+    world.AddObject(capsule);
+
+    /*StaticMeshComponent* smCapsule = new StaticMeshComponent("../resources/objs/Capsule.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+    capsule->AddComponent(smCapsule);
+
+    smCapsule->Initialize();*/
+    CapsuleCollider* capsuleCollider = new CapsuleCollider(glm::vec3(0.0f, 0.0f, 0.0f), 7.0f, 5.0f,
+        glm::vec3(0.0f, 0.0f, -1.0f));
+    capsule->AddComponent(capsuleCollider);
+    capsule->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    int wasd[4] = { GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D };
+
+    KeyboardCallback movement[4];
+
+    for (int i = 0; i < 4; ++i) {
+        movement[i] = [&world, i, &sphere](CallbackAction ca) {
+            if (sphere == nullptr) {
+                std::cout << "Sphere == nullptr" << std::endl;
+                return;
+            }
+            glm::vec3 pos;
+            switch (i) {
+            case 0: // W
+                pos = sphere->transform.position;
+                sphere->transform.position = pos + glm::vec3(0.0f, 0.0f, 1.0f);
+                break;
+
+            case 1: // A
+                pos = sphere->transform.position;
+                sphere->transform.position = pos - glm::vec3(1.0f, 0.0f, 0.0f);
+                break;
+
+            case 2: // S
+                pos = sphere->transform.position;
+                sphere->transform.position = pos - glm::vec3(0.0f, 0.0f, 1.0f);
+                break;
+
+            case 3: // D
+                pos = sphere->transform.position;
+                sphere->transform.position = pos + glm::vec3(1.0f, 0.0f, 0.0f);
+                break;
+
+            default:
+
+                break;
+            }
+        };
+        InputManager::GetInstance().RegisterKeyboardCallback(wasd[i], CallbackAction::KEY_PRESSED, movement[i]);
     }
+
+
+
 
     int i = 0;
     while (!end) {
@@ -405,7 +493,11 @@ int main() {
 
         world.Update(deltaTime);
         //callbacks[i](CallbackAction::KEY_PRESSED);
-
+        /*std::cout << sphere->transform.position.x << ", " << sphere->transform.position.y << ", " <<
+            sphere->transform.position.z << std::endl;*/
+        if (collider->Collision(capsuleCollider)) {
+            std::cout << "IS COLLIDING" << std::endl;
+        }
         i = (i + 1) % 5;
         logicTicks++;
 
@@ -426,7 +518,7 @@ int main() {
 
     //rt.StopThread();
 
-   
+
 
     for (auto& entry : objs) {
         delete entry;

@@ -29,6 +29,12 @@
     <Filter Include="src\RenderEngine\SingleThreadRenderer">
       <UniqueIdentifier>{cc20b3b3-a158-43ad-b792-7ef9bacc1725}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Game">
+      <UniqueIdentifier>{9e5ea1c4-71f4-4b8d-a4c6-e4648ea47b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Game\Colliders">
+      <UniqueIdentifier>{cb30b4ea-e928-44ab-ae9e-1ec6daf99300}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -97,6 +103,12 @@
     </ClCompile>
     <ClCompile Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.cpp">
       <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Game\Colliders\CapsuleCollider.cpp">
+      <Filter>src\Game\Colliders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Game\Colliders\SphereCollider.cpp">
+      <Filter>src\Game\Colliders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +189,12 @@
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.h">
       <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Colliders\CapsuleCollider.h">
+      <Filter>src\Game\Colliders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Colliders\SphereCollider.h">
+      <Filter>src\Game\Colliders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
