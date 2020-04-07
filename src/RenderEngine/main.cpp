@@ -351,34 +351,6 @@ int main() {
     KeyboardCallback callbacks[5];
 
 
-    /*for (int i = 0; i < 5; i++) {
-        // create
-        callbacks[i] = [&world, &objs, i, &colors, &show](CallbackAction ca) {
-            if (objs[i] == nullptr) {
-                objs[i] = new GameObject();
-
-                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", colors[i]);
-
-                objs[i]->AddComponent(mesh);
-
-                objs[i]->transform.scale = glm::vec3(10, 10, 10);
-
-                objs[i]->transform.position = glm::vec3(-40 + i * 20, 0, 0);
-                world.AddObject(objs[i]);
-
-                mesh->Initialize();
-            }
-            else {
-                world.RemoveObject(objs[i]);
-                delete objs[i];
-                objs[i] = nullptr;
-            }
-        };
-        InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);
-    }*/
-
-    /* ======================================================================================================== */
-
 
     /* MY TEST */
 
@@ -398,45 +370,32 @@ int main() {
 
     sphere->transform.scale = glm::vec3(1.0f) * collider->GetRadius();
 
+    // Capsule with spheres
+    float pos = -18.0f;
+    while (pos <= 18.0f) {
+        GameObject* sphere = new GameObject();
 
-    GameObject* sphere2 = new GameObject();
+        world.AddObject(sphere);
 
-    world.AddObject(sphere2);
+        StaticMeshComponent* smSphere = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 
-    StaticMeshComponent* smSphere2 = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+        sphere->AddComponent(smSphere);
 
-    sphere2->AddComponent(smSphere2);
+        smSphere->Initialize();
 
-    smSphere2->Initialize();
+        sphere->transform.position = glm::vec3(0.0f, 0.0f, pos);
 
-    sphere2->transform.position = glm::vec3(0.0f, 0.0f, 5.0f);
+        sphere->transform.scale = glm::vec3(7.0f);
 
-    sphere2->transform.scale = glm::vec3(7.0f);
+        pos += 1.0f;
+    }
 
-    GameObject* sphere3 = new GameObject();
-
-    world.AddObject(sphere3);
-
-    StaticMeshComponent* smSphere3 = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-
-    sphere3->AddComponent(smSphere3);
-
-    smSphere3->Initialize();
-
-    sphere3->transform.position = glm::vec3(0.0f, 0.0f, -5.0f);
-
-    sphere3->transform.scale = glm::vec3(7.0f);
 
     GameObject* capsule = new GameObject();
 
     world.AddObject(capsule);
 
-    /*StaticMeshComponent* smCapsule = new StaticMeshComponent("../resources/objs/Capsule.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-
-    capsule->AddComponent(smCapsule);
-
-    smCapsule->Initialize();*/
-    CapsuleCollider* capsuleCollider = new CapsuleCollider(glm::vec3(0.0f, 0.0f, 0.0f), 7.0f, 5.0f,
+    CapsuleCollider* capsuleCollider = new CapsuleCollider(glm::vec3(0.0f, 0.0f, 0.0f), 7.0f, 18.0f,
         glm::vec3(0.0f, 0.0f, -1.0f));
     capsule->AddComponent(capsuleCollider);
     capsule->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -492,9 +451,7 @@ int main() {
         glfwPollEvents();
 
         world.Update(deltaTime);
-        //callbacks[i](CallbackAction::KEY_PRESSED);
-        /*std::cout << sphere->transform.position.x << ", " << sphere->transform.position.y << ", " <<
-            sphere->transform.position.z << std::endl;*/
+
         if (collider->Collision(capsuleCollider)) {
             std::cout << "IS COLLIDING" << std::endl;
         }
@@ -503,6 +460,10 @@ int main() {
 
         renderer.DrawFrame();
         endFrame = std::chrono::high_resolution_clock::now();
+    }
+
+    for (auto& obj : world.GetObjects()) {
+        delete obj;
     }
 
     world.End();
