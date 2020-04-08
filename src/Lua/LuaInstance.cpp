@@ -48,6 +48,7 @@ bool LuaInstance::Open() {
 	*/
 	luaL_openlibs(_lua);
 
+
 	RegisterGameObjectsFunctions();
 
 	return true;
@@ -121,9 +122,31 @@ bool LuaInstance::ExecuteProcedure(const char* subroutineName, GameObject* obj) 
 }
 
 void LuaInstance::RegisterGameObjectsFunctions() {
+	// GameObjects
 	RegisterFunction(LuaGameobjectFunctions::GetPosition, "GetPosition");
 	RegisterFunction(LuaGameobjectFunctions::SetPosition, "SetPosition");
+	RegisterFunction(LuaGameobjectFunctions::GetRotation, "GetRotation");
+	RegisterFunction(LuaGameobjectFunctions::SetRotation, "SetRotation");
+	RegisterFunction(LuaGameobjectFunctions::GetScale, "GetScale");
+	RegisterFunction(LuaGameobjectFunctions::SetScale, "SetScale");
+
+	RegisterFunction(LuaGameobjectFunctions::SetFirstPersonLookAt, "SetFirstPersonLookAt");
+	RegisterFunction(LuaGameobjectFunctions::GetFirstPersonLookAt, "GetFirstPersonLookAt");
+
+
+	// input
 	RegisterFunction(LuaGameobjectFunctions::IsKeyPressed, "IsKeyPressed");
+	RegisterFunction(LuaGameobjectFunctions::GetMousePosition, "GetMousePosition");
+
+	// maths
+	RegisterFunction(LuaGameobjectFunctions::NormalizeVector, "NormalizeVector");
+	RegisterFunction(LuaGameobjectFunctions::CrossProduct, "CrossProduct");
+	RegisterFunction(LuaGameobjectFunctions::DotProduct, "DotProduct");
+	RegisterFunction(LuaGameobjectFunctions::RotateVector, "RotateVector");
+
+	RegisterFunction(LuaGameobjectFunctions::VecAddVec, "VecAddVec");
+	RegisterFunction(LuaGameobjectFunctions::VecMinusVec, "VecMinusVec");
+	RegisterFunction(LuaGameobjectFunctions::VecMulEsc, "VecMulEsc");
 }
 
 /*

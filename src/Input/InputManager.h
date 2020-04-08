@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#include "RenderEngine/VulkanInstance.h"
 #include <functional>
 #include <map>
 
@@ -89,6 +89,11 @@ namespace Input {
 			Return the last mouse position
 		*/
 		void GetMousePosition(double& x, double& y);
+
+		/*
+			Reset cursor position
+		*/
+		void ResetCursorPosition();
 
 	private:
 		struct KeyboardCallbackInfo {

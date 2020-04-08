@@ -178,3 +178,7 @@ void InputManager::GetMousePosition(double& x, double& y) {
 	x = _mousePosition[0];
 	y = _mousePosition[1];
 }
+
+void InputManager::ResetCursorPosition() {
+	glfwSetCursorPos(_actualWindow, VulkanInstance::GetInstance().width / 2, VulkanInstance::GetInstance().height / 2);
+}

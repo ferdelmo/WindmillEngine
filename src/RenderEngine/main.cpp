@@ -17,11 +17,15 @@
 #include "Engine/World.h"
 #include "Engine/GameObject.h"
 #include "Engine/StaticMeshComponent.h"
+
+
 #include "Game/Colliders/SphereCollider.h"
 #include "Game/Colliders/CapsuleCollider.h"
 
+#include "Game/GameObjects/FirstPersonPlayer.h"
 
 #include "Lua/LuaComponent.h"
+
 
 
 const std::vector<VertexNormal> vertices = {
@@ -354,14 +358,30 @@ int main() {
 
     KeyboardCallback callbacks[5];
 
+    
+
+    FirstPersonPlayer* fpp = new FirstPersonPlayer();
+
+    LuaComponent* luaComp = new LuaComponent("../resources/lua/player.lua");
+
+    world.AddObject(fpp);
+
+    fpp->AddComponent(luaComp);
+
+    glfwSetInputMode(VulkanInstance::GetInstance().window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+    fpp->transform.position = glm::vec3(0, -15, 0);
 
 
-    LuaComponent* luaComp = new LuaComponent("D:/Fernando/WindmillEngine/resources/enemy.lua");
+    StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1, 0, 0, 1));
 
     GameObject* luaObject = new GameObject();
 
     world.AddObject(luaObject);
-    luaObject->AddComponent(luaComp);
+
+    luaObject->AddComponent(mesh);
+
+    luaObject->transform.scale = glm::vec3(15);
 
     int i = 0;
     while (!end) {
@@ -379,11 +399,11 @@ int main() {
         endFrame = std::chrono::high_resolution_clock::now();
     }
 
+    world.End();
+
     for (auto& obj : world.GetObjects()) {
         delete obj;
     }
-
-    world.End();
 
     realTimeExecuted = std::chrono::duration<float, std::chrono::seconds::period>(
         std::chrono::high_resolution_clock::now() - startTime).count();

@@ -11,6 +11,8 @@ public:
 
 	void SetLookAt(glm::vec3 lookAt);
 
+	glm::vec3 GetLookAt() const;
+
 	virtual void Update(float deltaTime) override;
 };
 

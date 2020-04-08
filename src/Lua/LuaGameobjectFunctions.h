@@ -53,9 +53,54 @@ namespace LuaGameobjectFunctions {
 	/*
 		Return the mouse position
 		
-		return an array with the mouse position
+		return an array with the mouse position in coordinates between -1,-1 and 1,1
 	*/
 	int GetMousePosition(lua_State* lua);
+
+	/*
+		If the gameobject is a FirstPersonPlayer, change the camera view
+	*/
+	int SetFirstPersonLookAt(lua_State* lua);
+
+	/*
+		If the gameobject is a FirstPersonPlayer, return the direction view
+	*/
+	int GetFirstPersonLookAt(lua_State* lua);
+
+	/*
+		Normalize Vector
+	*/
+	int NormalizeVector(lua_State* lua);
+
+	/*
+		Cross Product
+	*/
+	int CrossProduct(lua_State* lua);
+
+	/*
+		Dot Product
+	*/
+	int DotProduct(lua_State* lua);
+
+	/*
+		Rotate vector
+	*/
+	int RotateVector(lua_State* lua);
+
+	/*
+		Vec + Vec
+	*/
+	int VecAddVec(lua_State* lua);
+
+	/*
+		Vec - vec
+	*/
+	int VecMinusVec(lua_State* lua);
+
+	/*
+		Vec*esc
+	*/
+	int VecMulEsc(lua_State* lua);
 }
 
 
