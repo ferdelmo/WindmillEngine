@@ -13,6 +13,7 @@ void GameObject::AddComponent(Component* component) {
 	if (component != nullptr) {
 		component->SetOwner(this);
 		_components.push_back(component);
+		component->Initialize();
 	}
 }
 

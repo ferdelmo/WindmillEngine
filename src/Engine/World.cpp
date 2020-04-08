@@ -70,3 +70,11 @@ void World::End() {
 		go->End();
 	}
 }
+
+void World::Clean() {
+	for (auto& go : _objects) {
+		delete go;
+	}
+
+	_objects.empty();
+}

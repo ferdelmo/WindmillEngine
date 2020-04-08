@@ -20,6 +20,10 @@
 #include "Game/Colliders/SphereCollider.h"
 #include "Game/Colliders/CapsuleCollider.h"
 
+
+#include "Lua/LuaComponent.h"
+
+
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
     {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f,0.0f}},
@@ -352,96 +356,12 @@ int main() {
 
 
 
-    /* MY TEST */
+    LuaComponent* luaComp = new LuaComponent("D:/Fernando/WindmillEngine/resources/enemy.lua");
 
-    GameObject* sphere = new GameObject();
+    GameObject* luaObject = new GameObject();
 
-    world.AddObject(sphere);
-
-    StaticMeshComponent* smSphere = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-    SphereCollider* collider = new SphereCollider(7.0f);
-
-    sphere->AddComponent(collider);
-
-    sphere->AddComponent(smSphere);
-
-    smSphere->Initialize();
-
-    sphere->transform.scale = glm::vec3(1.0f) * collider->GetRadius();
-
-    // Capsule with spheres
-    float pos = -18.0f;
-    while (pos <= 18.0f) {
-        GameObject* sphere = new GameObject();
-
-        world.AddObject(sphere);
-
-        StaticMeshComponent* smSphere = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-
-        sphere->AddComponent(smSphere);
-
-        smSphere->Initialize();
-
-        sphere->transform.position = glm::vec3(0.0f, 0.0f, pos);
-
-        sphere->transform.scale = glm::vec3(7.0f);
-
-        pos += 1.0f;
-    }
-
-
-    GameObject* capsule = new GameObject();
-
-    world.AddObject(capsule);
-
-    CapsuleCollider* capsuleCollider = new CapsuleCollider(glm::vec3(0.0f, 0.0f, 0.0f), 7.0f, 18.0f,
-        glm::vec3(0.0f, 0.0f, -1.0f));
-    capsule->AddComponent(capsuleCollider);
-    capsule->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    int wasd[4] = { GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D };
-
-    KeyboardCallback movement[4];
-
-    for (int i = 0; i < 4; ++i) {
-        movement[i] = [&world, i, &sphere](CallbackAction ca) {
-            if (sphere == nullptr) {
-                std::cout << "Sphere == nullptr" << std::endl;
-                return;
-            }
-            glm::vec3 pos;
-            switch (i) {
-            case 0: // W
-                pos = sphere->transform.position;
-                sphere->transform.position = pos + glm::vec3(0.0f, 0.0f, 1.0f);
-                break;
-
-            case 1: // A
-                pos = sphere->transform.position;
-                sphere->transform.position = pos - glm::vec3(1.0f, 0.0f, 0.0f);
-                break;
-
-            case 2: // S
-                pos = sphere->transform.position;
-                sphere->transform.position = pos - glm::vec3(0.0f, 0.0f, 1.0f);
-                break;
-
-            case 3: // D
-                pos = sphere->transform.position;
-                sphere->transform.position = pos + glm::vec3(1.0f, 0.0f, 0.0f);
-                break;
-
-            default:
-
-                break;
-            }
-        };
-        InputManager::GetInstance().RegisterKeyboardCallback(wasd[i], CallbackAction::KEY_PRESSED, movement[i]);
-    }
-
-
-
+    world.AddObject(luaObject);
+    luaObject->AddComponent(luaComp);
 
     int i = 0;
     while (!end) {
@@ -452,9 +372,6 @@ int main() {
 
         world.Update(deltaTime);
 
-        if (collider->Collision(capsuleCollider)) {
-            std::cout << "IS COLLIDING" << std::endl;
-        }
         i = (i + 1) % 5;
         logicTicks++;
 

@@ -35,6 +35,9 @@
     <Filter Include="src\Game\Colliders">
       <UniqueIdentifier>{cb30b4ea-e928-44ab-ae9e-1ec6daf99300}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Lua">
+      <UniqueIdentifier>{e96d1fbd-1e11-4aed-9b72-c83c32e98757}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -109,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Game\Colliders\SphereCollider.cpp">
       <Filter>src\Game\Colliders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Lua\LuaInstance.cpp">
+      <Filter>src\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Lua\LuaComponent.cpp">
+      <Filter>src\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +204,12 @@
     </ClInclude>
     <ClInclude Include="..\src\Game\Colliders\SphereCollider.h">
       <Filter>src\Game\Colliders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Lua\LuaInstance.h">
+      <Filter>src\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Lua\LuaComponent.h">
+      <Filter>src\Lua</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

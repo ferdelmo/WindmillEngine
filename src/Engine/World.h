@@ -59,5 +59,8 @@ public:
 	void Update(float deltaTime);
 
 	void End();
+
+	/* Destroy all the gameobjects in the world*/
+	void Clean();
 };
 
