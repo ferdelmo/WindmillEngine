@@ -26,6 +26,7 @@
     <ClCompile Include="..\src\Engine\World.cpp" />
     <ClCompile Include="..\src\Game\Colliders\CapsuleCollider.cpp" />
     <ClCompile Include="..\src\Game\Colliders\SphereCollider.cpp" />
+    <ClCompile Include="..\src\Game\GameObjects\FirstPersonPlayer.cpp" />
     <ClCompile Include="..\src\Input\InputManager.cpp" />
     <ClCompile Include="..\src\Lua\LuaComponent.cpp" />
     <ClCompile Include="..\src\Lua\LuaGameobjectFunctions.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="..\src\Engine\World.h" />
     <ClInclude Include="..\src\Game\Colliders\CapsuleCollider.h" />
     <ClInclude Include="..\src\Game\Colliders\SphereCollider.h" />
+    <ClInclude Include="..\src\Game\GameObjects\FirstPersonPlayer.h" />
     <ClInclude Include="..\src\Input\InputManager.h" />
     <ClInclude Include="..\src\Lua\LuaComponent.h" />
     <ClInclude Include="..\src\Lua\LuaGameobjectFunctions.h" />

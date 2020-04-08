@@ -41,12 +41,12 @@ public:
 
 	World* GetWorld() const;
 
-	void Initialize();
+	virtual void Initialize();
 
-	void Start();
+	virtual void Start();
 
-	void Update(float deltaTime);
+	virtual void Update(float deltaTime);
 
-	void End();
+	virtual void End();
 };
 

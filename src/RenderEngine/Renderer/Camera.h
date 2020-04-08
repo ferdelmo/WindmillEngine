@@ -23,5 +23,9 @@ public:
 
 	glm::mat4 GetProjection() const;
 
+	void SetView(glm::mat4 view);
+
+	void SetProjection(glm::mat4 proj);
+
 };
 

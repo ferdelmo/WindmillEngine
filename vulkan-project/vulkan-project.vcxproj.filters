@@ -38,6 +38,9 @@
     <Filter Include="src\Lua">
       <UniqueIdentifier>{e96d1fbd-1e11-4aed-9b72-c83c32e98757}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Game\GameObjects">
+      <UniqueIdentifier>{0727e50d-03bf-44e8-8b10-7023084345d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -121,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Lua\LuaGameobjectFunctions.cpp">
       <Filter>src\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Game\GameObjects\FirstPersonPlayer.cpp">
+      <Filter>src\Game\GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -216,6 +222,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Lua\LuaGameobjectFunctions.h">
       <Filter>src\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\GameObjects\FirstPersonPlayer.h">
+      <Filter>src\Game\GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

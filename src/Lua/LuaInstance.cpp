@@ -66,6 +66,11 @@ void LuaInstance::Close() {
 
 
 bool LuaInstance::LoadScript(const char* script) {
+	if (loaded.find(script) != loaded.end()) {
+		// already loaded
+		return true;
+	}
+
 	std::cout << "LOADING SCRIPT " << script << std::endl;
 
 	int error = luaL_loadfile(_lua, script);
@@ -76,6 +81,8 @@ bool LuaInstance::LoadScript(const char* script) {
 	}
 
 	lua_call(_lua, 0, 0);
+
+	loaded.insert(script);
 
 	return true;
 }
@@ -99,6 +106,17 @@ bool LuaInstance::ExecuteProcedure(const char* subroutineName, GameObject* obj, 
 }
 
 bool LuaInstance::ExecuteProcedure(const char* subroutineName, GameObject* obj) {
+	lua_getglobal(_lua, subroutineName);
+
+	if (!lua_isfunction(_lua, -1)) {
+		lua_pop(_lua, 1);
+		return false;
+	}
+
+
+
+	lua_pushinteger(_lua, (lua_Integer)obj);
+	lua_call(_lua, 1, 0);
 	return true;
 }
 

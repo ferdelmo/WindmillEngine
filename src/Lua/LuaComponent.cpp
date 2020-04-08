@@ -28,6 +28,7 @@ void LuaComponent::Initialize() {
 
 void LuaComponent::Start() {
 	// call LuaStart
+	LuaInstance::GetInstance().ExecuteProcedure((ScriptName() + "_Start").c_str(), _owner);
 }
 
 void LuaComponent::Update(float deltaTime) {
@@ -37,5 +38,6 @@ void LuaComponent::Update(float deltaTime) {
 
 void LuaComponent::End() {
 	// call LuaEnd
+	LuaInstance::GetInstance().ExecuteProcedure((ScriptName() + "_End").c_str(), _owner);
 
 }

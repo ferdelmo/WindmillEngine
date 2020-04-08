@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <set>
+
 // Context structure for the luaVM
 struct lua_State;
 
@@ -62,5 +65,8 @@ private:
 	bool Open();
 
 	void Close();
+	
+
+	std::set<std::string> loaded = {};
 };
 

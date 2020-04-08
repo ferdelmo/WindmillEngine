@@ -24,3 +24,11 @@ glm::mat4 Camera::GetView() const{
 glm::mat4 Camera::GetProjection() const{
 	return _proj;
 }
+
+void Camera::SetView(glm::mat4 view) {
+	_view = view;
+}
+
+void Camera::SetProjection(glm::mat4 proj) {
+	_proj = proj;
+}
