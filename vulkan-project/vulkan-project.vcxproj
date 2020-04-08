@@ -28,6 +28,7 @@
     <ClCompile Include="..\src\Game\Colliders\SphereCollider.cpp" />
     <ClCompile Include="..\src\Input\InputManager.cpp" />
     <ClCompile Include="..\src\Lua\LuaComponent.cpp" />
+    <ClCompile Include="..\src\Lua\LuaGameobjectFunctions.cpp" />
     <ClCompile Include="..\src\Lua\LuaInstance.cpp" />
     <ClCompile Include="..\src\RenderEngine\main.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Buffer.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="..\src\Game\Colliders\SphereCollider.h" />
     <ClInclude Include="..\src\Input\InputManager.h" />
     <ClInclude Include="..\src\Lua\LuaComponent.h" />
+    <ClInclude Include="..\src\Lua\LuaGameobjectFunctions.h" />
     <ClInclude Include="..\src\Lua\LuaInstance.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Buffer.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Camera.h" />

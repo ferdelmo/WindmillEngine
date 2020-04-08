@@ -1,5 +1,8 @@
 #include "LuaInstance.h"
 
+#include <iostream>
+
+#include "LuaGameobjectFunctions.h"
 /*
 	Incude Lua api
 */
@@ -38,12 +41,14 @@ void LuaInstance::CleanUp() {
 }
 
 bool LuaInstance::Open() {
-	_lua = lua_open();
+	_lua = luaL_newstate();
 
 	/*
 		Open de libraries for lua
 	*/
 	luaL_openlibs(_lua);
+
+	RegisterGameObjectsFunctions();
 
 	return true;
 }
@@ -61,7 +66,12 @@ void LuaInstance::Close() {
 
 
 bool LuaInstance::LoadScript(const char* script) {
-	if (luaL_loadfile(_lua, script) != 0) {
+	std::cout << "LOADING SCRIPT " << script << std::endl;
+
+	int error = luaL_loadfile(_lua, script);
+
+	if (error != 0) {
+		std::cout << "ERROR: " << error << std::endl;
 		return false;
 	}
 
@@ -70,11 +80,8 @@ bool LuaInstance::LoadScript(const char* script) {
 	return true;
 }
 
-/*
-	Execute procedure
-*/
-bool LuaInstance::ExecuteProcedure(const char* subroutineName, float param1) {
 
+bool LuaInstance::ExecuteProcedure(const char* subroutineName, GameObject* obj, float dt) {
 	lua_getglobal(_lua, subroutineName);
 
 	if (!lua_isfunction(_lua, -1)) {
@@ -82,8 +89,28 @@ bool LuaInstance::ExecuteProcedure(const char* subroutineName, float param1) {
 		return false;
 	}
 
-	lua_pushnumber(_lua, param1);
-	lua_call(_lua, 1, 0);
+
+
+	lua_pushinteger(_lua, (lua_Integer)obj);
+	lua_pushnumber(_lua, dt);
+	lua_call(_lua, 2, 0);
 
 	return true;
+}
+
+bool LuaInstance::ExecuteProcedure(const char* subroutineName, GameObject* obj) {
+	return true;
+}
+
+void LuaInstance::RegisterGameObjectsFunctions() {
+	RegisterFunction(LuaGameobjectFunctions::GetPosition, "GetPosition");
+	RegisterFunction(LuaGameobjectFunctions::SetPosition, "SetPosition");
+	RegisterFunction(LuaGameobjectFunctions::IsKeyPressed, "IsKeyPressed");
+}
+
+/*
+	Register a function for its use in lua
+*/
+void LuaInstance::RegisterFunction(lua_CFunction f, const char* luaName) {
+	lua_register(_lua, luaName, f);
 }

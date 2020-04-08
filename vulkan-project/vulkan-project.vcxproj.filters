@@ -119,6 +119,9 @@
     <ClCompile Include="..\src\Lua\LuaComponent.cpp">
       <Filter>src\Lua</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Lua\LuaGameobjectFunctions.cpp">
+      <Filter>src\Lua</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
@@ -209,6 +212,9 @@
       <Filter>src\Lua</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Lua\LuaComponent.h">
+      <Filter>src\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Lua\LuaGameobjectFunctions.h">
       <Filter>src\Lua</Filter>
     </ClInclude>
   </ItemGroup>

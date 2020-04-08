@@ -24,9 +24,6 @@ std::string LuaComponent::ScriptName() {
 
 void LuaComponent::Initialize() {
 	LuaInstance::GetInstance().LoadScript(_pathScript.c_str());
-	LuaInstance::GetInstance().LoadScript("enemy.lua");
-	LuaInstance::GetInstance().LoadScript("../enemy.lua");
-	LuaInstance::GetInstance().LoadScript("../resources/lua/enemy.lua");
 }
 
 void LuaComponent::Start() {
@@ -35,7 +32,7 @@ void LuaComponent::Start() {
 
 void LuaComponent::Update(float deltaTime) {
 	// call LuaUpdate
-	LuaInstance::GetInstance().ExecuteProcedure((ScriptName() + "_Update").c_str(), deltaTime);
+	LuaInstance::GetInstance().ExecuteProcedure((ScriptName() + "_Update").c_str(), _owner, deltaTime);
 }
 
 void LuaComponent::End() {
