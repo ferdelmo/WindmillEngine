@@ -27,7 +27,6 @@
 #include "Lua/LuaComponent.h"
 
 
-
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
     {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f,0.0f}},
@@ -308,11 +307,17 @@ int main() {
     light2.position = glm::vec3(-20, -10, 10);
     light2.power = 500;
 
+    PointLight light3;
+    light2.color = glm::vec3(0, 0, 1);
+    light2.position = glm::vec3(-20, -10, 10);
+    light2.power = 100000;
+
     Lights lights;
     lights.lights[0] = light;
     lights.lights[1] = light2;
+    lights.lights[2] = light3;
 
-    lights.num_lights = 2;
+    lights.num_lights = 3;
 
     AmbientLight ambient = { {1,1,1}, .1f };
 
@@ -329,7 +334,7 @@ int main() {
 
     world.Initialize();
 
-    world.Start();
+    
 
     float realTimeExecuted = 0;
 
@@ -359,8 +364,8 @@ int main() {
     KeyboardCallback callbacks[5];
 
     
-
-    FirstPersonPlayer* fpp = new FirstPersonPlayer();
+    
+    FirstPersonPlayer* fpp = new FirstPersonPlayer(light3);
 
     LuaComponent* luaComp = new LuaComponent("../resources/lua/player.lua");
 
@@ -373,7 +378,7 @@ int main() {
     fpp->transform.position = glm::vec3(0, -15, 0);
 
 
-    StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1, 0, 0, 1));
+   /* StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1, 0, 0, 1));
 
     GameObject* luaObject = new GameObject();
 
@@ -381,9 +386,30 @@ int main() {
 
     luaObject->AddComponent(mesh);
 
-    luaObject->transform.scale = glm::vec3(15);
+    luaObject->transform.scale = glm::vec3(15);*/
+
+    for (int i = 0; i < 25; i++) {
+        StaticMeshComponent* skullMesh = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0, 0, 1, 1));
+
+        GameObject* skull = new GameObject();
+
+        LuaComponent* luaEnemy = new LuaComponent("../resources/lua/enemy.lua");
+
+        world.AddObject(skull);
+
+        skull->AddComponent(luaEnemy);
+
+        skull->AddComponent(skullMesh);
+
+        skull->transform.position = glm::vec3(0.0f, i * 5.0f, 10.0f);
+
+    }
+   
 
     int i = 0;
+
+    world.Start();
+     
     while (!end) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame - currentTime).count();
 

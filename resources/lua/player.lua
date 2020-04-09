@@ -1,6 +1,7 @@
 
 print "Player.lua"
 
+playerPos = {0.0, 0.0, 0.0}
 speed = 25
 
 angularSpeedX = 1000.0

@@ -150,6 +150,7 @@ void LuaInstance::RegisterGameObjectsFunctions() {
 	RegisterFunction(LuaGameobjectFunctions::VecAddVec, "VecAddVec");
 	RegisterFunction(LuaGameobjectFunctions::VecMinusVec, "VecMinusVec");
 	RegisterFunction(LuaGameobjectFunctions::VecMulEsc, "VecMulEsc");
+	RegisterFunction(LuaGameobjectFunctions::Magnitude, "Magnitude");
 
 	// World
 	RegisterFunction(LuaGameobjectFunctions::CreateBullet, "CreateBullet");

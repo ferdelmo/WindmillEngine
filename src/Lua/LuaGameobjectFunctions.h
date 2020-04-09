@@ -109,6 +109,11 @@ namespace LuaGameobjectFunctions {
 	*/
 	int VecMulEsc(lua_State* lua);
 
+	/*
+		Magnitude of a vector
+	*/
+
+	int Magnitude(lua_State* lua);
 
 	/*
 		Create GameObjects

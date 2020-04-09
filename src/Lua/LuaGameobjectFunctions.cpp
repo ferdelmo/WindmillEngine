@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <iostream>
 
 /*
 	Incude Lua api
@@ -29,10 +30,6 @@ extern "C" {
 #include <lauxlib.h>
 #include <lualib.h>  // Para inicializar la librería base de Lua
 }
-
-
-
-
 
 glm::vec3 ReadVector(lua_State* lua, int index) {
 	double x, y, z;
@@ -218,6 +215,16 @@ int LuaGameobjectFunctions::NormalizeVector(lua_State* lua) {
 	glm::vec3 resul = glm::normalize(vec1);
 
 	PushVector(lua, resul);
+
+	return 1;
+}
+
+int LuaGameobjectFunctions::Magnitude(lua_State* lua) {
+	glm::vec3 vec = ReadVector(lua, -1);
+
+	double result = glm::length(vec);
+
+	lua_pushnumber(lua, result);
 
 	return 1;
 }
