@@ -147,6 +147,11 @@ void LuaInstance::RegisterGameObjectsFunctions() {
 	RegisterFunction(LuaGameobjectFunctions::VecAddVec, "VecAddVec");
 	RegisterFunction(LuaGameobjectFunctions::VecMinusVec, "VecMinusVec");
 	RegisterFunction(LuaGameobjectFunctions::VecMulEsc, "VecMulEsc");
+
+	// World
+	RegisterFunction(LuaGameobjectFunctions::CreateBullet, "CreateBullet");
+	RegisterFunction(LuaGameobjectFunctions::DestroyGameObject, "DestroyGameObject");
+	RegisterFunction(LuaGameobjectFunctions::GetPlayer, "GetPlayer");
 }
 
 /*

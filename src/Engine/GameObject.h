@@ -5,6 +5,8 @@
 
 class Component;
 class World;
+class StaticMeshComponent;
+
 
 /*
 	Class to represent a game object. 
@@ -17,6 +19,12 @@ class GameObject
 private:
 	std::vector<Component*> _components;
 
+	/* 
+		Late update components, this vector is for components like render or colliders that 
+		should be updated after the other componentes
+	*/
+	std::vector<Component*> _lateUpdateComponents;
+
 	World* _world;
 
 
@@ -26,11 +34,20 @@ public:
 	~GameObject();
 
 
+
+	void AddComponent(StaticMeshComponent* component);
+
 	void AddComponent(Component* component);
 	
 	template <typename T>
 	T* GetComponent() {
 		for (auto& entry : _components) {
+			if ((T*)entry != nullptr) {
+				return (T*)entry;
+			}
+		}
+
+		for (auto& entry : _lateUpdateComponents) {
 			if ((T*)entry != nullptr) {
 				return (T*)entry;
 			}

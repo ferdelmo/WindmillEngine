@@ -1,8 +1,9 @@
 #include "World.h"
 
 #include "StaticMeshComponent.h"
+#include <iostream>
 
-World::World() : _objects(0){
+World::World() : _objects(0) {
 
 }
 World::~World() {
@@ -60,8 +61,11 @@ void World::Start() {
 }
 
 void World::Update(float deltaTime) {
-	for (auto& go : _objects) {
-		go->Update(deltaTime);
+	int i = 0;
+	while(i<_objects.size()) {
+		//std::cout << "OBJECT: " << (*iter) << std::endl;
+		_objects[i]->Update(deltaTime);
+		i++;
 	}
 }
 

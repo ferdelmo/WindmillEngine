@@ -13,6 +13,8 @@ private:
 	*/
 	std::string ScriptName();
 
+	std::string _name;
+
 public:
 
 	LuaComponent(std::string _pathScript);

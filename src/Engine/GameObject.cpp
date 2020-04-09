@@ -2,10 +2,24 @@
 
 #include "World.h"
 #include "Component.h"
+#include "StaticMeshComponent.h"
 
 GameObject::~GameObject() {
 	for (auto& entry : _components) {
 		delete entry;
+	}
+
+	for (auto& entry : _lateUpdateComponents) {
+		delete entry;
+	}
+}
+
+void GameObject::AddComponent(StaticMeshComponent* component) {
+	if (component != nullptr) {
+		component->SetOwner(this);
+		_lateUpdateComponents.push_back(component);
+		component->Initialize();
+		component->Start();
 	}
 }
 
@@ -14,6 +28,7 @@ void GameObject::AddComponent(Component* component) {
 		component->SetOwner(this);
 		_components.push_back(component);
 		component->Initialize();
+		component->Start();
 	}
 }
 
@@ -39,6 +54,9 @@ void GameObject::Start() {
 
 void GameObject::Update(float deltaTime) {
 	for (auto& entry : _components) {
+		entry->Update(deltaTime);
+	}
+	for (auto& entry : _lateUpdateComponents) {
 		entry->Update(deltaTime);
 	}
 }

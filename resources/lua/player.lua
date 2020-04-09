@@ -9,19 +9,25 @@ angularSpeedY = 500.0
 zenitMin = math.rad(10)
 zenitMax = math.rad(180-math.deg(zenitMin))
 
+-- Needs to be the same as in GLFW
+shoot_button = '\0'
+cadence = 0.1
+timeSinceLastShoot = 0.0
+
+lookAt = {0.0, 0.0, 0.0}
 
 function player_Update(obj, delta)
 	
 	-- lookAt
-	local lookAt = GetFirstPersonLookAt(obj)
+	lookAt = GetFirstPersonLookAt(obj)
 
 	local deltaMouse = GetMousePosition()
 
-	local look = { deltaMouse[0] * angularSpeedX * delta, 
-			deltaMouse[1] * angularSpeedY * delta}
+	local look = { -deltaMouse[0] * angularSpeedX * delta, 
+			-deltaMouse[1] * angularSpeedY * delta}
 
-	currentDeclination = math.acos(lookAt[3])
-	requestedDeclination = currentDeclination-look[2]
+	local currentDeclination = math.acos(lookAt[3])
+	local requestedDeclination = currentDeclination-look[2]
 
 	if requestedDeclination < zenitMin then
 		look[2] = currentDeclination - zenitMin
@@ -46,8 +52,6 @@ function player_Update(obj, delta)
 
 	local mov = { 0.0, 0.0, 0.0 }
 
-	local update = 0
-
 	if IsKeyPressed('w') then
 		mov[2] = mov[2] + 1
 	end
@@ -57,11 +61,11 @@ function player_Update(obj, delta)
 	end
 
 	if IsKeyPressed('a') then
-		mov[1] = mov[1] + 1
+		mov[1] = mov[1] - 1
 	end
 
 	if IsKeyPressed('d') then
-		mov[1] = mov[1] - 1
+		mov[1] = mov[1] + 1
 	end
 
 	local frontMov = lookAt
@@ -77,4 +81,16 @@ function player_Update(obj, delta)
 	pos = VecAddVec(pos, VecMulEsc(rightMov, mov[1]))
 
 	SetPosition(obj, pos)
+
+	-- shoot 
+	if timeSinceLastShoot <= 0 then
+		if IsKeyPressed(shoot_button) then
+			CreateBullet(obj)
+			timeSinceLastShoot = cadence
+		end
+	else 
+		timeSinceLastShoot = timeSinceLastShoot - delta
+	end
+
+
 end

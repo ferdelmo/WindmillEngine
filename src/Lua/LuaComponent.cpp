@@ -5,7 +5,8 @@
 #include "LuaInstance.h"
 
 LuaComponent::LuaComponent(std::string pathScript) : _pathScript(pathScript) {
-	std::cout << ScriptName() << std::endl;
+	//std::cout << ScriptName() << std::endl;
+	_name = ScriptName();
 }
 
 std::string LuaComponent::ScriptName() {
@@ -28,16 +29,16 @@ void LuaComponent::Initialize() {
 
 void LuaComponent::Start() {
 	// call LuaStart
-	LuaInstance::GetInstance().ExecuteProcedure((ScriptName() + "_Start").c_str(), _owner);
+	LuaInstance::GetInstance().ExecuteProcedure((_name + "_Start").c_str(), _owner);
 }
 
 void LuaComponent::Update(float deltaTime) {
 	// call LuaUpdate
-	LuaInstance::GetInstance().ExecuteProcedure((ScriptName() + "_Update").c_str(), _owner, deltaTime);
+	LuaInstance::GetInstance().ExecuteProcedure((_name + "_Update").c_str(), _owner, deltaTime);
 }
 
 void LuaComponent::End() {
 	// call LuaEnd
-	LuaInstance::GetInstance().ExecuteProcedure((ScriptName() + "_End").c_str(), _owner);
+	LuaInstance::GetInstance().ExecuteProcedure((_name + "_End").c_str(), _owner);
 
 }

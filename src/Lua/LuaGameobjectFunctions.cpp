@@ -2,7 +2,14 @@
 
 #include "RenderEngine/VulkanInstance.h"
 
+#include "Engine/World.h"
 #include "Engine/GameObject.h"
+#include "Engine/StaticMeshComponent.h"
+
+
+#include "LuaComponent.h"
+
+
 #include "Input/InputManager.h"
 
 #include "Game/GameObjects/FirstPersonPlayer.h"
@@ -271,6 +278,72 @@ int LuaGameobjectFunctions::VecMulEsc(lua_State* lua) {
 	glm::vec3 resul = vec1 * esc;
 
 	PushVector(lua, resul);
+
+	return 1;
+}
+
+/*
+	Create a bullet
+*/
+int LuaGameobjectFunctions::CreateBullet(lua_State* lua) {
+	GameObject* obj = nullptr;
+
+	obj = (GameObject*)lua_tointeger(lua, -1);
+
+	// create a bullet, for now we use new, this should be a pool of bullets to not use 
+	// new almost each tick the player is shooting
+
+	GameObject* bullet = new GameObject();
+
+	glm::vec3 lookAt = ((FirstPersonPlayer*)obj)->GetLookAt();
+
+	glm::normalize(lookAt);
+
+	const float dist = 5.0f;
+
+	obj->GetWorld()->AddObject(bullet);
+	bullet->transform.position = obj->transform.position + lookAt*dist;
+	bullet->transform.scale = glm::vec3(2,2,2);
+
+	StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1,0,1,1));
+	LuaComponent* luaComp = new LuaComponent("../resources/lua/bullet.lua");
+
+	bullet->AddComponent(mesh);
+	bullet->AddComponent(luaComp);
+
+	lua_pushinteger(lua, (lua_Integer)bullet);
+
+	return 1;
+}
+
+int LuaGameobjectFunctions::DestroyGameObject(lua_State* lua) {
+	GameObject* obj = nullptr;
+
+	obj = (GameObject*)lua_tointeger(lua, -1);
+
+	obj->GetWorld()->RemoveObject(obj);
+	delete obj;
+
+	return 0;
+}
+
+
+int LuaGameobjectFunctions::GetPlayer(lua_State* lua) {
+	GameObject* obj = nullptr;
+
+	obj = (GameObject*)lua_tointeger(lua, -1);
+
+	std::vector<GameObject*> objs = obj->GetWorld()->GetObjects();
+
+	FirstPersonPlayer* fpp = nullptr;
+	for (auto& entry : objs) {
+		if ((FirstPersonPlayer*)entry != nullptr) {
+			fpp = (FirstPersonPlayer*)entry;
+			break;
+		}
+	}
+
+	lua_pushinteger(lua, (lua_Integer)fpp);
 
 	return 1;
 }

@@ -28,7 +28,7 @@ void FirstPersonPlayer::Update(float deltaTime) {
 	cam.SetView(glm::lookAt(
 		transform.position,
 		transform.position + directionLookAt,
-		-up
+		up
 	));
 
 }

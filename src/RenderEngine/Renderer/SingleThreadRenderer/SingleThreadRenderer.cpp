@@ -239,7 +239,7 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
 
     vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    std::cout << "THERE ARE: " << objects.size() << std::endl;
+    //std::cout << "THERE ARE: " << objects.size() << std::endl;
 
     for (auto obj : objects) {
         obj->BindCommandsToBuffer(commandBuffers[i]);

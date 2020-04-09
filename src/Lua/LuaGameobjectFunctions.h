@@ -101,6 +101,33 @@ namespace LuaGameobjectFunctions {
 		Vec*esc
 	*/
 	int VecMulEsc(lua_State* lua);
+
+
+	/*
+		Create GameObjects
+	*/
+
+	/*
+		Create a bullet
+		params Recives a pointer to the gameobejct thats going to instantiate the bullet
+		return a pointer to the Bullet gameObject
+	*/
+	int CreateBullet(lua_State* lua);
+
+	/*
+		Destroy GameObject
+		param obj to destryo
+	*/
+	int DestroyGameObject(lua_State* lua);
+
+	/*
+		Get the GameObject of the first player
+
+		params A gameObject to get the world
+		return the player
+	*/
+	int GetPlayer(lua_State* lua);
+
 }
 
 
