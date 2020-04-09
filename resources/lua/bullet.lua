@@ -11,9 +11,21 @@ function bullet_Start(obj)
 	bullets[obj] = {}
 	bullets[obj]["time"] = 0.0
 	-- get the direction that the player is looking at at the start
-	bullets[obj]["direction"] = GetFirstPersonLookAt(GetPlayer(obj))
+	local dir = GetFirstPersonLookAt(GetPlayer(obj))
 
-	--SetRotationWithVector(obj, bullets[obj]["direction"])
+	local sparse = 15
+
+	if shotgun then
+		sparse = 30
+	end
+	-- put some error in the direction
+	for i=1,3 do
+		dir[i] = dir[i] + (math.random(-sparse,sparse)*1.0)/100.0
+	end
+
+	bullets[obj]["direction"] = dir
+
+	SetRotationWithVector(obj, bullets[obj]["direction"])
 end
 
 function bullet_Update(obj, delta)
@@ -25,8 +37,6 @@ function bullet_Update(obj, delta)
 		DestroyGameObject(obj)
 		return
 	end
-
-	SetRotationWithVector(obj, bullets[obj]["direction"])
 
 	-- Move the bullet in its direction
 

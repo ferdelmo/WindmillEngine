@@ -186,6 +186,24 @@ int LuaGameobjectFunctions::GetMousePosition(lua_State* lua) {
 	return 1;
 }
 
+
+int LuaGameobjectFunctions::RegisterMouseButtonRightPressedFunction(lua_State* lua) {
+	GameObject* obj = nullptr;
+
+	obj = (GameObject*)lua_tointeger(lua, -2);
+
+	size_t lenFun = 0;
+	const char* function = lua_tolstring(lua, -1, &lenFun);
+
+	Input::MouseButtonCallback call = [function, obj](Input::CallbackAction ca) {
+		LuaInstance::GetInstance().ExecuteProcedure(function, obj);
+	};
+
+	Input::InputManager::GetInstance().RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, 
+		Input::CallbackAction::KEY_PRESSED, call);
+	return 0;
+}
+
 int LuaGameobjectFunctions::SetFirstPersonLookAt(lua_State* lua) {
 
 	FirstPersonPlayer* fpp = (FirstPersonPlayer*)lua_tointeger(lua, -2);
@@ -308,18 +326,18 @@ int LuaGameobjectFunctions::VecMulEsc(lua_State* lua) {
 	Create a bullet
 */
 int LuaGameobjectFunctions::CreateBullet(lua_State* lua) {
-	GameObject* obj = nullptr;
+	FirstPersonPlayer* obj = nullptr;
 
-	obj = (GameObject*)lua_tointeger(lua, -1);
+	obj = (FirstPersonPlayer*)lua_tointeger(lua, -1);
 
 	// create a bullet, for now we use new, this should be a pool of bullets to not use 
 	// new almost each tick the player is shooting
 
 	GameObject* bullet = new GameObject();
 
-	glm::vec3 lookAt = ((FirstPersonPlayer*)obj)->GetLookAt();
+	glm::vec3 lookAt = obj->GetLookAt();
 
-	glm::normalize(lookAt);
+	lookAt = glm::normalize(lookAt);
 
 	const float dist = 5.0f;
 

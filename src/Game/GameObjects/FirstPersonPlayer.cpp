@@ -6,7 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-FirstPersonPlayer::FirstPersonPlayer(PointLight& personalLight) : _pLight(personalLight) {
+FirstPersonPlayer::FirstPersonPlayer(PointLight& personalLight) : _pLight(personalLight),
+	directionLookAt(0,1,0){
 
 }
 

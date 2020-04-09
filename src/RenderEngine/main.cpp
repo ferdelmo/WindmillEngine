@@ -26,6 +26,8 @@
 
 #include "Lua/LuaComponent.h"
 
+#include "Lua/LuaGameobjectFunctions.h"
+
 
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
@@ -297,29 +299,12 @@ int main() {
     /*
         Initialize world
     */
-    PointLight light;
-    light.color = glm::vec3(1, 1, 1);
-    light.position = glm::vec3(15, -20, 15.0f);
-    light.power = 500;
-
-    PointLight light2;
-    light2.color = glm::vec3(0, 0, 1);
-    light2.position = glm::vec3(-20, -10, 10);
-    light2.power = 500;
-
-    PointLight light3;
-    light2.color = glm::vec3(0, 0, 1);
-    light2.position = glm::vec3(-20, -10, 10);
-    light2.power = 100000;
 
     Lights lights;
-    lights.lights[0] = light;
-    lights.lights[1] = light2;
-    lights.lights[2] = light3;
 
-    lights.num_lights = 3;
+    lights.num_lights = 1;
 
-    AmbientLight ambient = { {1,1,1}, .1f };
+    AmbientLight ambient = { {1,.8,.8}, .3f };
 
     SceneLight l = { lights, ambient };
     World world;
@@ -327,7 +312,7 @@ int main() {
     world.SetLights(l);
 
     Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 1000.0f);
+        glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 800.0f);
 
     world.SetCamera(cam);
 
@@ -363,9 +348,10 @@ int main() {
 
     KeyboardCallback callbacks[5];
 
-    
-    
-    FirstPersonPlayer* fpp = new FirstPersonPlayer(light3);
+    world.GetLights().lights.lights[0].color = glm::vec3(1, 1, 1);
+    world.GetLights().lights.lights[0].power = 25;
+
+    FirstPersonPlayer* fpp = new FirstPersonPlayer(world.GetLights().lights.lights[0]);
 
     LuaComponent* luaComp = new LuaComponent("../resources/lua/player.lua");
 
@@ -441,12 +427,6 @@ int main() {
     std::cout << "Logic Ticks per second: " << logicTicks / realTimeExecuted << std::endl;
 
     //rt.StopThread();
-
-
-
-    for (auto& entry : objs) {
-        delete entry;
-    }
 
 
     renderer.CleanUp();

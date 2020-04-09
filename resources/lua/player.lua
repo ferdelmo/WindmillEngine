@@ -17,6 +17,20 @@ timeSinceLastShoot = 0.0
 
 lookAt = {0.0, 0.0, 0.0}
 
+-- Jump
+gravity = 9.8 * 5.0
+velocityUpInitial = 25
+velocityUp = 0
+jump_button = ' '
+isJumping = false
+
+shotgun = false
+
+function player_Start(obj)
+	-- body
+	RegisterMouseButtonRightPressedFunction(obj,"player_shotgun")
+end
+
 function player_Update(obj, delta)
 	
 	-- lookAt
@@ -86,6 +100,7 @@ function player_Update(obj, delta)
 	-- shoot 
 	if timeSinceLastShoot <= 0 then
 		if IsKeyPressed(shoot_button) then
+			shotgun = false
 			CreateBullet(obj)
 			timeSinceLastShoot = cadence
 		end
@@ -93,5 +108,33 @@ function player_Update(obj, delta)
 		timeSinceLastShoot = timeSinceLastShoot - delta
 	end
 
+	--Jump
+	if IsKeyPressed(jump_button) and (not isJumping) then
+		velocityUp = velocityUpInitial
+		isJumping = true
+	end
+
+	if pos[3] >= 0 and isJumping then
+		velocityUp = velocityUp - gravity * delta
+		pos[3] = pos[3] + velocityUp * delta
+	else
+		pos[3] = 0
+		isJumping = false
+	end
+
+	SetPosition(obj, pos)
+
+
+end
+
+function player_shotgun(obj)
+	if timeSinceLastShoot > 0 then
+		return
+	end
+	timeSinceLastShoot = 0.5
+	shotgun = true
+	for i=1,5 do
+		CreateBullet(obj)
+	end
 
 end

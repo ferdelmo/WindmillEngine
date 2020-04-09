@@ -65,6 +65,13 @@ namespace LuaGameobjectFunctions {
 	int GetMousePosition(lua_State* lua);
 
 	/*
+		Register key pressed function
+		params key, function_name
+	*/
+	int RegisterMouseButtonRightPressedFunction(lua_State* lua);
+
+
+	/*
 		If the gameobject is a FirstPersonPlayer, change the camera view
 	*/
 	int SetFirstPersonLookAt(lua_State* lua);

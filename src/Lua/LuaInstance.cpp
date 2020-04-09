@@ -140,6 +140,7 @@ void LuaInstance::RegisterGameObjectsFunctions() {
 	// input
 	RegisterFunction(LuaGameobjectFunctions::IsKeyPressed, "IsKeyPressed");
 	RegisterFunction(LuaGameobjectFunctions::GetMousePosition, "GetMousePosition");
+	RegisterFunction(LuaGameobjectFunctions::RegisterMouseButtonRightPressedFunction, "RegisterMouseButtonRightPressedFunction");
 
 	// maths
 	RegisterFunction(LuaGameobjectFunctions::NormalizeVector, "NormalizeVector");
