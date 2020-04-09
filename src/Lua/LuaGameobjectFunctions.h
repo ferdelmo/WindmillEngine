@@ -33,6 +33,13 @@ namespace LuaGameobjectFunctions {
 	int SetRotation(lua_State* lua);
 
 	/*
+		Set the rotation using a vector
+		params Gameobject, vector
+		return 0
+	*/
+	int SetRotationWithVector(lua_State* lua);
+
+	/*
 		Get Scale
 	*/
 	int GetScale(lua_State* lua);

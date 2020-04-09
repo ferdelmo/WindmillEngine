@@ -5,6 +5,11 @@
 #include "Input/InputManager.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+
+FirstPersonPlayer::FirstPersonPlayer(PointLight& personalLight) : _pLight(personalLight) {
+
+}
+
 glm::vec3 FirstPersonPlayer::GetLookAt() const {
 	return glm::normalize(directionLookAt);
 }
@@ -30,5 +35,7 @@ void FirstPersonPlayer::Update(float deltaTime) {
 		transform.position + directionLookAt,
 		up
 	));
+
+	_pLight.position = transform.position;
 
 }

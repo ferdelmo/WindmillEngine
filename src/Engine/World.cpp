@@ -4,11 +4,13 @@
 #include <iostream>
 
 World::World() : _objects(0) {
-
+	_activeWorld = this;
 }
 World::~World() {
 
 }
+
+World* World::_activeWorld = nullptr;
 
 void World::AddObject(GameObject* go) {
 	if (go != nullptr) {
@@ -81,4 +83,9 @@ void World::Clean() {
 	}
 
 	_objects.empty();
+}
+
+
+World& World::GetActiveWorld() {
+	return *_activeWorld;
 }

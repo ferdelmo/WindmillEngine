@@ -26,6 +26,7 @@ private:
 
 	Camera _camera;
 
+	static World* _activeWorld;
 public:
 	World();
 	~World(); 
@@ -62,5 +63,7 @@ public:
 
 	/* Destroy all the gameobjects in the world*/
 	void Clean();
+
+	static World& GetActiveWorld();
 };
 

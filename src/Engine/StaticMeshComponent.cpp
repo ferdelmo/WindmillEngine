@@ -64,9 +64,12 @@ void StaticMeshComponent::Update(float deltaTime) {
 	obj.model = glm::mat4(1);
 
 	Transform trans = _owner->transform;
-	glm::mat4 rot = glm::rotate(glm::mat4(1), glm::radians(trans.rotation.x), glm::vec3(1,0,0)) *
-		glm::rotate(glm::mat4(1), glm::radians(trans.rotation.y), glm::vec3(0, 1, 0)) *
-		glm::rotate(glm::mat4(1), glm::radians(trans.rotation.z), glm::vec3(0, 0, 1));
+	glm::mat4 rot = glm::toMat4(trans.rotation);
+		/*
+			glm::rotate(glm::mat4(1), glm::radians(trans.rotation.x), glm::vec3(1,0,0)) *
+			glm::rotate(glm::mat4(1), glm::radians(trans.rotation.y), glm::vec3(0, 1, 0)) *
+			glm::rotate(glm::mat4(1), glm::radians(trans.rotation.z), glm::vec3(0, 0, 1));
+		*/
 
 	obj.model = glm::translate(glm::mat4(1), trans.position)*rot*glm::scale(glm::mat4(1),trans.scale);
 

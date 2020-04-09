@@ -9,11 +9,12 @@
 #include "GraphicsPipeline.h"
 #include "DescriptorSetLayout.h"
 #include "Material.h"
+#include "Engine/World.h"
 
 #include <iostream>
 
 StaticMesh::StaticMesh(const std::vector<VertexNormal>& vertices, const std::vector<Index>& indices, Material* mat)
-	: _vertices(vertices), _indices(indices), _vertexBuffer(), _indexBuffer(), _material(mat)  {
+	: _vertices(vertices), _indices(indices), _vertexBuffer(), _indexBuffer(), _material(mat) {
 	_ubo.model = glm::mat4(1.0f);
 }
 
@@ -43,6 +44,12 @@ void StaticMesh::Initialize() {
 void StaticMesh::Update(float deltaTime) {
 	std::vector<MVP> uniform = { _ubo };
 	_uniforms.at("MVP")->Fill(uniform);
+
+	std::vector<Lights> uniLights = { World::GetActiveWorld().GetLights().lights };
+	_uniforms.at("Lights")->Fill(uniLights);
+
+	std::vector<AmbientLight> uniAmbient = { World::GetActiveWorld().GetLights().ambient };
+	_uniforms.at("AmbientLight")->Fill(uniAmbient);
 }
 
 void StaticMesh::Rotate(float angle, glm::vec3 up) {

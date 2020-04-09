@@ -125,8 +125,11 @@ void LuaInstance::RegisterGameObjectsFunctions() {
 	// GameObjects
 	RegisterFunction(LuaGameobjectFunctions::GetPosition, "GetPosition");
 	RegisterFunction(LuaGameobjectFunctions::SetPosition, "SetPosition");
+
 	RegisterFunction(LuaGameobjectFunctions::GetRotation, "GetRotation");
 	RegisterFunction(LuaGameobjectFunctions::SetRotation, "SetRotation");
+	RegisterFunction(LuaGameobjectFunctions::SetRotationWithVector, "SetRotationWithVector");
+
 	RegisterFunction(LuaGameobjectFunctions::GetScale, "GetScale");
 	RegisterFunction(LuaGameobjectFunctions::SetScale, "SetScale");
 

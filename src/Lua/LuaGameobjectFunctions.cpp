@@ -109,7 +109,7 @@ int LuaGameobjectFunctions::GetRotation(lua_State* lua) {
 	obj = (GameObject*)lua_tointeger(lua, -1);
 
 
-	PushVector(lua, obj->transform.rotation);
+	PushVector(lua, glm::eulerAngles(obj->transform.rotation));
 
 	return 1;
 }
@@ -122,6 +122,21 @@ int LuaGameobjectFunctions::SetRotation(lua_State* lua) {
 	obj->transform.rotation = ReadVector(lua, -1);
 
 	return 0;
+}
+
+
+int LuaGameobjectFunctions::SetRotationWithVector(lua_State* lua) {
+	GameObject* obj = nullptr;
+
+	obj = (GameObject*)lua_tointeger(lua, -2);
+
+	glm::vec3 orient = ReadVector(lua, -1);
+
+
+	obj->transform.rotation = glm::quatLookAt(orient, { 0,0,1 });
+
+	return 0;
+
 }
 
 
@@ -337,10 +352,12 @@ int LuaGameobjectFunctions::GetPlayer(lua_State* lua) {
 
 	FirstPersonPlayer* fpp = nullptr;
 	for (auto& entry : objs) {
+
 		if ((FirstPersonPlayer*)entry != nullptr) {
 			fpp = (FirstPersonPlayer*)entry;
 			break;
 		}
+
 	}
 
 	lua_pushinteger(lua, (lua_Integer)fpp);

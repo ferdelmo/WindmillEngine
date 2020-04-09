@@ -42,7 +42,13 @@ void main() {
 		vec3 lightDir = normalize(lights[i].position-worldPos);
 		float diff = max(dot(norm, lightDir), 0.0);
 
-		float dist = distance(worldPos, lights[i].position);
+		// need to check this distance
+		float dist = distance(worldPos, lights[i].position)*10;
+		if(dist<1){
+			dist = 1;
+		}
+
+
 		float distCof = min(lights[i].power/(dist*dist),1.0);
 
 		lightColor+= (lights[i].color * diff * distCof);

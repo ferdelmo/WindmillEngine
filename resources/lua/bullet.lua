@@ -3,7 +3,7 @@ print "Bullet.lua"
 
 bullets = {}
 
-max_bullet_time = 7.0
+max_bullet_time = 5.0
 bullet_speed = 50.0
 
 
@@ -12,6 +12,8 @@ function bullet_Start(obj)
 	bullets[obj]["time"] = 0.0
 	-- get the direction that the player is looking at at the start
 	bullets[obj]["direction"] = GetFirstPersonLookAt(GetPlayer(obj))
+
+	--SetRotationWithVector(obj, bullets[obj]["direction"])
 end
 
 function bullet_Update(obj, delta)
@@ -23,6 +25,8 @@ function bullet_Update(obj, delta)
 		DestroyGameObject(obj)
 		return
 	end
+
+	SetRotationWithVector(obj, bullets[obj]["direction"])
 
 	-- Move the bullet in its direction
 
