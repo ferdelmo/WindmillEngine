@@ -146,6 +146,13 @@ namespace LuaGameobjectFunctions {
 		return the player
 	*/
 	int GetPlayer(lua_State* lua);
+	
+	/*
+		Creates a skull on the scene 
+		params Recives a pointer to the gameobejct thats going to instantiate the bullet
+		return a pointer to the Bullet gameObject
+	*/
+	int CreateSkull(lua_State* lua);
 
 }
 

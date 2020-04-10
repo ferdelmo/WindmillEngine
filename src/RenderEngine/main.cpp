@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 
 #include "Renderer/SingleThreadRenderer/SingleThreadRenderer.h"
 #include <GLFW/glfw3.h>
@@ -21,6 +22,7 @@
 
 #include "Game/Colliders/SphereCollider.h"
 #include "Game/Colliders/CapsuleCollider.h"
+#include "Game/Managers/PhysicsManager.h"
 
 #include "Game/GameObjects/FirstPersonPlayer.h"
 
@@ -28,6 +30,7 @@
 
 #include "Lua/LuaGameobjectFunctions.h"
 
+#define M_PI           3.14159265358979323846
 
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
@@ -319,8 +322,6 @@ int main() {
 
     world.Initialize();
 
-    
-
     float realTimeExecuted = 0;
 
     auto realStartTime = std::chrono::high_resolution_clock::now();
@@ -355,14 +356,18 @@ int main() {
 
     LuaComponent* luaComp = new LuaComponent("../resources/lua/player.lua");
 
+    CapsuleCollider* fppCollider = new CapsuleCollider(fpp->transform.position, 5.0f, 5.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+    
     world.AddObject(fpp);
 
     fpp->AddComponent(luaComp);
+    fpp->AddComponent(fppCollider);
 
     glfwSetInputMode(VulkanInstance::GetInstance().window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     fpp->transform.position = glm::vec3(0, -15, 0);
 
+    Physics::PhysicsManager::GetInstance().AddPlayer(fppCollider);
 
    /* StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1, 0, 0, 1));
 
@@ -374,7 +379,7 @@ int main() {
 
     luaObject->transform.scale = glm::vec3(15);*/
 
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 0; i++) {
         StaticMeshComponent* skullMesh = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0, 0, 1, 1));
 
         GameObject* skull = new GameObject();
@@ -388,14 +393,31 @@ int main() {
         skull->AddComponent(skullMesh);
 
         skull->transform.position = glm::vec3(0.0f, i * 5.0f, 10.0f);
+    }
 
+    std::random_device rd;
+    std::mt19937 gen = std::mt19937(rd());
+    std::uniform_real_distribution<float> random = std::uniform_real_distribution<float>(0, 1);
+
+    for (int i = 0; i < 1; ++i) {
+        
+
+        StaticMeshComponent* daggerMesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(0, 1, 0, 1));
+        GameObject* dagger = new GameObject();
+        LuaComponent* luaDagger = new LuaComponent("../resources/lua/dagger.lua");
+        world.AddObject(dagger);
+        dagger->AddComponent(luaDagger);
+        dagger->AddComponent(daggerMesh);
+        float a = random(gen) * 2 * M_PI;
+        dagger->transform.position = glm::vec3(80.0 * cos(a), 80.0 * sin(a), 0.0f);
+        dagger->transform.scale = glm::vec3(4.0f, 4.0f, 25.0f);
     }
    
 
     int i = 0;
 
     world.Start();
-     
+    
     while (!end) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame - currentTime).count();
 
@@ -408,6 +430,7 @@ int main() {
         logicTicks++;
 
         renderer.DrawFrame();
+        Physics::PhysicsManager::GetInstance().UpdateCollisions();
         endFrame = std::chrono::high_resolution_clock::now();
     }
 

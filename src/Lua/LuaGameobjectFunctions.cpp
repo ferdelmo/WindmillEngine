@@ -21,6 +21,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <iostream>
+#include <random>
+
+#include "Game/Colliders/SphereCollider.h"
+#include "Game/Colliders/CapsuleCollider.h"
+#include "Game/Managers/PhysicsManager.h"
 
 /*
 	Incude Lua api
@@ -30,6 +35,15 @@ extern "C" {
 #include <lauxlib.h>
 #include <lualib.h>  // Para inicializar la librería base de Lua
 }
+
+
+#define M_PI           3.14159265358979323846
+
+// to generate randon numbers
+
+std::random_device rd;
+std::mt19937 gen = std::mt19937(rd());
+std::uniform_real_distribution<float> random = std::uniform_real_distribution<float>(0, 1);
 
 glm::vec3 ReadVector(lua_State* lua, int index) {
 	double x, y, z;
@@ -347,9 +361,12 @@ int LuaGameobjectFunctions::CreateBullet(lua_State* lua) {
 
 	StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1,0,1,1));
 	LuaComponent* luaComp = new LuaComponent("../resources/lua/bullet.lua");
-
+	CapsuleCollider* collider = new CapsuleCollider(bullet->transform.position, 3.0, 1.5, lookAt);
 	bullet->AddComponent(mesh);
 	bullet->AddComponent(luaComp);
+	bullet->AddComponent(collider);
+
+	Physics::PhysicsManager::GetInstance().AddBullet(collider);
 
 	lua_pushinteger(lua, (lua_Integer)bullet);
 
@@ -389,3 +406,32 @@ int LuaGameobjectFunctions::GetPlayer(lua_State* lua) {
 
 	return 1;
 }
+
+int LuaGameobjectFunctions::CreateSkull(lua_State* lua) {
+	GameObject* obj = (GameObject*)lua_tointeger(lua, -1);
+	GameObject* skull = new GameObject();
+
+	float dist = 7.0f;
+
+	obj->GetWorld()->AddObject(skull);
+
+	float theta = 2 * M_PI* random(gen);
+	float phi = acos(1 - 2 * random(gen));
+
+	glm::vec3 dir = glm::vec3(sin(phi) * cos(theta), sin(phi)*sin(theta), cos(phi)) * dist;
+	skull->transform.position = obj->transform.position + dir;
+
+	StaticMeshComponent* sm = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0, 0, 1, 1));
+	LuaComponent* luaComp = new LuaComponent("../resources/lua/enemy.lua");
+	SphereCollider* collider = new SphereCollider(skull->transform.position, skull->transform.scale.x);
+
+	skull->AddComponent(sm);
+	skull->AddComponent(luaComp);
+	skull->AddComponent(collider);
+
+	Physics::PhysicsManager::GetInstance().AddSkull(collider);
+	lua_pushinteger(lua, (lua_Integer) skull);
+	
+	return 1;
+}
+

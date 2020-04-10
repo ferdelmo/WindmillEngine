@@ -1,18 +1,20 @@
-#include "Physics.h"
-#include "Colliders/CapsuleCollider.h"
-#include "Colliders/SphereCollider.h"
+#include "PhysicsManager.h"
+#include "Game/Colliders/CapsuleCollider.h"
+#include "Game/Colliders/SphereCollider.h"
 #include <iostream>
 
-using namespace PhysicsManager;
+using namespace Physics;
 
-Physics& Physics::GetInstance() {
+PhysicsManager* PhysicsManager::_instance = nullptr;
+
+PhysicsManager& PhysicsManager::GetInstance() {
 	if (_instance == nullptr) {
-		_instance = new Physics();
+		_instance = new PhysicsManager();
 	}
 	return *_instance;
 }
 
-void Physics::Update(float deltaTime) {
+void PhysicsManager::Update(float deltaTime) {
 
 	for (SphereCollider* it : _skulls) {
 		it->Update(deltaTime);
@@ -33,23 +35,25 @@ void Physics::Update(float deltaTime) {
 	_player->Update(deltaTime);
 }
 
-void Physics::AddSkull(SphereCollider* c) {
+void PhysicsManager::AddSkull(SphereCollider* c) {
+	std::cout << "skull added" << std::endl;
 	_skulls.push_back(c);
 }
 
-void Physics::AddDagger(SphereCollider* c) {
+void PhysicsManager::AddDagger(SphereCollider* c) {
 	_daggers.push_back(c);
 }
 
-void Physics::AddBullet(CapsuleCollider* c) {
+void PhysicsManager::AddBullet(CapsuleCollider* c) {
+	std::cout << "bullet added" << std::endl;
 	_bullets.push_back(c);
 }
 
-void Physics::AddGem(SphereCollider* c) {
+void PhysicsManager::AddGem(SphereCollider* c) {
 	_gems.push_back(c);
 }
 
-void Physics::AddPlayer(CapsuleCollider* c) {
+void PhysicsManager::AddPlayer(CapsuleCollider* c) {
 	if (_player != nullptr) {
 		std::cout << "Physiscs.cpp: a player already exists in the physics world." << std::endl;
 		return;
@@ -57,14 +61,15 @@ void Physics::AddPlayer(CapsuleCollider* c) {
 	_player = c;
 }
 
-void Physics::CheckCollisions() {
+void PhysicsManager::UpdateCollisions() {
 	// bullet-skull collision
 	for (int i = 0; i < _bullets.size(); ++i) {
 		for (int j = 0; j < _skulls.size(); ++j) {
 			if (_skulls.at(j)->Collision(_bullets.at(i))) {
 				//lower skull's health and delete bullet
-				_bullets.erase(_bullets.begin() + i);
-				--i;
+				std::cout << "bullet - skull collision" << std::endl;
+				//_bullets.erase(_bullets.begin() + i);
+				//--i;
 				break;
 			}
 		}
@@ -75,8 +80,9 @@ void Physics::CheckCollisions() {
 		for (int j = 0; j < _daggers.size(); ++j) {
 			if (_daggers.at(j)->Collision(_bullets.at(i))) {
 				//lower dagger's health and delete bullet
-				_bullets.erase(_bullets.begin() + i);
-				--i;
+				std::cout << "bullet - dagger collision" << std::endl;
+				//_bullets.erase(_bullets.begin() + i);
+				//--i;
 				break;
 			}
 		}
@@ -85,6 +91,7 @@ void Physics::CheckCollisions() {
 	//player-skull collision
 	for (SphereCollider* skull : _skulls) {
 		if (skull->Collision(_player)) {
+			std::cout << "player - skull collision" << std::endl;
 			// kill pllayer 
 			break;
 		}
@@ -93,6 +100,7 @@ void Physics::CheckCollisions() {
 	//player-dagger collision
 	for (SphereCollider* dagger : _daggers) {
 		if (dagger->Collision(_player)) {
+			std::cout << "player - dagger collision" << std::endl;
 			// kill player
 			break;
 		}
@@ -106,6 +114,8 @@ void Physics::CheckCollisions() {
 	}
 }
 
-Physics::~Physics() {}
+PhysicsManager::~PhysicsManager() {}
 
-Physics::Physics() {}
+PhysicsManager::PhysicsManager() {
+	_player = nullptr;
+}

@@ -4,15 +4,14 @@
 
 class CapsuleCollider;
 class SphereCollider;
-class GameObject;
 
-namespace PhysicsManager {
+namespace Physics {
 
-	class Physics {
+	class PhysicsManager {
 	
 	public:
 
-		static Physics& GetInstance();
+		static PhysicsManager& GetInstance();
 
 		void Update(float deltaTime);
 		
@@ -26,14 +25,14 @@ namespace PhysicsManager {
 
 		void AddPlayer(CapsuleCollider* c);
 
-		void CheckCollisions();
+		void UpdateCollisions();
 
-		~Physics();
+		~PhysicsManager();
 
 	private:
-		Physics();
+		PhysicsManager();
 
-		static Physics* _instance;
+		static PhysicsManager* _instance;
 
 		std::vector<SphereCollider*> _skulls;
 

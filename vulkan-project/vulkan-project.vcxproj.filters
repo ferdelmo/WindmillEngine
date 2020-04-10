@@ -41,6 +41,9 @@
     <Filter Include="src\Game\GameObjects">
       <UniqueIdentifier>{0727e50d-03bf-44e8-8b10-7023084345d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Game\Managers">
+      <UniqueIdentifier>{66fed01b-db06-435d-9f03-11af6d4e0a51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -127,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Game\GameObjects\FirstPersonPlayer.cpp">
       <Filter>src\Game\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Game\Managers\PhysicsManager.cpp">
+      <Filter>src\Game\Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +231,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Game\GameObjects\FirstPersonPlayer.h">
       <Filter>src\Game\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Managers\PhysicsManager.h">
+      <Filter>src\Game\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
