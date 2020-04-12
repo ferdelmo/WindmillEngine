@@ -360,14 +360,18 @@ int LuaGameobjectFunctions::CreateBullet(lua_State* lua) {
 	const float dist = 5.0f;
 
 	obj->GetWorld()->AddObject(bullet);
-	bullet->transform.position = obj->transform.position + lookAt*dist;
-	bullet->transform.scale = glm::vec3(2,2,2);
+	bullet->transform.position = obj->transform.position + lookAt*dist+glm::vec3(0,0,-2);
+	bullet->transform.scale = glm::vec3(1, 1, 1);
 
 	World* world = obj->GetWorld();
-	Texture* tex = new Texture();
-	tex->Initialize("../resources/textures/Skull.png");
-	Material* sword = GetBasicLightMaterial(world->GetCamera(), tex, world->GetLights().lights, world->GetLights().ambient,
-		SingleThreadRenderer::GetInstance().GetRenderPass());
+	static Material* sword = nullptr;
+	if (sword == nullptr) {
+		Texture* tex = new Texture();
+		tex->Initialize("../resources/textures/Skull.png");
+
+		sword = GetBasicLightMaterial(world->GetCamera(), tex, world->GetLights().lights, world->GetLights().ambient,
+			SingleThreadRenderer::GetInstance().GetRenderPass());
+	}
 
 	StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Sword.obj", sword);
 	LuaComponent* luaComp = new LuaComponent("../resources/lua/bullet.lua");
@@ -432,13 +436,15 @@ int LuaGameobjectFunctions::CreateSkull(lua_State* lua) {
 	glm::vec3 dir = glm::vec3(sin(phi) * cos(theta), sin(phi)*sin(theta), cos(phi)) * dist;
 	skull->transform.position = obj->transform.position + dir;
 
-	Material* skullMat = nullptr;
+	static Material* skullMat = nullptr;
 
 	World* world = obj->GetWorld();
-	Texture* tex = new Texture();
-	tex->Initialize("../resources/textures/Skull.png");
-	skullMat = GetBasicLightMaterial(world->GetCamera(), tex, world->GetLights().lights, world->GetLights().ambient,
-		SingleThreadRenderer::GetInstance().GetRenderPass());
+	if (skullMat == nullptr) {
+		Texture* tex = new Texture();
+		tex->Initialize("../resources/textures/Skull.png");
+		skullMat = GetBasicLightMaterial(world->GetCamera(), tex, world->GetLights().lights, world->GetLights().ambient,
+			SingleThreadRenderer::GetInstance().GetRenderPass());
+	}
 
 	StaticMeshComponent* sm = new StaticMeshComponent("../resources/objs/Skull.obj", skullMat);
 	LuaComponent* luaComp = new LuaComponent("../resources/lua/enemy.lua");

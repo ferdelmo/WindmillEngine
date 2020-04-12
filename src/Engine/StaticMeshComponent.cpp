@@ -10,6 +10,9 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+
+std::map<std::string, Mesh*> StaticMeshComponent::meshes = std::map<std::string, Mesh*>();
+
 StaticMeshComponent::StaticMeshComponent(std::string mesh, Material* mat) : _pathMesh(mesh), 
 	_mesh(nullptr), _material(mat), color(glm::vec4(1)), _staticMesh(nullptr) {
 
@@ -27,17 +30,21 @@ StaticMeshComponent::~StaticMeshComponent() {
 
 	std::function<void()> cleanup = [staticMesh, material]() {
 		delete staticMesh;
-		delete material;
+		//delete material;
 	};
 
 	SingleThreadRenderer::GetInstance().RemoveObject(_staticMesh, cleanup);
 
-	delete _mesh;
+	//delete _mesh;
 }
 
 
 void StaticMeshComponent::Initialize() {
-	_mesh = Mesh::LoadMesh(_pathMesh, 1);
+	if (meshes.find(_pathMesh) == meshes.end()) {
+		meshes[_pathMesh] = Mesh::LoadMesh(_pathMesh, 1);
+	}
+
+	_mesh = meshes[_pathMesh];
 
 	if (_material == nullptr) {
 		World* world = _owner->GetWorld();

@@ -471,4 +471,5 @@ int main() {
     delete renderPass;
 
     VulkanInstance::GetInstance().CleanUp();
+    LuaInstance::GetInstance().CleanUp();
 }

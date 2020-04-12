@@ -2,6 +2,7 @@
 #include "Component.h"
 
 #include <string>
+#include <map>
 
 #include <glm/glm.hpp>
 #define GLM_FORCE_RADIANS
@@ -20,6 +21,9 @@ class StaticMeshComponent : public Component
 {
 
 public:
+
+	static std::map<std::string, Mesh*> meshes;
+
 	StaticMeshComponent(std::string mesh, Material* mat = nullptr);
 
 	StaticMeshComponent(std::string mesh, glm::vec4 color);

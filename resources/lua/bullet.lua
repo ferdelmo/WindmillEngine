@@ -3,8 +3,8 @@
 
 bullets = {}
 
-max_bullet_time = 5.0
-bullet_speed = 50.0
+max_bullet_time = 3.5
+bullet_speed = 100.0
 
 
 function bullet_Start(obj)
