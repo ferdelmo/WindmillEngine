@@ -64,7 +64,7 @@ void PhysicsManager::UpdateCollisions() {
 				LuaInstance::GetInstance().ExecuteProcedure("bullet_Die", _bullets.at(i)->GetOwner());
 				_bullets.erase(_bullets.begin() + i);
 				_skulls.erase(_skulls.begin() + j);
-
+				
 				--i;
 				break;
 			}
@@ -80,7 +80,8 @@ void PhysicsManager::UpdateCollisions() {
 				LuaInstance::GetInstance().ExecuteProcedure("bullet_Die", _bullets.at(i)->GetOwner());
 				_bullets.erase(_bullets.begin() + i);
 				_skulls.erase(_skulls.begin() + j);
-				//--i;
+				--i;
+				
 				break;
 			}
 		}

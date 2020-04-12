@@ -31,7 +31,7 @@ namespace Input {
 		return static_cast<CallbackAction>(static_cast<int>(a) & static_cast<int>(b));
 	}
 
-	// OR operator
+	// OR operatoraaaaaaaaaa
 	inline int operator|(int a, CallbackAction b)
 	{
 		return (static_cast<int>(a) | static_cast<int>(b));

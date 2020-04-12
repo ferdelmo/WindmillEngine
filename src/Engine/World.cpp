@@ -97,10 +97,13 @@ void World::AddPendingToRemove(GameObject* go) {
 }
 
 void World::DeletePendingToRemove() {
+	GameObject* aux = nullptr;
 	for (int i = 0; i < _pendingToRemove.size(); ++i) {
-		RemoveObject(_pendingToRemove.at(i));
-		delete _pendingToRemove.at(i);
+		aux = _pendingToRemove.at(i);
+		RemoveObject(aux);
 		_pendingToRemove.erase(_pendingToRemove.begin() + i);
+		delete aux;
+		--i;
 	}
 
 	_pendingToRemove.empty();
