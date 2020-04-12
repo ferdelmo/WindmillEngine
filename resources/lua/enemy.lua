@@ -64,5 +64,6 @@ end
 
 
 function enemy_Die(obj)
+	enemies[obj] = nil
 	DestroyGameObject(obj)
 end
