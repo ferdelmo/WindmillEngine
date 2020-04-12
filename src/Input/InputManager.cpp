@@ -63,10 +63,6 @@ IdCallback InputManager::RegisterKeyboardCallback(int key, CallbackAction action
 	return _id;
 }
 
-
-
-
-
 void InputManager::MousePositionCallbackIntern(GLFWwindow* window, double xpos, double ypos) {
 	for (auto& entry : _instance->_mousePos) {
 		entry.function(xpos, ypos);

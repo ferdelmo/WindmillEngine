@@ -59,7 +59,7 @@ namespace LuaGameobjectFunctions {
 
 	/*
 		Return the mouse position
-		
+
 		return an array with the mouse position in coordinates between -1,-1 and 1,1
 	*/
 	int GetMousePosition(lua_State* lua);
@@ -146,15 +146,20 @@ namespace LuaGameobjectFunctions {
 		return the player
 	*/
 	int GetPlayer(lua_State* lua);
-	
+
 	/*
-		Creates a skull on the scene 
+		Creates a skull on the scene
 		params Recives a pointer to the gameobejct thats going to instantiate the bullet
 		return a pointer to the Bullet gameObject
 	*/
 	int CreateSkull(lua_State* lua);
 
-}
+	/*
+		Register on begin overlap function
+		params key, function_name
+	*/
+	int RegisterOnBeginOverlap(lua_State* lua);
 
+}
 
 

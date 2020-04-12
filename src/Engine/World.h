@@ -22,6 +22,8 @@ class World
 private:
 	std::vector<GameObject*> _objects;
 
+	std::vector<GameObject*> _pendingToRemove;
+
 	SceneLight _lights;
 
 	Camera _camera;
@@ -65,5 +67,16 @@ public:
 	void Clean();
 
 	static World& GetActiveWorld();
+
+	/* Adds a game object to the pending to remove
+	   game object vector
+	*/
+	void AddPendingToRemove(GameObject* go);
+
+	/*
+		Deletes all the pending to remove game objects
+		from both _objects and _pendingToRemove
+	*/
+	void DeletePendingToRemove();
 };
 

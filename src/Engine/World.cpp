@@ -89,3 +89,19 @@ void World::Clean() {
 World& World::GetActiveWorld() {
 	return *_activeWorld;
 }
+
+void World::AddPendingToRemove(GameObject* go) {
+	if (go != nullptr) {
+		_pendingToRemove.push_back(go);
+	}
+}
+
+void World::DeletePendingToRemove() {
+	for (int i = 0; i < _pendingToRemove.size(); ++i) {
+		RemoveObject(_pendingToRemove.at(i));
+		delete _pendingToRemove.at(i);
+		_pendingToRemove.erase(_pendingToRemove.begin() + i);
+	}
+
+	_pendingToRemove.empty();
+}

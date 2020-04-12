@@ -4,8 +4,10 @@
 
 class CapsuleCollider;
 class SphereCollider;
+class Component;
 
 namespace Physics {
+
 
 	class PhysicsManager {
 	
@@ -20,8 +22,6 @@ namespace Physics {
 		void AddDagger(SphereCollider* c);
 
 		void AddBullet(CapsuleCollider* c);
-
-		void AddGem(SphereCollider* c);
 
 		void AddPlayer(CapsuleCollider* c);
 
@@ -40,8 +40,7 @@ namespace Physics {
 
 		std::vector<CapsuleCollider*> _bullets;
 
-		std::vector<SphereCollider*> _gems;
-
 		CapsuleCollider* _player;
+
 	};
 }

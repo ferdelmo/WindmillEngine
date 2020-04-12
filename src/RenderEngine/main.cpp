@@ -431,6 +431,8 @@ int main() {
 
         renderer.DrawFrame();
         Physics::PhysicsManager::GetInstance().UpdateCollisions();
+
+        world.DeletePendingToRemove();
         endFrame = std::chrono::high_resolution_clock::now();
     }
 

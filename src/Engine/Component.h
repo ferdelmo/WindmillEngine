@@ -42,5 +42,9 @@ public:
 	void SetOwner(GameObject* go) {
 		_owner = go;
 	}
+
+	GameObject* GetOwner() {
+		return _owner;
+	}
 };
 

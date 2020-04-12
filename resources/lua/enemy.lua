@@ -1,5 +1,5 @@
 
-print "Enemy.lua"
+--print "Enemy.lua"
 
 -- All enemies in the scene
 enemies = {}
@@ -60,4 +60,9 @@ end
 
 function printVector(v)
 	print("{" .. v[1] .. ", " .. v[2] .. ", " .. v[3] .."}")
+end
+
+
+function enemy_Die(obj)
+	DestroyGameObject(obj)
 end

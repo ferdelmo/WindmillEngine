@@ -38,5 +38,6 @@ public:
 		Call it at the end of the execution, usefull to free resources
 	*/
 	virtual void End();
+
 };
 

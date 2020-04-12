@@ -1,5 +1,5 @@
 
-print "Dagger.lua"
+--print "Dagger.lua"
 
 linearSpeed = 15.0
 
@@ -40,4 +40,9 @@ end
 
 function dagger_End(obj)
 
+end
+
+
+function dagger_Die(obj)
+	DestroyGameObject(obj)
 end

@@ -378,8 +378,9 @@ int LuaGameobjectFunctions::DestroyGameObject(lua_State* lua) {
 
 	obj = (GameObject*)lua_tointeger(lua, -1);
 
-	obj->GetWorld()->RemoveObject(obj);
-	delete obj;
+	//obj->GetWorld()->RemoveObject(obj);
+	obj->GetWorld()->AddPendingToRemove(obj);
+	//delete obj;
 
 	return 0;
 }
@@ -434,4 +435,3 @@ int LuaGameobjectFunctions::CreateSkull(lua_State* lua) {
 	
 	return 1;
 }
-

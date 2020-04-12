@@ -158,6 +158,7 @@ void LuaInstance::RegisterGameObjectsFunctions() {
 	RegisterFunction(LuaGameobjectFunctions::CreateSkull, "CreateSkull");
 	RegisterFunction(LuaGameobjectFunctions::DestroyGameObject, "DestroyGameObject");
 	RegisterFunction(LuaGameobjectFunctions::GetPlayer, "GetPlayer");
+
 }
 
 /*

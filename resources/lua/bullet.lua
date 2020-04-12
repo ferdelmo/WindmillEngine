@@ -1,5 +1,5 @@
 
-print "Bullet.lua"
+--print "Bullet.lua"
 
 bullets = {}
 
@@ -24,7 +24,6 @@ function bullet_Start(obj)
 	end
 
 	bullets[obj]["direction"] = dir
-
 	SetRotationWithVector(obj, bullets[obj]["direction"])
 end
 
@@ -48,4 +47,12 @@ function bullet_Update(obj, delta)
 
 	SetPosition(obj, bullet_pos)
 
+end
+
+function Destroy(obj)
+	DestroyGameObject(obj)
+end
+
+function bullet_Die(obj)
+	DestroyGameObject(obj)
 end

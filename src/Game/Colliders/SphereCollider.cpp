@@ -112,3 +112,7 @@ bool SphereCollider::Collision(const CapsuleCollider* b) {
     }
     return false;
 }
+
+void SphereCollider::OnBeginOverlap(const Component* otherCollider) {
+
+}

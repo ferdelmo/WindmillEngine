@@ -2,6 +2,7 @@
 #include "Game/Colliders/CapsuleCollider.h"
 #include "Game/Colliders/SphereCollider.h"
 #include <iostream>
+#include "Lua/LuaInstance.h"
 
 using namespace Physics;
 
@@ -28,15 +29,11 @@ void PhysicsManager::Update(float deltaTime) {
 		it->Update(deltaTime);
 	}
 
-	for (SphereCollider* it : _gems) {
-		it->Update(deltaTime);
-	}
-
 	_player->Update(deltaTime);
 }
 
 void PhysicsManager::AddSkull(SphereCollider* c) {
-	std::cout << "skull added" << std::endl;
+	//std::cout << "skull added" << std::endl;
 	_skulls.push_back(c);
 }
 
@@ -45,17 +42,13 @@ void PhysicsManager::AddDagger(SphereCollider* c) {
 }
 
 void PhysicsManager::AddBullet(CapsuleCollider* c) {
-	std::cout << "bullet added" << std::endl;
+	//std::cout << "bullet added" << std::endl;
 	_bullets.push_back(c);
-}
-
-void PhysicsManager::AddGem(SphereCollider* c) {
-	_gems.push_back(c);
 }
 
 void PhysicsManager::AddPlayer(CapsuleCollider* c) {
 	if (_player != nullptr) {
-		std::cout << "Physiscs.cpp: a player already exists in the physics world." << std::endl;
+		//std::cout << "Physiscs.cpp: a player already exists in the physics world." << std::endl;
 		return;
 	}
 	_player = c;
@@ -66,10 +59,13 @@ void PhysicsManager::UpdateCollisions() {
 	for (int i = 0; i < _bullets.size(); ++i) {
 		for (int j = 0; j < _skulls.size(); ++j) {
 			if (_skulls.at(j)->Collision(_bullets.at(i))) {
-				//lower skull's health and delete bullet
-				std::cout << "bullet - skull collision" << std::endl;
-				//_bullets.erase(_bullets.begin() + i);
-				//--i;
+				//std::cout << "bullet - skull collision" << std::endl;
+				LuaInstance::GetInstance().ExecuteProcedure("enemy_Die", _skulls.at(j)->GetOwner());
+				LuaInstance::GetInstance().ExecuteProcedure("bullet_Die", _bullets.at(i)->GetOwner());
+				_bullets.erase(_bullets.begin() + i);
+				_skulls.erase(_skulls.begin() + j);
+
+				--i;
 				break;
 			}
 		}
@@ -79,9 +75,11 @@ void PhysicsManager::UpdateCollisions() {
 	for (int i = 0; i < _bullets.size(); ++i) {
 		for (int j = 0; j < _daggers.size(); ++j) {
 			if (_daggers.at(j)->Collision(_bullets.at(i))) {
-				//lower dagger's health and delete bullet
-				std::cout << "bullet - dagger collision" << std::endl;
-				//_bullets.erase(_bullets.begin() + i);
+				//std::cout << "bullet - dagger collision" << std::endl;
+				LuaInstance::GetInstance().ExecuteProcedure("dagger_Die", _skulls.at(j)->GetOwner());
+				LuaInstance::GetInstance().ExecuteProcedure("bullet_Die", _bullets.at(i)->GetOwner());
+				_bullets.erase(_bullets.begin() + i);
+				_skulls.erase(_skulls.begin() + j);
 				//--i;
 				break;
 			}
@@ -106,12 +104,6 @@ void PhysicsManager::UpdateCollisions() {
 		}
 	}
 
-	//player-gem collision
-	for (SphereCollider* gem : _gems) {
-		if (gem->Collision(_player)) {
-			// increase level
-		}
-	}
 }
 
 PhysicsManager::~PhysicsManager() {}
