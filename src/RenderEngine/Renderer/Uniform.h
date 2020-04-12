@@ -22,6 +22,10 @@ struct UniformInterface {
 	virtual UniformTypes GetTypeUniform() { return UniformTypes::UNIFORM; };
 
 	VkDeviceSize size;
+
+	virtual ~UniformInterface() {
+
+	}
 };
 
 /*
@@ -38,6 +42,12 @@ struct UniformType : public UniformInterface {
 	UniformType(std::vector<T> objs) {
 		size = sizeof(objs[0]);
 		this->objs = objs;
+	}
+
+	~UniformType() {
+		/*for (int i = 0; i < objs.size(); i++) {
+			delete objs[i];
+		}*/
 	}
 
 	Buffer* GetUniformBuffer() override {

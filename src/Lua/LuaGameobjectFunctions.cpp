@@ -14,6 +14,10 @@
 
 #include "Game/GameObjects/FirstPersonPlayer.h"
 
+#include "RenderEngine/Renderer/Utils/MaterialUtils.h"
+#include "RenderEngine/Renderer/Texture.h"
+#include "RenderEngine/Renderer/SingleThreadRenderer/SingleThreadRenderer.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -359,7 +363,13 @@ int LuaGameobjectFunctions::CreateBullet(lua_State* lua) {
 	bullet->transform.position = obj->transform.position + lookAt*dist;
 	bullet->transform.scale = glm::vec3(2,2,2);
 
-	StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1,0,1,1));
+	World* world = obj->GetWorld();
+	Texture* tex = new Texture();
+	tex->Initialize("../resources/textures/Skull.png");
+	Material* sword = GetBasicLightMaterial(world->GetCamera(), tex, world->GetLights().lights, world->GetLights().ambient,
+		SingleThreadRenderer::GetInstance().GetRenderPass());
+
+	StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Sword.obj", sword);
 	LuaComponent* luaComp = new LuaComponent("../resources/lua/bullet.lua");
 	CapsuleCollider* collider = new CapsuleCollider(bullet->transform.position, 3.0, 1.5, lookAt);
 	bullet->AddComponent(mesh);
@@ -422,9 +432,18 @@ int LuaGameobjectFunctions::CreateSkull(lua_State* lua) {
 	glm::vec3 dir = glm::vec3(sin(phi) * cos(theta), sin(phi)*sin(theta), cos(phi)) * dist;
 	skull->transform.position = obj->transform.position + dir;
 
-	StaticMeshComponent* sm = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0, 0, 1, 1));
+	Material* skullMat = nullptr;
+
+	World* world = obj->GetWorld();
+	Texture* tex = new Texture();
+	tex->Initialize("../resources/textures/Skull.png");
+	skullMat = GetBasicLightMaterial(world->GetCamera(), tex, world->GetLights().lights, world->GetLights().ambient,
+		SingleThreadRenderer::GetInstance().GetRenderPass());
+
+	StaticMeshComponent* sm = new StaticMeshComponent("../resources/objs/Skull.obj", skullMat);
 	LuaComponent* luaComp = new LuaComponent("../resources/lua/enemy.lua");
 	SphereCollider* collider = new SphereCollider(skull->transform.position, skull->transform.scale.x);
+	skull->transform.scale = glm::vec3(1.0f / 5);
 
 	skull->AddComponent(sm);
 	skull->AddComponent(luaComp);

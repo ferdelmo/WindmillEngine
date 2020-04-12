@@ -365,7 +365,7 @@ int main() {
 
     glfwSetInputMode(VulkanInstance::GetInstance().window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-    fpp->transform.position = glm::vec3(0, -15, 0);
+    fpp->transform.position = glm::vec3(0, 0, 0);
 
     Physics::PhysicsManager::GetInstance().AddPlayer(fppCollider);
 
@@ -415,6 +415,18 @@ int main() {
    
 
     int i = 0;
+
+    /*
+        Add the floor
+    */
+    GameObject* floor = new GameObject();
+    world.AddObject(floor);
+    StaticMeshComponent* floorMesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(0.3, 0.3, 0.3, 1));
+    floor->AddComponent(floorMesh);
+
+    floor->transform.scale = glm::vec3(250, 250, 0.1);
+    floor->transform.position = glm::vec3(0, 0, -5);
+
 
     world.Start();
     
