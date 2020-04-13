@@ -64,7 +64,7 @@ void PhysicsManager::UpdateCollisions() {
 				LuaInstance::GetInstance().ExecuteProcedure("bullet_Die", _bullets.at(i)->GetOwner());
 				_bullets.erase(_bullets.begin() + i);
 				_skulls.erase(_skulls.begin() + j);
-				
+
 				--i;
 				break;
 			}
@@ -75,13 +75,12 @@ void PhysicsManager::UpdateCollisions() {
 	for (int i = 0; i < _bullets.size(); ++i) {
 		for (int j = 0; j < _daggers.size(); ++j) {
 			if (_daggers.at(j)->Collision(_bullets.at(i))) {
-				//std::cout << "bullet - dagger collision" << std::endl;
-				LuaInstance::GetInstance().ExecuteProcedure("dagger_Die", _skulls.at(j)->GetOwner());
+				LuaInstance::GetInstance().ExecuteProcedure("dagger_Die", _daggers.at(j)->GetOwner());
 				LuaInstance::GetInstance().ExecuteProcedure("bullet_Die", _bullets.at(i)->GetOwner());
 				_bullets.erase(_bullets.begin() + i);
-				_skulls.erase(_skulls.begin() + j);
+				_daggers.erase(_daggers.begin() + j);
+
 				--i;
-				
 				break;
 			}
 		}
@@ -105,6 +104,30 @@ void PhysicsManager::UpdateCollisions() {
 		}
 	}
 
+}
+
+void PhysicsManager::RemoveSphereCollider(SphereCollider* c) {
+	for (int i = 0; i < _skulls.size(); ++i) {
+		if (_skulls.at(i) == c) {
+			_skulls.erase(_skulls.begin() + i);
+			return;
+		}
+	}
+	for (int i = 0; i < _daggers.size(); ++i) {
+		if (_daggers.at(i) == c) {
+			_daggers.erase(_daggers.begin() + i);
+			return;
+		}
+	}
+}
+
+void PhysicsManager::RemoveCapsuleCollider(CapsuleCollider* c) {
+	for (int i = 0; i < _bullets.size(); ++i) {
+		if (_bullets.at(i) == c) {
+			_bullets.erase(_bullets.begin() + i);
+			return;
+		}
+	}
 }
 
 PhysicsManager::~PhysicsManager() {}

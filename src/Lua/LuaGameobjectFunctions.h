@@ -149,10 +149,17 @@ namespace LuaGameobjectFunctions {
 
 	/*
 		Creates a skull on the scene
-		params Recives a pointer to the gameobejct thats going to instantiate the bullet
-		return a pointer to the Bullet gameObject
+		params Recives a pointer to the gameobejct thats going to instantiate the skull
+		return a pointer to the skull gameObject
 	*/
 	int CreateSkull(lua_State* lua);
+
+	/*
+		Creates a dagger on the scene
+		params Recives a pointer to the gameobejct thats going to instantiate the dagger
+		return a pointer to the dagger gameObject
+	*/
+	int CreateDagger(lua_State* lua);
 
 	/*
 		Register on begin overlap function

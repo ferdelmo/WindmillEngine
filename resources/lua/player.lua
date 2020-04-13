@@ -131,7 +131,7 @@ function player_shotgun(obj)
 	if timeSinceLastShoot > 0 then
 		return
 	end
-	timeSinceLastShoot = 0.5
+	timeSinceLastShoot = 0.1
 	shotgun = true
 	for i=1,5 do
 		CreateBullet(obj)

@@ -27,6 +27,10 @@ namespace Physics {
 
 		void UpdateCollisions();
 
+		void RemoveSphereCollider(SphereCollider* c);
+
+		void RemoveCapsuleCollider(CapsuleCollider* c);
+
 		~PhysicsManager();
 
 	private:

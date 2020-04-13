@@ -1,5 +1,6 @@
 #include "CapsuleCollider.h"
 #include "Engine/GameObject.h"
+#include "Game/Managers/PhysicsManager.h"
 
 CapsuleCollider::CapsuleCollider() : _focus1(glm::vec3(0.0f, 0.0f, 0.0f)), _focus2(glm::vec3(0.0f, 0.0f, 0.0f)),
 				_center(glm::vec3(0.0f, 0.0f, 0.0f)), _radius(0.0f), _axis(glm::vec3(0.0f, 0.0f, 0.0f)), 
@@ -23,7 +24,9 @@ CapsuleCollider::CapsuleCollider(glm::vec3 center, float radius, float semiHeigh
 
 }
 
-CapsuleCollider::~CapsuleCollider(){}
+CapsuleCollider::~CapsuleCollider(){
+	Physics::PhysicsManager::GetInstance().RemoveCapsuleCollider(this);
+}
 
 void CapsuleCollider::Initialize(){}
 

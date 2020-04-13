@@ -361,7 +361,7 @@ int LuaGameobjectFunctions::CreateBullet(lua_State* lua) {
 
 	obj->GetWorld()->AddObject(bullet);
 	bullet->transform.position = obj->transform.position + lookAt*dist+glm::vec3(0,0,-2);
-	bullet->transform.scale = glm::vec3(1, 1, 1);
+	bullet->transform.scale = glm::vec3(0.4, 0.4, 0.4);
 
 	World* world = obj->GetWorld();
 	static Material* sword = nullptr;
@@ -375,7 +375,7 @@ int LuaGameobjectFunctions::CreateBullet(lua_State* lua) {
 
 	StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Sword.obj", sword);
 	LuaComponent* luaComp = new LuaComponent("../resources/lua/bullet.lua");
-	CapsuleCollider* collider = new CapsuleCollider(bullet->transform.position, 3.0, 1.5, lookAt);
+	CapsuleCollider* collider = new CapsuleCollider(bullet->transform.position, 1.5, 1.0, lookAt);
 	bullet->AddComponent(mesh);
 	bullet->AddComponent(luaComp);
 	bullet->AddComponent(collider);
@@ -460,3 +460,31 @@ int LuaGameobjectFunctions::CreateSkull(lua_State* lua) {
 	
 	return 1;
 }
+
+int LuaGameobjectFunctions::CreateDagger(lua_State* lua) {
+	GameObject* obj = (GameObject*)lua_tointeger(lua, -1);
+	GameObject* dagger = new GameObject();
+	World* world = obj->GetWorld();
+	StaticMeshComponent* daggerMesh = new StaticMeshComponent("../resources/objs/Dagger.obj", glm::vec4(0, 1, 0, 1));
+	LuaComponent* luaDagger = new LuaComponent("../resources/lua/dagger.lua");
+	
+	
+	world->AddObject(dagger);
+	dagger->AddComponent(luaDagger);
+	dagger->AddComponent(daggerMesh);
+
+	float a = random(gen) * 2 * M_PI;
+	dagger->transform.position = glm::vec3(100.0 * cos(a), 100.0 * sin(a), 15.0f);
+	dagger->transform.scale = glm::vec3(0.5f, 0.5f, 0.5f);
+	SphereCollider* collider = new SphereCollider(dagger->transform.position + glm::vec3(0.0, 0.0, 20.0), 0.5);
+	dagger->AddComponent(collider);
+
+	Physics::PhysicsManager::GetInstance().AddDagger(collider);
+
+	lua_pushinteger(lua, (lua_Integer)dagger);
+
+	return 1;
+}
+
+
+

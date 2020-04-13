@@ -36,7 +36,6 @@ public:
 
 	bool Collision(const CapsuleCollider* b);
 
-	void OnBeginOverlap(const Component* otherCollider);
 
 
 private:

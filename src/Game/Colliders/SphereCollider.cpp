@@ -2,7 +2,7 @@
 #include "Engine/GameObject.h"
 #include "CapsuleCollider.h"
 #include <iostream>
-
+#include "Game/Managers/PhysicsManager.h"
 SphereCollider::SphereCollider() : _center(glm::vec3(0.0f,0.0f,0.0f)), _radius(0.0f) {}
 
 SphereCollider::SphereCollider(float radius) : _radius(radius), _center(glm::vec3(0.0f, 0.0f, 0.0f)) {}
@@ -10,7 +10,7 @@ SphereCollider::SphereCollider(float radius) : _radius(radius), _center(glm::vec
 SphereCollider::SphereCollider(glm::vec3 center, float radius) : _center(center), _radius(radius) {}
 
 SphereCollider::~SphereCollider() {
-
+    Physics::PhysicsManager::GetInstance().RemoveSphereCollider(this);
 }
 
 void SphereCollider::Initialize() {
@@ -111,8 +111,4 @@ bool SphereCollider::Collision(const CapsuleCollider* b) {
         }
     }
     return false;
-}
-
-void SphereCollider::OnBeginOverlap(const Component* otherCollider) {
-
 }

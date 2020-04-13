@@ -369,48 +369,35 @@ int main() {
 
     Physics::PhysicsManager::GetInstance().AddPlayer(fppCollider);
 
-   /* StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(1, 0, 0, 1));
+    GameObject* manager = new GameObject();
+    LuaComponent* luaManager = new LuaComponent("../resources/lua/manager.lua");
 
-    GameObject* luaObject = new GameObject();
+    world.AddObject(manager);
+    manager->AddComponent(luaManager);
 
-    world.AddObject(luaObject);
-
-    luaObject->AddComponent(mesh);
-
-    luaObject->transform.scale = glm::vec3(15);*/
-
-    for (int i = 0; i < 0; i++) {
-        StaticMeshComponent* skullMesh = new StaticMeshComponent("../resources/objs/Ball.obj", glm::vec4(0, 0, 1, 1));
-
-        GameObject* skull = new GameObject();
-
-        LuaComponent* luaEnemy = new LuaComponent("../resources/lua/enemy.lua");
-
-        world.AddObject(skull);
-
-        skull->AddComponent(luaEnemy);
-
-        skull->AddComponent(skullMesh);
-
-        skull->transform.position = glm::vec3(0.0f, i * 5.0f, 10.0f);
-    }
+    
 
     std::random_device rd;
     std::mt19937 gen = std::mt19937(rd());
     std::uniform_real_distribution<float> random = std::uniform_real_distribution<float>(0, 1);
 
-    for (int i = 0; i < 1; ++i) {
+    for (int i = 0; i < 0; ++i) {
         
 
-        StaticMeshComponent* daggerMesh = new StaticMeshComponent("../resources/objs/Cube.obj", glm::vec4(0, 1, 0, 1));
+        StaticMeshComponent* daggerMesh = new StaticMeshComponent("../resources/objs/Dagger.obj", glm::vec4(0, 1, 0, 1));
         GameObject* dagger = new GameObject();
         LuaComponent* luaDagger = new LuaComponent("../resources/lua/dagger.lua");
+        
         world.AddObject(dagger);
         dagger->AddComponent(luaDagger);
         dagger->AddComponent(daggerMesh);
         float a = random(gen) * 2 * M_PI;
-        dagger->transform.position = glm::vec3(80.0 * cos(a), 80.0 * sin(a), 0.0f);
-        dagger->transform.scale = glm::vec3(4.0f, 4.0f, 25.0f);
+        dagger->transform.position = glm::vec3(100.0 * cos(a), 100.0 * sin(a), 15.0f);
+        dagger->transform.scale = glm::vec3(0.5f, 0.5f, 0.5f);
+        SphereCollider* collider = new SphereCollider(dagger->transform.position + glm::vec3(0.0,0.0, 20.0), 0.2);
+        dagger->AddComponent(collider); 
+
+        Physics::PhysicsManager::GetInstance().AddDagger(collider);
     }
    
 
