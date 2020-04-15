@@ -1,11 +1,11 @@
 #pragma once
 #include "Vertex.h"
 #include <vector>
-#include "Buffer.h"
 #include "Camera.h"
 #include "Texture.h"
 #include "Renderizable.h"
 #include "Uniform.h"
+#include "MeshManager.h"
 #include <map>
 
 class VulkanInstance;
@@ -20,11 +20,7 @@ class Material;
 class StaticMesh : public Renderizable
 {
 private:
-	std::vector<VertexNormal> _vertices;
-	Buffer _vertexBuffer;
-
-	std::vector<Index> _indices;
-	Buffer _indexBuffer;
+	MeshManager::MeshInfo* _mesh;
 
 	MVP _ubo;
 
@@ -49,14 +45,9 @@ public:
 	/*
 		Constructor with a list of vertices and indices
 	*/
-	StaticMesh(const std::vector<VertexNormal>& vertices, const std::vector<Index>& indices, Material* mat);
+	StaticMesh(std::string path, Material* mat);
 
 	~StaticMesh();
-
-	/*
-		Initialize the mesh -> Initialize the needed bufers and rest of vulkan things needed
-	*/
-	void Initialize();
 
 	/*
 		Update to call every frame

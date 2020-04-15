@@ -37,7 +37,6 @@ StaticMeshComponent::~StaticMeshComponent() {
 
 
 void StaticMeshComponent::Initialize() {
-	_mesh = Mesh::LoadMesh(_pathMesh, 1);
 
 	if (_material == nullptr) {
 		World* world = _owner->GetWorld();
@@ -45,8 +44,7 @@ void StaticMeshComponent::Initialize() {
 			world->GetLights().lights, world->GetLights().ambient, SingleThreadRenderer::GetInstance().GetRenderPass());
 	}
 
-	_staticMesh = new StaticMesh(_mesh->vertices, _mesh->indices, _material);
-	_staticMesh->Initialize();
+	_staticMesh = new StaticMesh(_pathMesh, _material);
 
 	SingleThreadRenderer::GetInstance().AddObject(_staticMesh);
 }

@@ -437,5 +437,7 @@ int main() {
 
     delete renderPass;
 
+    MeshManager::CleanUp();
+
     VulkanInstance::GetInstance().CleanUp();
 }
