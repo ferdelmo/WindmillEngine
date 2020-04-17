@@ -277,21 +277,22 @@ int main() {
     */
     bool end = false;
     KeyboardCallback quit = [&end](CallbackAction ca) {
-        std::cout << "Q PULSADA" << std::endl;
+        std::cout << "ESC PULSADA" << std::endl;
         end = true;
     };
 
     InputManager::GetInstance().SetWindow(VulkanInstance::GetInstance().window);
 
-    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_Q, CallbackAction::KEY_PRESSED, quit);
+    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_ESCAPE, CallbackAction::KEY_PRESSED, quit);
 
     /*
         Initialize world
     */
     PointLight light;
     light.color = glm::vec3(1, 1, 1);
-    light.position = glm::vec3(15, -20, 15.0f);
+    light.position = glm::vec3(0, 5, 5.0f);
     light.power = 500;
+
 
     PointLight light2;
     light2.color = glm::vec3(0, 0, 1);
@@ -302,7 +303,7 @@ int main() {
     lights.lights[0] = light;
     lights.lights[1] = light2;
 
-    lights.num_lights = 2;
+    lights.num_lights = 1;
 
     AmbientLight ambient = { {1,1,1}, .1f };
 
@@ -311,10 +312,13 @@ int main() {
 
     world.SetLights(l);
 
-    Camera cam = Camera(glm::vec3(2, -35, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), 
-        glm::vec3(0.0f, 0.0f, 1.0f), 90, 16 / 9.0f, 0.1f, 1000.0f);
+    Camera cam = Camera(glm::vec3(0, -5, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+        90, 16 / 9.0f, 0.1f, 1000.0f);
+
 
     world.SetCamera(cam);
+
+    //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
 
 
     world.Initialize();
@@ -340,7 +344,7 @@ int main() {
 
     std::vector<GameObject*> objs = std::vector<GameObject*>(5, nullptr);
     
-    int keys[5] = { GLFW_KEY_W, GLFW_KEY_E, GLFW_KEY_R, GLFW_KEY_T, GLFW_KEY_Y };
+    int keys[5] = { GLFW_KEY_Z, GLFW_KEY_X, GLFW_KEY_C, GLFW_KEY_V, GLFW_KEY_B };
 
     glm::vec4 colors[5] = { {1,1,1,1}, {1,0,0,1}, {0,1,0,1}, {0,0,1,1}, {1,0,1,1} };
 
@@ -368,6 +372,7 @@ int main() {
         };
         InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);
     }
+
     */
 
     for (int i = 0; i < 5; i++) {
@@ -380,9 +385,9 @@ int main() {
 
                 objs[i]->AddComponent(mesh);
 
-                objs[i]->transform.scale = glm::vec3(10, 10, 10);
+                objs[i]->transform.scale = glm::vec3(1, 1, 1);
 
-                objs[i]->transform.position = glm::vec3(-40 + i * 20, 0, 0);
+                objs[i]->transform.position = glm::vec3(-4 + i *2, 0, 0);
                 world.AddObject(objs[i]);
 
                 mesh->Initialize();
@@ -397,11 +402,16 @@ int main() {
     }
 
     int i = 0;
-    while (!end) {
+
+    Input::InputManager::GetInstance().ResetCursorPosition();
+
+    while (!end && !glfwWindowShouldClose(VulkanInstance::GetInstance().window)) {
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(endFrame - currentTime).count();
 
         currentTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
+
+        world.GetCamera().Update(deltaTime);
 
         world.Update(deltaTime);
         //callbacks[i](CallbackAction::KEY_PRESSED);

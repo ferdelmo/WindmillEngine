@@ -114,11 +114,14 @@ struct PointLight {
 	glm::vec3 position;
 	float power;
 	glm::vec3 color;
-	float aux; //used for aligment, but obiusly not the best option
+	float aux1;
+	glm::vec3 LightPosition_cameraspace;
+	float aux2; //used for aligment, but obiusly not the best option
 
 	PointLight(glm::vec3 _pos = glm::vec3(0), float _power = 0, glm::vec3 _color = glm::vec3(1)) :
-	position(_pos), power(_power), color(_color) {
-
+		position(_pos), power(_power), color(_color), 
+		LightPosition_cameraspace({0, 0, 0}) {
+		
 	}
 };
 

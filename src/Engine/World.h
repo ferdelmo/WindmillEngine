@@ -26,9 +26,13 @@ private:
 
 	Camera _camera;
 
+	static World* _world;
+
 public:
 	World();
 	~World(); 
+
+	static World* GetActiveWorld();
 
 	/*
 		Add an object to the scene

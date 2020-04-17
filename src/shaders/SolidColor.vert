@@ -14,11 +14,18 @@ layout(location = 1) in vec3 inColor;
 layout(location = 2) in vec2 inTexCoord;
 layout(location = 3) in vec3 normal;
 
-layout(location = 0) out vec3 normalFrag;
-layout(location = 1) out vec3 worldPos;
+layout(location = 0) out vec3 worldPos;
+layout(location = 1) out vec3 EyeDirection_cameraspace; 
+layout(location = 2) out vec3 Normal_cameraspace;  
 
 void main() {
     gl_Position = mvp.proj * mvp.view * mvp.model * vec4(position, 1.0);
-    normalFrag = (mvp.model * vec4(normal, 0.0)).xyz;
     worldPos =  (mvp.model * vec4(position, 1.0)).xyz;
+
+	vec3 vertexPosition_cameraspace = ( mvp.view * mvp.model * vec4(position,1)).xyz;
+	EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace;
+
+	// Normal of the the vertex, in camera space
+	Normal_cameraspace = (transpose(inverse(mvp.view * mvp.model)) * vec4(normal,0)).xyz; 
+	// Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 }

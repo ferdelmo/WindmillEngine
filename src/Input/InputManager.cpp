@@ -18,9 +18,12 @@ InputManager& InputManager::GetInstance() {
 
 void InputManager::SetWindow(GLFWwindow* window) {
 	_actualWindow = window;
+
+
 	glfwSetKeyCallback(_actualWindow, InputManager::KeyCallback);
 	glfwSetCursorPosCallback(_actualWindow, InputManager::MousePositionCallbackIntern); 
 	glfwSetMouseButtonCallback(window, InputManager::MouseButtonCallbackIntern);
+	glfwSetScrollCallback(window, InputManager::MouseScrollCallbackIntern);
 
 }
 
@@ -107,6 +110,7 @@ void InputManager::MouseButtonCallbackIntern(GLFWwindow* window, int button, int
 }
 
 IdCallback InputManager::RegisterMouseButtonCallback(int button, CallbackAction actions, MouseButtonCallback mouseCal) {
+
 	MouseButtonCallbackInfo aux = {
 		++_id, mouseCal, actions
 	};
@@ -115,6 +119,23 @@ IdCallback InputManager::RegisterMouseButtonCallback(int button, CallbackAction 
 	return _id;
 }
 
+
+void InputManager::MouseScrollCallbackIntern(GLFWwindow* window, double xpos, double ypos) {
+	
+	for (auto& entry : _instance->_scrollPos) {
+		entry.function(xpos, ypos);
+	}
+
+	_instance->_scrollPosition[0] = xpos;
+	_instance->_scrollPosition[1] = ypos;
+}
+
+
+IdCallback InputManager::RegisterMouseScrollCallback(MousePositionCallback mouseCal) {
+	MousePosCallbackInfo aux = { ++_id, mouseCal };
+	_scrollPos.push_back(aux);
+	return _id;
+}
 
 
 
@@ -129,6 +150,17 @@ void InputManager::UnregisterCallback(IdCallback id) {
 	}
 	if (e != _mousePos.end()) {
 		_mousePos.erase(e);
+		return;
+	}
+
+	// look in ScrollPos functions
+	for (e = _scrollPos.begin(); e < _scrollPos.end(); e++) {
+		if ((*e).id == id) {
+			break;
+		}
+	}
+	if (e != _scrollPos.end()) {
+		_scrollPos.erase(e);
 		return;
 	}
 
@@ -177,4 +209,19 @@ bool InputManager::IsKeyPressed(int keyButton) {
 void InputManager::GetMousePosition(double& x, double& y) {
 	x = _mousePosition[0];
 	y = _mousePosition[1];
+}
+
+void InputManager::GetScrollPosition(double& x, double& y) {
+	x = _scrollPosition[0];
+	y = _scrollPosition[1];
+
+	// reset position
+	_scrollPosition[0] = 0;
+	_scrollPosition[1] = 0;
+}
+
+void InputManager::ResetCursorPosition() {
+	glfwSetCursorPos(_actualWindow, VulkanInstance::GetInstance().width / 2, VulkanInstance::GetInstance().height / 2);
+	_mousePosition[0] = VulkanInstance::GetInstance().width / 2;
+	_mousePosition[1] = VulkanInstance::GetInstance().height / 2;
 }

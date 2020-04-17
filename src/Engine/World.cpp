@@ -2,11 +2,18 @@
 
 #include "StaticMeshComponent.h"
 
-World::World() : _objects(0){
 
+World* World::_world = nullptr;
+
+World::World() : _objects(0){
+	_world = this;
 }
 World::~World() {
 
+}
+
+World* World::GetActiveWorld() {
+	return _world;
 }
 
 void World::AddObject(GameObject* go) {

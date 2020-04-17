@@ -1,8 +1,9 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#include "RenderEngine/VulkanInstance.h"
 #include <functional>
 #include <map>
+
 
 class GLFWwindow;
 namespace Input {
@@ -76,6 +77,11 @@ namespace Input {
 		IdCallback RegisterMouseButtonCallback(int button, CallbackAction actions, MouseButtonCallback mouseCal);
 
 		/*
+			Add a function to be called when the mouse moves
+		*/
+		IdCallback RegisterMouseScrollCallback(MousePositionCallback mouseCal);
+
+		/*
 			Unregister a callback previusly added
 		*/
 		void UnregisterCallback(IdCallback id);
@@ -89,6 +95,16 @@ namespace Input {
 			Return the last mouse position
 		*/
 		void GetMousePosition(double& x, double& y);
+
+		/*
+			Return the last scroll position
+		*/
+		void GetScrollPosition(double& x, double& y);
+
+		/*
+			Reset the cursor position
+		*/
+		void ResetCursorPosition();
 
 	private:
 		struct KeyboardCallbackInfo {
@@ -116,6 +132,8 @@ namespace Input {
 
 		static void MouseButtonCallbackIntern(GLFWwindow* window, int button, int action, int mods);
 
+		static void MouseScrollCallbackIntern(GLFWwindow* window, double xpos, double ypos);
+
 
 		// singleton instance
 		static InputManager* _instance;
@@ -131,6 +149,9 @@ namespace Input {
 		//vector for the mouse position callbacks
 		std::vector<MousePosCallbackInfo> _mousePos;
 
+		//vector for the mouse scroll callbacks
+		std::vector<MousePosCallbackInfo> _scrollPos;
+
 		//map to store the callbacks for mouse buttons
 		std::map<int, std::vector<MouseButtonCallbackInfo>> _mouseButton;
 
@@ -138,6 +159,7 @@ namespace Input {
 		std::map<int, bool> _keys;
 
 		double _mousePosition[2] = { 0, 0 };
+		double _scrollPosition[2] = { 0, 0 };
 	};
 }
 
