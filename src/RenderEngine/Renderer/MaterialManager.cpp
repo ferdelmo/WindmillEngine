@@ -1,4 +1,5 @@
 #include "MaterialManager.h"
+#include "Material.h"
 
 #include <iostream>
 
@@ -9,7 +10,9 @@ MaterialManager::MaterialManager() {
 }
 
 MaterialManager::~MaterialManager() {
-
+	for (auto entry : _materials) {
+		delete entry.second.material;
+	}
 }
 
 MaterialManager& MaterialManager::GetInstance() {

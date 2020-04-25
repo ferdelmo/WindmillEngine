@@ -4,7 +4,8 @@
 
 MaterialInstance* GetBasicLightMaterial(const Camera& cam, Texture* tex, const Lights& lights, const AmbientLight ambient,
     RenderPass* renderPass) {
-    Material* resul = MaterialManager::GetInstance().GetMaterial("BasicLightMaterial");
+    std::string materialName = "BasicLightMaterial";
+    Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
     if (resul == nullptr) {
         std::vector<UniformInfo*> vertexDescriptor(0);
         MVP aux;
@@ -25,17 +26,17 @@ MaterialInstance* GetBasicLightMaterial(const Camera& cam, Texture* tex, const L
         UniformInfo* ambientUniform = UniformInfo::GenerateInfo(ambient, "AmbientLight", 3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(ambientUniform);
 
-        Material* resul = new Material("BasicLightMaterial");
+        Material* resul = new Material(materialName);
         resul->Initialize("../resources/shaders/BasicLight.vert.spv", vertexDescriptor,
             "../resources/shaders/BasicLight.frag.spv", fragmentDescriptor,
             renderPass,
             VertexNormal::getBindingDescription(),
             VertexNormal::getAttributeDescriptions());
 
-        MaterialManager::GetInstance().AddMaterial("BasicLightMaterial", resul);
+        MaterialManager::GetInstance().AddMaterial(materialName, resul);
     }
     
-    MaterialInstance* aux = new MaterialInstance("BasicLightMaterial");
+    MaterialInstance* aux = new MaterialInstance(materialName);
     aux->SetValue<AmbientLight>("AmbientLight", ambient);
     aux->SetValue<Lights>("Lights", lights);
     aux->SetValue<Texture>("Texture", *tex);
@@ -46,8 +47,10 @@ MaterialInstance* GetBasicLightMaterial(const Camera& cam, Texture* tex, const L
 
 MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color, const Lights& lights, const AmbientLight ambient,
     RenderPass* renderPass) {
+    std::string materialName = "BasicColorMaterial";
+    Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
 
-    Material* resul = MaterialManager::GetInstance().GetMaterial("BasicColorMaterial");
+    UniformColor auxColor(color);
     if (resul == nullptr) {
         std::vector<UniformInfo*> vertexDescriptor(0);
         MVP aux;
@@ -66,25 +69,21 @@ MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color, cons
         UniformInfo* ambientUniform = UniformInfo::GenerateInfo(ambient, "AmbientLight", 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(ambientUniform);
 
-        UniformColor auxColor(color);
-
         UniformInfo* basicColor = UniformInfo::GenerateInfo(auxColor, "Color", 3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(basicColor);
 
-        Material* resul = new Material("BasicColorMaterial");
+        Material* resul = new Material(materialName);
         resul->Initialize("../resources/shaders/SolidColor.vert.spv", vertexDescriptor,
             "../resources/shaders/SolidColor.frag.spv", fragmentDescriptor,
             renderPass,
             VertexNormal::getBindingDescription(),
             VertexNormal::getAttributeDescriptions());
 
-        MaterialManager::GetInstance().AddMaterial("BasicColorMaterial", resul);
+        MaterialManager::GetInstance().AddMaterial(materialName, resul);
     }
 
-    MaterialInstance* aux = new MaterialInstance("BasicColorMaterial");
-    aux->SetValue<AmbientLight>("AmbientLight", ambient);
-    aux->SetValue<Lights>("Lights", lights);
-    aux->SetValue<glm::vec4>("Color", color);
+    MaterialInstance* aux = new MaterialInstance(materialName);
+    aux->SetValue<UniformColor>("Color", auxColor);
 
     return aux;
 }

@@ -8,6 +8,8 @@
 #include "GraphicsPipeline.h"
 #include "DescriptorSetLayout.h"
 #include "MaterialInstance.h"
+#include "Material.h"
+#include "MaterialManager.h"
 
 #include "Engine/World.h"
 
@@ -18,33 +20,53 @@
 */
 StaticMesh::StaticMesh(std::string path, std::string materialName) 
 	: _mesh(MeshManager::GetInstance().LoadMesh(path)) {
-	_material = new MaterialInstance(materialName);
+
+	_material = MaterialManager::GetInstance().GetMaterial(materialName);
+	_materialInstance = nullptr;
+
+
+	_uniforms = _material->GenerateDescriptorSet(_descriptorPool, _descriptorSet);
 }
 
 StaticMesh::StaticMesh(std::string path, MaterialInstance* mat)
-	: _mesh(MeshManager::GetInstance().LoadMesh(path)), _material(mat) {
+	: _mesh(MeshManager::GetInstance().LoadMesh(path)), _materialInstance(mat), 
+	_material(mat->GetMaterial()) {
 
+
+	_uniforms = _material->GenerateDescriptorSet(_descriptorPool, _descriptorSet);
+	
+	for (auto& entry : mat->GetValues()) {
+		entry.second->Fill(_uniforms.at(entry.first));
+	}
 }
 
 StaticMesh::~StaticMesh() {
 	MeshManager::GetInstance().UnloadMesh(_mesh->path);
+
+	for (auto& entry : _uniforms) {
+		delete entry.second;
+	}
+
+	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
 }
 
 void StaticMesh::Update(float deltaTime) {
 	std::vector<MVP> uniform = { _ubo };
-	_material->SetValue<MVP>("MVP", _ubo);
+	_uniforms.at("MVP")->Fill(uniform);
 
 	World* world = World::GetActiveWorld();
 
 	if (world != nullptr) {
-		_material->SetValue<AmbientLight>("AmbientLight", world->GetLights().ambient);
+		std::vector<AmbientLight> ambient = { world->GetLights().ambient };
+		_uniforms.at("AmbientLight")->Fill(ambient);
 
 		Lights l = world->GetLights().lights;
 
 		for (int i = 0; i < l.num_lights; i++) {
 			l.lights[i].LightPosition_cameraspace = (_ubo.view * glm::vec4(l.lights[i].position, 1));
 		}
-		_material->SetValue<Lights>("Lights", l);
+		std::vector<Lights> lights = { l };
+		_uniforms.at("Lights")->Fill(lights);
 	}
 
 
@@ -54,13 +76,15 @@ void StaticMesh::Rotate(float angle, glm::vec3 up) {
 	float actualRot = angle;
 	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), up);
 
-	_material->SetValue<MVP>("MVP", _ubo);
+	std::vector<MVP> uniform = { _ubo };
+	_uniforms.at("MVP")->Fill(uniform);
 }
 
 void StaticMesh::Translate(glm::vec3 trans) {
 	_ubo.model = glm::translate(_ubo.model, trans);
 
-	_material->SetValue<MVP>("MVP", _ubo);
+	std::vector<MVP> uniform = { _ubo };
+	_uniforms.at("MVP")->Fill(uniform);
 }
 
 void StaticMesh::SetCamera(const Camera& cam) {
@@ -91,7 +115,8 @@ void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 
 	vkCmdBindIndexBuffer(cmd, _mesh->index->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->GetPipeline().GetPipelineLayout(), 0, 1, &_material->GetDescriptorSet(), 0, nullptr);
+	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, 
+		_material->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSet, 0, nullptr);
 
 	vkCmdDrawIndexed(cmd, static_cast<uint32_t>(_mesh->mesh->indices.size()), 1, 0, 0, 0);
 
@@ -112,5 +137,5 @@ MVP& StaticMesh::GetMVP() {
 }
 
 MaterialInstance* StaticMesh::GetMaterialInstance() {
-	return _material;
+	return _materialInstance;
 }

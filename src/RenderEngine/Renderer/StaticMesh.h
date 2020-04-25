@@ -24,7 +24,16 @@ private:
 
 	MVP _ubo;
 
-	MaterialInstance* _material;
+	std::map<std::string, Buffer*> _uniforms;
+
+	VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
+	VkDescriptorSet _descriptorSet = VK_NULL_HANDLE;
+
+	//material itself
+	Material* _material = nullptr;
+
+	//instance for the parameters
+	MaterialInstance* _materialInstance = nullptr;
 
 public:
 	/*

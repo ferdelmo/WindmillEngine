@@ -12,6 +12,7 @@ typedef enum class UniformTypes {
 	TEXTURE
 };
 
+
 struct UniformInterface {
 	virtual Buffer* GetUniformBuffer() { return nullptr; };
 

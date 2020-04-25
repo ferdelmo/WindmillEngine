@@ -202,7 +202,7 @@ public:
 			}
 			if (_size != size) {
 				throw std::runtime_error("Buffer::Fill: try to fill a buffer with different size of the initialized");
-				}
+			}
 		#endif // DEBUG
 
 		if (!_gpu) {

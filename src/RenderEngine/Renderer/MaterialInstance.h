@@ -4,28 +4,50 @@
 #include <vector>
 #include <string>
 
+#include "Uniform.h"
 #include "Buffer.h"
-#include "GraphicsPipeline.h"
 
 class Material;
+
+struct ParameterInfo {
+	virtual ~ParameterInfo() {
+
+	}
+
+	virtual void Fill(Buffer* buffer) {}
+};
+
+template<typename T>
+struct GenericParameter : public ParameterInfo {
+	T obj;
+
+	GenericParameter(T obj) : obj(obj) {
+
+	}
+
+	virtual void Fill(Buffer* buffer) override {
+		std::vector<T> aux = { obj };
+		
+		buffer->Fill(aux);
+	}
+};
+
 
 /*
 	Class to represent a material instance, 
 	to reuse same pipeline a shader with different parameters
+
+	@author Fernando del Molino
 */
 class MaterialInstance
 {
 private:
+
 	Material* _parent;
 
 	std::string _materialName;
 
-	std::map<std::string, Buffer*> _uniforms;
-
-	VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSet _descriptorSet = VK_NULL_HANDLE;
-
-	bool _init = false;
+	std::map<std::string, ParameterInfo*> _uniforms;
 
 public:
 
@@ -35,11 +57,6 @@ public:
 	MaterialInstance(std::string materialName);
 
 	~MaterialInstance();
-
-	/*
-		clean the things of the last parent and change the material parent
-	*/
-	void LoadMaterial(std::string materialName);
 
 	// to acces pipeline, shaders and other stuff
 	Material* GetMaterial();
@@ -53,19 +70,19 @@ public:
 	bool SetValue(std::string variable, T value) {
 		if (_uniforms.find(variable) != _uniforms.end()) {
 			// the key exists
-
-			std::vector<T> uni = { value };
-			_uniforms.at(variable)->Fill(uni);
+			
+			((GenericParameter<T>*)_uniforms[variable])->obj = value;
 
 			return true;
 		}
 		else {
+			GenericParameter<T>* aux = new GenericParameter<T>(value);
+			_uniforms[variable] = aux;
+
 			return false;
 		}
 	}
 
-	VkDescriptorSet& GetDescriptorSet();
-
-	GraphicsPipeline& GetPipeline();
+	std::map<std::string, ParameterInfo*>& GetValues();
 };
 
