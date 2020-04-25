@@ -17,8 +17,11 @@ private:
 
 	std::map<std::string, UniformInfo*> _uniforms;
 
+	//used as key for the material manager
+	std::string _materialName;
+
 public: 
-	Material();
+	Material(std::string materialName);
 
 	~Material();
 
@@ -34,6 +37,10 @@ public:
 
 	GraphicsPipeline& GetPipeline() {
 		return _pipeline;
+	}
+
+	std::string GetName() {
+		return _materialName;
 	}
 };
 

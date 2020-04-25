@@ -9,7 +9,7 @@
 
 class Mesh;
 class StaticMesh;
-class Material;
+class MaterialInstance;
 
 /*
 	Componente to renderize an static mesh
@@ -20,7 +20,7 @@ class StaticMeshComponent : public Component
 {
 
 public:
-	StaticMeshComponent(std::string mesh, Material* mat = nullptr);
+	StaticMeshComponent(std::string mesh, MaterialInstance* mat = nullptr);
 
 	StaticMeshComponent(std::string mesh, glm::vec4 color);
 
@@ -42,7 +42,7 @@ private:
 	Mesh* _mesh;
 
 	StaticMesh* _staticMesh;
-	Material* _material;
+	MaterialInstance* _material;
 
 	glm::vec4 color;
 

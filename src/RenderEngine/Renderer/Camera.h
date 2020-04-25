@@ -29,8 +29,8 @@ private:
 	float aspectRatio, near, far, fov;
 
 	// max zenit in radians
-	float zenitMin = M_PI / 180.0f * 10;
-	float zenitMax = M_PI / 180.0f * 10;
+	float zenitMin = M_PI / 180.0f * 5.0f;
+	float zenitMax = M_PI - zenitMin;
 
 	double minSensibility = 2.0f;
 

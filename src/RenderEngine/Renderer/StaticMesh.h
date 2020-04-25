@@ -6,11 +6,11 @@
 #include "Renderizable.h"
 #include "Uniform.h"
 #include "MeshManager.h"
+#include "MaterialInstance.h"
 #include <map>
 
 class VulkanInstance;
-class GraphicsPipeline;
-class Material;
+
 /**
 * Represent a static mesh with a list of vertex. Initially once initialized, the list of vertex
 * should not change (TODO: fix that)
@@ -24,28 +24,15 @@ private:
 
 	MVP _ubo;
 
-	std::map<std::string, Buffer*> _uniforms;
-
-	Material* _material;
-
-	VkDescriptorPool _descriptorPool;
-	VkDescriptorSet _descriptorSet;
-
-	/*
-		Create the descriptorPool
-	*/
-	void CreateDescriptorPool();
-
-	/*
-		Create the descriptor set
-	*/
-	void CreateDescriptoSet();
+	MaterialInstance* _material;
 
 public:
 	/*
 		Constructor with a list of vertices and indices
 	*/
-	StaticMesh(std::string path, Material* mat);
+	StaticMesh(std::string path, std::string materialName);
+
+	StaticMesh(std::string path, MaterialInstance* mat);
 
 	~StaticMesh();
 
@@ -75,11 +62,6 @@ public:
 	VkBuffer& GetIndexBuffer();
 
 	/*
-		Get the uniform buffer
-	*/
-	VkBuffer& GetUniformBuffer();
-
-	/*
 		Bind to a command the draw orders
 	*/
 	void BindCommandsToBuffer(VkCommandBuffer& cmd) override;
@@ -89,5 +71,7 @@ public:
 	std::vector<VertexNormal> GetVertices();
 
 	MVP& GetMVP();
+
+	MaterialInstance* GetMaterialInstance();
 };
 

@@ -101,6 +101,12 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\MeshManager.cpp">
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\MaterialManager.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\MaterialInstance.cpp">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
@@ -182,6 +188,12 @@
       <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\MeshManager.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\MaterialManager.h">
+      <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\MaterialInstance.h">
       <Filter>src\RenderEngine\Renderer</Filter>
     </ClInclude>
   </ItemGroup>

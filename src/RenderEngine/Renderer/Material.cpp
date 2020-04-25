@@ -3,8 +3,9 @@
 #include "Uniform.h"
 #include "SingleThreadRenderer/SingleThreadRenderer.h"
 #include <string>
+#include <iostream>
 
-Material::Material() {
+Material::Material(std::string materialName) : _materialName(materialName) {
 
 }
 
@@ -19,6 +20,8 @@ void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vert
 	RenderPass* renderPass,
 	VkVertexInputBindingDescription inputBind,
 	std::vector<VkVertexInputAttributeDescription> inputAttr) {
+
+	std::cout << "MATERIAL CREATED" << std::endl;
 
 	_vert.Initialize(vert, VK_SHADER_STAGE_VERTEX_BIT, vertBinds);
 	_frag.Initialize(frag, VK_SHADER_STAGE_FRAGMENT_BIT, fragBinds);

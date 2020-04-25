@@ -4,10 +4,11 @@
 #include "RenderEngine/Renderer/Uniform.h"
 #include "RenderEngine/Renderer/Camera.h"
 #include "RenderEngine/Renderer/Vertex.h"
+#include "RenderEngine/Renderer/MaterialInstance.h"
 
-Material* GetBasicLightMaterial(const Camera& cam, Texture* tex, const Lights& lights, const AmbientLight ambient,
+MaterialInstance* GetBasicLightMaterial(const Camera& cam, Texture* tex, const Lights& lights, const AmbientLight ambient,
     RenderPass* renderPass);
 
 
-Material* GetBasicColorMaterial(const Camera& cam, glm::vec4 color, const Lights& lights, const AmbientLight ambient,
+MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color, const Lights& lights, const AmbientLight ambient,
     RenderPass* renderPass);

@@ -8,9 +8,10 @@
 #include "Renderer/Image.h"
 #include "Renderer/Uniform.h"
 #include "Renderer/RenderPass.h"
-#include "Renderer/Material.h"
+#include "Renderer/MaterialManager.h"
 #include "Renderer/Utils/MaterialUtils.h"
 #include "Renderer/Mesh.h"
+
 
 #include "Input/InputManager.h"
 
@@ -446,6 +447,8 @@ int main() {
     renderer.CleanUp();
 
     delete renderPass;
+
+    MaterialManager::CleanUp();
 
     MeshManager::CleanUp();
 

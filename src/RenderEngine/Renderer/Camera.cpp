@@ -69,28 +69,35 @@ void Camera::MoveFirstPersonCamera(float deltaTime) {
 	glm::vec3 right = glm::cross(lookAt, defaultUp);
 	glm::vec3 up = glm::cross(right, lookAt);
 
+
+	glm::vec3 movement = { 0, 0, 0 };
 	/*
 		Camera position movement
 	*/
 	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_W)) {
-		position += lookAt * movSpeed * deltaTime;
+		movement += lookAt;
 	}
 	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_S)) {
-		position += -lookAt * movSpeed * deltaTime;
+		movement += -lookAt ;
 	}
 	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_A)) {
-		position += -right * movSpeed * deltaTime;
+		movement += -right;
 	}
 	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_D)) {
-		position += right * movSpeed * deltaTime;
+		movement += right;
 	}
 	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_E)) {
-		position += up * movSpeed * deltaTime;
+		movement += up;
 	}
 	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_Q)) {
-		position += -up * movSpeed * deltaTime;
+		movement += -up;
 	}
 
+	if (movement != glm::vec3({0, 0, 0})) {
+		movement = glm::normalize(movement);
+	}
+
+	position += movement * movSpeed * deltaTime;
 
 	_view = glm::lookAt(position, position + lookAt, up);
 
@@ -131,9 +138,10 @@ void Camera::OrientFirstPersonCamera(float deltaTime) {
 	};
 
 	float currentDeclination = std::acos(lookAt.z);
-	float requestedDeclination = currentDeclination - look.y;
+	float requestedDeclination = currentDeclination + look.y;
 
 	/*
+	std::cout << "CURRENT DECLINATION: " << std::acos(lookAt.z) << std::endl;
 	if (requestedDeclination < zenitMin) {
 		look.y = currentDeclination - zenitMin;
 	}
@@ -151,6 +159,9 @@ void Camera::OrientFirstPersonCamera(float deltaTime) {
 	finalLookAt = glm::rotate(glm::mat4(1), look.y, right) * glm::vec4(finalLookAt, 0);
 
 	lookAt = glm::lerp(lookAt, finalLookAt, (float)std::fmin(std::fmax(deltaTime * 1000.0f, 0.0), 1.0f));
+
+	right = glm::cross(lookAt, defaultUp);
+	up = glm::cross(right, lookAt);
 
 	Input::InputManager::GetInstance().ResetCursorPosition();
 
