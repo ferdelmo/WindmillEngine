@@ -110,10 +110,16 @@ Mesh* Mesh::LoadMesh(std::string path) {
         VertexNormalMapping vertex = {};
         vertex.pos = out_vertices[i];
         vertex.texCoord = out_uvs[i];
-        vertex.normal = out_normals[i];
-        vertex.bitangent = out_bitangents[i];
-        vertex.tangent = out_tangents[i];
+        vertex.normal = glm::normalize(out_normals[i]);
+        // the operation ensure orthogonalization
+        vertex.bitangent = glm::normalize(out_bitangents[i] - out_normals[i] * glm::dot(out_normals[i], out_bitangents[i]));
+        vertex.tangent = glm::normalize(out_tangents[i] - out_normals[i] * glm::dot(out_normals[i], out_tangents[i]));
         
+        //ensure the system is right-handed
+        if (glm::dot(glm::cross(vertex.normal, vertex.tangent), vertex.bitangent) < 0.0f) {
+            vertex.tangent = vertex.tangent * -1.0f;
+        }
+
         mesh->vertices.push_back(vertex);
     }
 
@@ -158,10 +164,6 @@ void Mesh::ComputeTangentBasis(
         glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
         glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
 
-        glm::vec3 normal = glm::normalize((vertices[i + 0] + vertices[i + 1] + vertices[i + 2]) / 3.0f);
-
-        tangent = glm::normalize(tangent - normal * glm::dot(normal, tangent));
-        bitangent = glm::normalize(bitangent - normal * glm::dot(normal, bitangent));
         // Set the same tangent for all three vertices of the triangle.
         // They will be merged later, in vboindexer.cpp
         tangents.push_back(tangent);
