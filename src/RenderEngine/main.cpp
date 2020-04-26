@@ -385,16 +385,16 @@ int main() {
             if (objs[i] == nullptr) {
                 objs[i] = new GameObject();
 
-                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cylinder.obj",
-                    GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/texture.jpg",
-                        "../resources/textures/normalMap.jpg"));
+                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+                    GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
+                        "../resources/textures/Brick_Tile_normal.png"));
 
                 objs[i]->AddComponent(mesh);
 
-                objs[i]->transform.scale = glm::vec3(.5, .5, .5);
-                objs[i]->transform.rotation = glm::vec3(90, 0, 0);
+                objs[i]->transform.scale = glm::vec3(5, 5, 5);
+                objs[i]->transform.rotation = glm::vec3(0, 0, 0);
 
-                objs[i]->transform.position = glm::vec3(-4 + i *2, 0, 0);
+                objs[i]->transform.position = glm::vec3(-5 + i *5, 0, 0);
                 world.AddObject(objs[i]);
 
                 mesh->Initialize();
