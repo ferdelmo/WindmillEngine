@@ -50,11 +50,10 @@ MaterialInstance* GetBasicLightMaterial(const Camera& cam, const std::string tex
 }
 
 
-MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color) {
+MaterialInstance* GetBasicColorMaterial(const Camera& cam, const PhongShading& phong) {
     std::string materialName = "BasicColorMaterial";
     Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
 
-    UniformColor auxColor(color);
     if (resul == nullptr) {
         std::vector<UniformInfo*> vertexDescriptor(0);
         MVP aux;
@@ -75,30 +74,31 @@ MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color) {
             "AmbientLight", 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(ambientUniform);
 
-        UniformInfo* basicColor = UniformInfo::GenerateInfo(auxColor, "Color", 3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-        fragmentDescriptor.push_back(basicColor);
+        UniformInfo* phongUniform = UniformInfo::GenerateInfo(phong, "Phong",
+            3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        fragmentDescriptor.push_back(phongUniform);
 
         Material* resul = new Material(materialName);
         resul->Initialize("../resources/shaders/SolidColor.vert.spv", vertexDescriptor,
             "../resources/shaders/SolidColor.frag.spv", fragmentDescriptor,
             SingleThreadRenderer::GetInstance().GetRenderPass(),
-            VertexNormal::getBindingDescription(),
-            VertexNormal::getAttributeDescriptions());
+            VertexNormalMapping::getBindingDescription(),
+            VertexNormalMapping::getAttributeDescriptions());
 
         MaterialManager::GetInstance().AddMaterial(materialName, resul);
     }
 
     MaterialInstance* aux = new MaterialInstance(materialName);
-    aux->SetValue<AmbientLight>("AmbientLight", World::GetActiveWorld()->GetLights().ambient);
-    aux->SetValue<Lights>("Lights", World::GetActiveWorld()->GetLights().lights);
-    aux->SetValue<UniformColor>("Color", auxColor);
+    aux->SetValue("AmbientLight", World::GetActiveWorld()->GetLights().ambient);
+    aux->SetValue("Lights", World::GetActiveWorld()->GetLights().lights);
+    aux->SetValue("Phong", phong);
 
     return aux;
 }
 
 
 MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const std::string tex,
-    const std::string normal) {
+    const std::string normal, const PhongShading& phong) {
         std::string materialName = "BasicLightNormalMappingMaterial";
         Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
         if (resul == nullptr) {
@@ -129,6 +129,10 @@ MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const st
                 "NormalTexture", 4, VK_SHADER_STAGE_FRAGMENT_BIT);
             fragmentDescriptor.push_back(normalTex);
 
+            UniformInfo* phongUniform = UniformInfo::GenerateInfo(phong, "Phong",
+                5, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
+            fragmentDescriptor.push_back(phongUniform);
+
             Material* resul = new Material(materialName);
             resul->Initialize("../resources/shaders/BasicLightNormalMapping.vert.spv", vertexDescriptor,
                 "../resources/shaders/BasicLightNormalMapping.frag.spv", fragmentDescriptor,
@@ -140,10 +144,11 @@ MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const st
         }
 
         MaterialInstance* aux = new MaterialInstance(materialName);
-        aux->SetValue<AmbientLight>("AmbientLight", World::GetActiveWorld()->GetLights().ambient);
-        aux->SetValue<Lights>("Lights", World::GetActiveWorld()->GetLights().lights);
+        aux->SetValue("AmbientLight", World::GetActiveWorld()->GetLights().ambient);
+        aux->SetValue("Lights", World::GetActiveWorld()->GetLights().lights);
         aux->SetTexture("Texture", tex);
         aux->SetTexture("NormalTexture", normal);
+        aux->SetValue("Phong", phong);
 
         return aux;
     }

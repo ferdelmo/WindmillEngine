@@ -9,8 +9,8 @@
 MaterialInstance* GetBasicLightMaterial(const Camera& cam, const std::string tex);
 
 
-MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color);
+MaterialInstance* GetBasicColorMaterial(const Camera& cam, const PhongShading& phong);
 
 
 MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const std::string tex, 
-	const std::string normal);
+	const std::string normal, const PhongShading& phong);

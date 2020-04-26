@@ -295,17 +295,10 @@ int main() {
     PointLight light;
     light.color = glm::vec3(1, 1, 1);
     light.position = glm::vec3(0, -5, 5.0f);
-    light.power = 450;
-
-
-    PointLight light2;
-    light2.color = glm::vec3(0, 0, 1);
-    light2.position = glm::vec3(-20, -10, 10);
-    light2.power = 500;
+    light.power = 50;
 
     Lights lights;
     lights.lights[0] = light;
-    lights.lights[1] = light2;
 
     lights.num_lights = 1;
 
@@ -351,6 +344,7 @@ int main() {
     int keys[5] = { GLFW_KEY_Z, GLFW_KEY_X, GLFW_KEY_C, GLFW_KEY_V, GLFW_KEY_B };
 
     glm::vec4 colors[5] = { {1,1,1,1}, {1,0,0,1}, {0,1,0,1}, {0,0,1,1}, {1,0,1,1} };
+    glm::vec3 colorsSpecular[5] = { {1,0,0}, {0, 1, 0}, {0, 0, 1}, {1,0,1}, {1,1,0} };
 
     bool show[5] = { false, false, false, false, false };
 
@@ -381,13 +375,18 @@ int main() {
 
     for (int i = 0; i < 5; i++) {
         // create
-        callbacks[i] = [&world, &objs, i, &colors, &show](CallbackAction ca) {
+        callbacks[i] = [&world, &objs, i, &colors, &colorsSpecular, &show](CallbackAction ca) {
             if (objs[i] == nullptr) {
                 objs[i] = new GameObject();
 
-                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+                /* StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
                     GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
-                        "../resources/textures/Brick_Tile_normal.png"));
+                        "../resources/textures/Brick_Tile_normal.png", 
+                        { glm::vec3{1, 1, 1}, 0.2f, glm::vec3{0, 1, 1}, 0.1f, 20 }));*/
+
+                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+                    GetBasicColorMaterial(world.GetCamera(),
+                        { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
 
                 objs[i]->AddComponent(mesh);
 

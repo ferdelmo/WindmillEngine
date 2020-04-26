@@ -26,22 +26,27 @@ layout(binding = 2) uniform AmbientLight{
 	float coef;
 } ambientLight;
 
-layout(binding = 3) uniform UniformColor{
-	vec4 color;
-} color;
-
+layout(binding = 3) uniform PhongShading {
+	vec3 difusseColor;
+	float kd;
+	vec3 specularColor;
+	float ks;
+	int alpha;
+	//aliment
+	vec3 aux;
+} phong;
 
 layout(location = 0) out vec4 outColor;
 
 void main() {
 
-	float kd = 0.1;
-	float ks = 0.4;
+	float kd = phong.kd;
+	float ks = phong.ks;
 
 	// Normal of the computed fragment, in camera space
 	vec3 n = normalize( Normal_cameraspace );
 
-	vec3 finalColor = color.color.xyz * ambientLight.color * ambientLight.coef;
+	vec3 finalColor = phong.difusseColor * ambientLight.color * ambientLight.coef;
 
 
 	vec3 lightSum = {0, 0, 0};
@@ -57,7 +62,7 @@ void main() {
 
 		float distance = max(distance(pl.position, worldPos), 1.0f);
 
-		vec3 diffuse = color.color.xyz * pl.color * pl.power * cosTheta / (distance * distance);
+		vec3 diffuse = pl.color * pl.power * cosTheta / (distance * distance);
 
 
 		// Eye vector (towards the camera)
@@ -68,12 +73,12 @@ void main() {
 
 		float cosAlpha = clamp(dot(E, R), 0, 1);
 
-		vec3 specular = pl.color * pl.power * pow(cosAlpha,100) / (distance * distance);
+		vec3 specular = pl.color * pl.power * pow(cosAlpha,phong.alpha) / (distance * distance);
 
 
-		lightSum = kd*diffuse + ks*specular;
+		lightSum = kd*diffuse*phong.difusseColor + ks*specular*phong.specularColor;
 	}
 
 	outColor.xyz = lightSum + finalColor;
-	outColor.w = color.color.w;
+	outColor.w = 1;
 }

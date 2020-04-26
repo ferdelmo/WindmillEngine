@@ -144,6 +144,22 @@ struct AmbientLight{
 	float coef = 0.0f;
 };
 
+/* struct to represent phong shading info */
+struct PhongShading {
+	glm::vec3 difusseColor = { 0, 0, 0 };
+	float kd;
+	glm::vec3 specularColor = { 0, 0, 0 };
+	float ks;
+	int alpha;
+	//aliment
+	glm::vec3 aux;
+
+	PhongShading(glm::vec3 kdc, float kd, glm::vec3 kds, float ks, int alpha) : difusseColor(kdc),
+	kd(kd), specularColor(kds), ks(ks), alpha(alpha) {
+
+	}
+};
+
 struct UniformInfo {
 	// Need a safer method
 	UniformInterface* obj;

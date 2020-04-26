@@ -33,12 +33,22 @@ layout(binding = 3) uniform sampler2D texSampler;
 
 layout(binding = 4) uniform sampler2D normalSampler;
 
+layout(binding = 5) uniform PhongShading {
+	vec3 difusseColor;
+	float kd;
+	vec3 specularColor;
+	float ks;
+	int alpha;
+	//aliment
+	vec3 aux;
+} phong;
+
 layout(location = 0) out vec4 outColor;
 
 void main() {
 
-    float kd = 0.4;
-	float ks = 0.1;
+    float kd = phong.kd;
+	float ks = phong.ks;
 
 
 
@@ -85,11 +95,14 @@ void main() {
 
 		float cosAlpha = clamp(dot(E, R), 0, 1);
 
-		vec3 specular = pl.color * pl.power * pow(cosAlpha,10) / (distance * distance);
+		vec3 specular = pl.color * pl.power * pow(cosAlpha, phong.alpha) / (distance * distance);
 
-		lightSum = kd*diffuse + ks*specular;
+		/*
+			sum of diffuse and specular componenets
+		*/
+		lightSum = kd*diffuse*texColor*phong.difusseColor + ks*specular*phong.specularColor;
 	}
 
-	outColor.xyz = texColor*(lightSum + ambient);
+	outColor.xyz = lightSum + ambient;
 	outColor.w = 1;
 }
