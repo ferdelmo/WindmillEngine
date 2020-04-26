@@ -41,8 +41,7 @@ void StaticMeshComponent::Initialize() {
 
 	if (_material == nullptr) {
 		World* world = _owner->GetWorld();
-		_material = GetBasicColorMaterial(world->GetCamera(), color,
-			world->GetLights().lights, world->GetLights().ambient, SingleThreadRenderer::GetInstance().GetRenderPass());
+		_material = GetBasicColorMaterial(world->GetCamera(), color);
 	}
 
 	_staticMesh = new StaticMesh(_pathMesh, _material);

@@ -67,7 +67,7 @@ void Material::AddUniformBuffer(std::string name, UniformInfo* value) {
 	}
 }
 
-std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, VkDescriptorSet& descriptorSet) {
+MapUniforms Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, VkDescriptorSet& descriptorSet) {
 	/* Create the descrtiptor pool */
 	std::vector<VkDescriptorPoolSize> poolSizes = {};
 	for (auto entry : _uniforms) {
@@ -103,21 +103,21 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 	std::vector<std::vector<VkDescriptorBufferInfo>> descriptorWritesBufferInfo = {};
 
 	int index = 0;
-	std::map<std::string, Buffer*> resul;
+	MapUniforms resul;
 	for (auto entry : _uniforms) {
 		if (entry.second->obj->GetTypeUniform() == UniformTypes::UNIFORM) {
 			descriptorWritesBufferInfo.push_back(std::vector<VkDescriptorBufferInfo>());
 			VkWriteDescriptorSet aux = {};
 
-			std::pair<std::string, Buffer*> pair;
+			std::pair<std::string, MaterialUniform*> pair;
 			pair.first = entry.second->name;
-			pair.second = entry.second->obj->GetUniformBuffer();
+			pair.second = new MaterialUniformBuffer(entry.second->obj->GetUniformBuffer());
 
 			resul.insert(pair);
 
 			for (int i = 0; i < entry.second->descriptorCount; i++) {
 				VkDescriptorBufferInfo bufferInfo;
-				bufferInfo.buffer = pair.second->GetBuffer();
+				bufferInfo.buffer = pair.second->GetBuffer()->GetBuffer();
 				bufferInfo.offset = i* entry.second->obj->size;
 				bufferInfo.range = entry.second->obj->size;
 
@@ -138,6 +138,18 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 			index++;
 		}
 		else if (entry.second->obj->GetTypeUniform() == UniformTypes::TEXTURE) {
+
+			std::pair<std::string, MaterialUniform*> pair;
+			pair.first = entry.second->name;
+			Texture* obj = ((UniformTexture*)entry.second->obj)->obj;
+
+			Texture* copyTex = new Texture();
+			copyTex->Initialize(obj->GetPath());
+
+			pair.second = new MaterialUniformTexture(copyTex);
+
+			resul.insert(pair);
+
 			VkDescriptorImageInfo imageInfo = {};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = *entry.second->obj->GetImageView();
@@ -164,4 +176,26 @@ std::map<std::string, Buffer*> Material::GenerateDescriptorSet(VkDescriptorPool&
 	}
 	*/
 	return resul;
+}
+
+void Material::UpdateDescriptorSet(VkDescriptorSet& descriptorSet, std::string variable, Texture* tex) {
+	std::vector<VkWriteDescriptorSet> descriptorWrites = {};
+	VkDescriptorImageInfo imageInfo = {};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = tex->GetImageView();
+	imageInfo.sampler = tex->GetImageSampler();
+
+	VkWriteDescriptorSet aux = {};
+	aux.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	aux.dstSet = descriptorSet;
+	aux.dstBinding = _uniforms[variable]->binding;
+	aux.dstArrayElement = 0;
+	aux.descriptorType = _uniforms[variable]->type;
+	aux.descriptorCount = _uniforms[variable]->descriptorCount;
+	aux.pImageInfo = &imageInfo;
+	aux.pTexelBufferView = nullptr; // Optional
+	descriptorWrites.push_back(aux);
+
+	vkUpdateDescriptorSets(VulkanInstance::GetInstance().device, static_cast<uint32_t>(descriptorWrites.size()),
+		descriptorWrites.data(), 0, nullptr);
 }

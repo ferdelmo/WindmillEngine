@@ -39,6 +39,8 @@ private:
 
 	int _width = 0, _height = 0, _channels = 0;
 
+	std::string _path = "";
+
 	void CreateImageView();
 
 	void CreateTextureSampler();
@@ -53,6 +55,10 @@ public:
 	//Initialize the texture by loading the texture in the path
 	void Initialize(std::string pathTexture);
 
+	//Change the image of the texture, for now mipmap, etc. cannot be changed
+	void ChangeSourceImage(std::string pathTexture);
+
+
 	VkImage& GetImage();
 
 	VkDeviceMemory& GetImageMemory();
@@ -62,5 +68,7 @@ public:
 	VkSampler& GetImageSampler();
 
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+	std::string GetPath() const;
 };
 

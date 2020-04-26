@@ -23,6 +23,7 @@ Texture::~Texture() {
 void Texture::Initialize(std::string pathTexture) {
 	/* TODO: ALLOW DIFFERENT IMAGE FORMATS */
 	//load the image
+	_path = pathTexture;
 	stbi_uc* pixels = stbi_load(pathTexture.c_str(), &_width, &_height, &_channels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = _width * _height * 4;
 
@@ -84,6 +85,45 @@ void Texture::Initialize(std::string pathTexture) {
 	CreateImageView();
 
 	CreateTextureSampler();
+}
+
+//Change the image of the texture
+void Texture::ChangeSourceImage(std::string pathTexture) {
+	_path = pathTexture;
+	int width = 0, height = 0;
+	stbi_uc* pixels = stbi_load(pathTexture.c_str(), &width, &height, &_channels, STBI_rgb_alpha);
+	VkDeviceSize imageSize = (VkDeviceSize)4 * width * height;
+
+	if (!pixels) {
+		throw std::runtime_error("Texture::Initialize: failed to load texture image!");
+	}
+
+	if (imageSize == 4 * _width * _height) {
+		// new image have the same size as old
+		//Create a buffer to copy the image
+		Buffer stagingBuffer;
+		stagingBuffer.Initialize(pixels, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		//Free the image loaded
+		stbi_image_free(pixels);
+
+		CopyBuffer cp;
+
+		// move the stagging buffer to a
+		cp.CopyBufferToImage(stagingBuffer.GetBuffer(), _image,
+			static_cast<uint32_t>(_width), static_cast<uint32_t>(_height));
+	}
+	else {
+		// destroy old image, Check if the same image can be reused
+		vkDestroySampler(VulkanInstance::GetInstance().device, _imageSampler, nullptr);
+		vkDestroyImageView(VulkanInstance::GetInstance().device, _imageView, nullptr);
+
+		vkDestroyImage(VulkanInstance::GetInstance().device, _image, nullptr);
+		vkFreeMemory(VulkanInstance::GetInstance().device, _imageMemory, nullptr);
+
+		this->Initialize(_path);
+	}
 }
 
 VkImage& Texture::GetImage() {
@@ -166,4 +206,8 @@ void Texture::CreateTextureSampler() {
 	if (vkCreateSampler(VulkanInstance::GetInstance().device, &samplerInfo, nullptr, &_imageSampler) != VK_SUCCESS) {
 		throw std::runtime_error("Texture::CreateTextureSampler: failed to create texture sampler!");
 	}
+}
+
+std::string Texture::GetPath() const {
+	return _path;
 }

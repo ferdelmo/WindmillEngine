@@ -14,6 +14,8 @@ typedef enum class UniformTypes {
 
 
 struct UniformInterface {
+	virtual ~UniformInterface(){}
+
 	virtual Buffer* GetUniformBuffer() { return nullptr; };
 
 	virtual VkImageView* GetImageView() { return nullptr; };
@@ -62,13 +64,13 @@ struct UniformTexture : public UniformInterface {
 		size = 0;
 	}
 
+	~UniformTexture() {
+		delete obj;
+	}
+
 	UniformTexture(Texture* obj) {
 		size = 0;
 		this->obj = obj;
-	}
-
-	~UniformTexture() {
-		delete obj;
 	}
 
 	virtual VkImageView *GetImageView() { return &obj->GetImageView(); };

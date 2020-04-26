@@ -29,6 +29,9 @@
     <Filter Include="src\RenderEngine\SingleThreadRenderer">
       <UniqueIdentifier>{cc20b3b3-a158-43ad-b792-7ef9bacc1725}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\RenderEngine\Renderer\Managers">
+      <UniqueIdentifier>{3c3ff543-d7ab-43db-bf72-cb26bd04348c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -98,14 +101,14 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.cpp">
       <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\RenderEngine\Renderer\MeshManager.cpp">
-      <Filter>src\RenderEngine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\RenderEngine\Renderer\MaterialManager.cpp">
-      <Filter>src\RenderEngine\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\RenderEngine\Renderer\MaterialInstance.cpp">
       <Filter>src\RenderEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Managers\MaterialManager.cpp">
+      <Filter>src\RenderEngine\Renderer\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Managers\MeshManager.cpp">
+      <Filter>src\RenderEngine\Renderer\Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -187,14 +190,14 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.h">
       <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\RenderEngine\Renderer\MeshManager.h">
-      <Filter>src\RenderEngine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\RenderEngine\Renderer\MaterialManager.h">
-      <Filter>src\RenderEngine\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\MaterialInstance.h">
       <Filter>src\RenderEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Managers\MaterialManager.h">
+      <Filter>src\RenderEngine\Renderer\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Managers\MeshManager.h">
+      <Filter>src\RenderEngine\Renderer\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

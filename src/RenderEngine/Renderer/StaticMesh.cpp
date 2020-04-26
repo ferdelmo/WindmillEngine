@@ -9,7 +9,7 @@
 #include "DescriptorSetLayout.h"
 #include "MaterialInstance.h"
 #include "Material.h"
-#include "MaterialManager.h"
+#include "Managers/MaterialManager.h"
 
 #include "Engine/World.h"
 
@@ -36,7 +36,16 @@ StaticMesh::StaticMesh(std::string path, MaterialInstance* mat)
 	_uniforms = _material->GenerateDescriptorSet(_descriptorPool, _descriptorSet);
 	
 	for (auto& entry : mat->GetValues()) {
-		entry.second->Fill(_uniforms.at(entry.first));
+		if (entry.second->GetType() == UniformTypes::UNIFORM) {
+			entry.second->Fill(_uniforms.at(entry.first)->GetBuffer());
+		}
+		else {
+			//update the texture
+			entry.second->Fill(_uniforms.at(entry.first)->GetTexture());
+			//update the descriptor set
+			_material->UpdateDescriptorSet(_descriptorSet, entry.first,
+				_uniforms.at(entry.first)->GetTexture());
+		}
 	}
 }
 
@@ -52,13 +61,13 @@ StaticMesh::~StaticMesh() {
 
 void StaticMesh::Update(float deltaTime) {
 	std::vector<MVP> uniform = { _ubo };
-	_uniforms.at("MVP")->Fill(uniform);
+	_uniforms.at("MVP")->GetBuffer()->Fill(uniform);
 
 	World* world = World::GetActiveWorld();
 
 	if (world != nullptr) {
 		std::vector<AmbientLight> ambient = { world->GetLights().ambient };
-		_uniforms.at("AmbientLight")->Fill(ambient);
+		_uniforms.at("AmbientLight")->GetBuffer()->Fill(ambient);
 
 		Lights l = world->GetLights().lights;
 
@@ -66,7 +75,7 @@ void StaticMesh::Update(float deltaTime) {
 			l.lights[i].LightPosition_cameraspace = (_ubo.view * glm::vec4(l.lights[i].position, 1));
 		}
 		std::vector<Lights> lights = { l };
-		_uniforms.at("Lights")->Fill(lights);
+		_uniforms.at("Lights")->GetBuffer()->Fill(lights);
 	}
 
 
@@ -77,14 +86,14 @@ void StaticMesh::Rotate(float angle, glm::vec3 up) {
 	_ubo.model = glm::rotate(_ubo.model, glm::radians(actualRot), up);
 
 	std::vector<MVP> uniform = { _ubo };
-	_uniforms.at("MVP")->Fill(uniform);
+	_uniforms.at("MVP")->GetBuffer()->Fill(uniform);
 }
 
 void StaticMesh::Translate(glm::vec3 trans) {
 	_ubo.model = glm::translate(_ubo.model, trans);
 
 	std::vector<MVP> uniform = { _ubo };
-	_uniforms.at("MVP")->Fill(uniform);
+	_uniforms.at("MVP")->GetBuffer()->Fill(uniform);
 }
 
 void StaticMesh::SetCamera(const Camera& cam) {

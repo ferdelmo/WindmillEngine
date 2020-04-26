@@ -2,8 +2,8 @@
 
 #include <map>
 
-#include "Buffer.h"
-#include "Mesh.h"
+#include "../Buffer.h"
+#include "../Mesh.h"
 
 
 /*

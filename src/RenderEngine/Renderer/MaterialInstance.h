@@ -6,6 +6,7 @@
 
 #include "Uniform.h"
 #include "Buffer.h"
+#include "Texture.h"
 
 class Material;
 
@@ -15,6 +16,10 @@ struct ParameterInfo {
 	}
 
 	virtual void Fill(Buffer* buffer) {}
+
+	virtual void Fill(Texture* tex){}
+	
+	virtual UniformTypes GetType() { return UniformTypes::UNIFORM;  }
 };
 
 template<typename T>
@@ -30,6 +35,23 @@ struct GenericParameter : public ParameterInfo {
 		
 		buffer->Fill(aux);
 	}
+
+	virtual UniformTypes GetType() override { return UniformTypes::UNIFORM; }
+};
+
+struct TextureParameter : public ParameterInfo {
+	std::string pathTex;
+
+	TextureParameter(std::string pathTex) : pathTex(pathTex) {
+
+	}
+
+	virtual void Fill(Texture* tex) {
+		tex->ChangeSourceImage(pathTex);
+	}
+
+	virtual UniformTypes GetType() override { return UniformTypes::TEXTURE; }
+
 };
 
 
@@ -77,6 +99,22 @@ public:
 		}
 		else {
 			GenericParameter<T>* aux = new GenericParameter<T>(value);
+			_uniforms[variable] = aux;
+
+			return false;
+		}
+	}
+
+	bool SetTexture(std::string variable, std::string path) {
+		if (_uniforms.find(variable) != _uniforms.end()) {
+			// the key exists
+
+			((TextureParameter*)_uniforms[variable])->pathTex = path;
+
+			return true;
+		}
+		else {
+			TextureParameter* aux = new TextureParameter(path);
 			_uniforms[variable] = aux;
 
 			return false;

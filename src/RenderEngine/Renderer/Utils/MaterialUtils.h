@@ -6,9 +6,7 @@
 #include "RenderEngine/Renderer/Vertex.h"
 #include "RenderEngine/Renderer/MaterialInstance.h"
 
-MaterialInstance* GetBasicLightMaterial(const Camera& cam, Texture* tex, const Lights& lights, const AmbientLight ambient,
-    RenderPass* renderPass);
+MaterialInstance* GetBasicLightMaterial(const Camera& cam, const std::string tex);
 
 
-MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color, const Lights& lights, const AmbientLight ambient,
-    RenderPass* renderPass);
+MaterialInstance* GetBasicColorMaterial(const Camera& cam, glm::vec4 color);

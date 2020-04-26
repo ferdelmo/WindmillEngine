@@ -8,9 +8,11 @@
 #include "Renderer/Image.h"
 #include "Renderer/Uniform.h"
 #include "Renderer/RenderPass.h"
-#include "Renderer/MaterialManager.h"
 #include "Renderer/Utils/MaterialUtils.h"
 #include "Renderer/Mesh.h"
+
+#include "Renderer/Managers/MaterialManager.h"
+#include "Renderer/Managers/MeshManager.h"
 
 
 #include "Input/InputManager.h"
@@ -292,7 +294,7 @@ int main() {
     PointLight light;
     light.color = glm::vec3(1, 1, 1);
     light.position = glm::vec3(0, 5, 5.0f);
-    light.power = 500;
+    light.power = 1000;
 
 
     PointLight light2;
@@ -382,7 +384,15 @@ int main() {
             if (objs[i] == nullptr) {
                 objs[i] = new GameObject();
 
-                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", colors[i]);
+                StaticMeshComponent* mesh = nullptr;
+                if (i < 3) {
+                    mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+                            GetBasicLightMaterial(world.GetCamera(), "../resources/textures/texture.jpg"));
+                }
+                else {
+                    mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+                        GetBasicLightMaterial(world.GetCamera(), "../resources/textures/test.png"));
+                }
 
                 objs[i]->AddComponent(mesh);
 

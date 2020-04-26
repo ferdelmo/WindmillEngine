@@ -39,6 +39,14 @@ void Camera::Update(float deltaTime) {
 	static bool firstCtrl = true;
 	static bool firstClick = true;
 
+	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_1)) {
+		movSpeed += 2.5 * deltaTime;
+	}
+
+	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_KEY_2)) {
+		movSpeed -= 2.5 * deltaTime;
+	}
+
 	if (Input::InputManager::GetInstance().IsKeyPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
 		//move camera
 		if (firstCtrl) {

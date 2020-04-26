@@ -7,6 +7,47 @@
 
 class UniformInfo;
 class RenderPass;
+class Buffer;
+
+/*
+	abstract class uniform to store uniform buffers and textures
+*/
+struct MaterialUniform {
+	virtual ~MaterialUniform(){}
+	virtual Buffer* GetBuffer() { return nullptr; }
+	virtual Texture* GetTexture() { return nullptr; }
+};
+
+struct MaterialUniformBuffer : public MaterialUniform {
+	Buffer* buf;
+
+	MaterialUniformBuffer(Buffer* buf) : buf(buf) {
+
+	}
+
+	~MaterialUniformBuffer(){
+		delete buf;
+	}
+
+	virtual Buffer* GetBuffer() override { return buf; }
+};
+
+struct MaterialUniformTexture : public MaterialUniform {
+	Texture* tex;
+
+	MaterialUniformTexture(Texture* tex) : tex(tex) {
+
+	}
+
+	~MaterialUniformTexture() {
+		delete tex;
+	}
+
+	virtual Texture* GetTexture() override { return tex; }
+};
+
+
+typedef std::map<std::string, MaterialUniform*> MapUniforms;
 
 class Material
 {
@@ -33,7 +74,7 @@ public:
 
 	void AddUniformBuffer(std::string name, UniformInfo* value);
 
-	std::map<std::string, Buffer*> GenerateDescriptorSet(VkDescriptorPool& descriptorPool, VkDescriptorSet& descriptorSet);
+	MapUniforms GenerateDescriptorSet(VkDescriptorPool& descriptorPool, VkDescriptorSet& descriptorSet);
 
 	GraphicsPipeline& GetPipeline() {
 		return _pipeline;
@@ -42,5 +83,7 @@ public:
 	std::string GetName() {
 		return _materialName;
 	}
+	
+	void UpdateDescriptorSet(VkDescriptorSet& descriptorSet, std::string variable, Texture* tex);
 };
 

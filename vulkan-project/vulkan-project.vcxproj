@@ -31,11 +31,11 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\GraphicsPipeline.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Image.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Managers\MaterialManager.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Managers\MeshManager.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Material.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\MaterialInstance.cpp" />
-    <ClCompile Include="..\src\RenderEngine\Renderer\MaterialManager.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Mesh.cpp" />
-    <ClCompile Include="..\src\RenderEngine\Renderer\MeshManager.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\RenderPass.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Shader.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.cpp" />
@@ -59,11 +59,11 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\GraphicsPipeline.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Image.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Managers\MaterialManager.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Managers\MeshManager.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Material.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\MaterialInstance.h" />
-    <ClInclude Include="..\src\RenderEngine\Renderer\MaterialManager.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Mesh.h" />
-    <ClInclude Include="..\src\RenderEngine\Renderer\MeshManager.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Renderizable.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\RenderPass.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Shader.h" />

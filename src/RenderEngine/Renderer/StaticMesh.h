@@ -5,8 +5,9 @@
 #include "Texture.h"
 #include "Renderizable.h"
 #include "Uniform.h"
-#include "MeshManager.h"
+#include "Managers/MeshManager.h"
 #include "MaterialInstance.h"
+#include "Material.h"
 #include <map>
 
 class VulkanInstance;
@@ -24,7 +25,7 @@ private:
 
 	MVP _ubo;
 
-	std::map<std::string, Buffer*> _uniforms;
+	MapUniforms _uniforms;
 
 	VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSet _descriptorSet = VK_NULL_HANDLE;
