@@ -15,6 +15,7 @@ class Material;
 class MaterialManager
 {
 public:
+	// maybe store number of references to clean the material at runtime when not used
 	struct MaterialInfo {
 		Material* material = nullptr;
 	};

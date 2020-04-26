@@ -13,6 +13,7 @@
 
 #include "Renderer/Managers/MaterialManager.h"
 #include "Renderer/Managers/MeshManager.h"
+#include "Renderer/Managers/TextureManager.h"
 
 
 #include "Input/InputManager.h"
@@ -458,9 +459,14 @@ int main() {
 
     delete renderPass;
 
+    //clean materials
     MaterialManager::CleanUp();
 
+    //clean meshes
     MeshManager::CleanUp();
+
+    //cleanup textures
+    TextureManager::CleanUp();
 
     VulkanInstance::GetInstance().CleanUp();
 }

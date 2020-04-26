@@ -143,10 +143,7 @@ MapUniforms Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, Vk
 			pair.first = entry.second->name;
 			Texture* obj = ((UniformTexture*)entry.second->obj)->obj;
 
-			Texture* copyTex = new Texture();
-			copyTex->Initialize(obj->GetPath());
-
-			pair.second = new MaterialUniformTexture(copyTex);
+			pair.second = new MaterialUniformTexture(obj);
 
 			resul.insert(pair);
 

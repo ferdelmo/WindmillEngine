@@ -16,6 +16,7 @@ struct MaterialUniform {
 	virtual ~MaterialUniform(){}
 	virtual Buffer* GetBuffer() { return nullptr; }
 	virtual Texture* GetTexture() { return nullptr; }
+	virtual void SetTexture(Texture* tex) { }
 };
 
 struct MaterialUniformBuffer : public MaterialUniform {
@@ -40,10 +41,12 @@ struct MaterialUniformTexture : public MaterialUniform {
 	}
 
 	~MaterialUniformTexture() {
-		delete tex;
+		//textures are deleted from the texture manager
+		//delete tex;
 	}
 
 	virtual Texture* GetTexture() override { return tex; }
+	virtual void SetTexture(Texture* tex) { this->tex = tex; }
 };
 
 

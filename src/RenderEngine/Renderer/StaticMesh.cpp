@@ -9,7 +9,9 @@
 #include "DescriptorSetLayout.h"
 #include "MaterialInstance.h"
 #include "Material.h"
+
 #include "Managers/MaterialManager.h"
+#include "Managers/TextureManager.h"
 
 #include "Engine/World.h"
 
@@ -41,10 +43,11 @@ StaticMesh::StaticMesh(std::string path, MaterialInstance* mat)
 		}
 		else {
 			//update the texture
-			entry.second->Fill(_uniforms.at(entry.first)->GetTexture());
+			Texture* aux = TextureManager::GetInstance().LoadTexture(
+				((TextureParameter*)entry.second)->pathTex);
+			_uniforms.at(entry.first)->SetTexture(aux);
 			//update the descriptor set
-			_material->UpdateDescriptorSet(_descriptorSet, entry.first,
-				_uniforms.at(entry.first)->GetTexture());
+			_material->UpdateDescriptorSet(_descriptorSet, entry.first, aux);
 		}
 	}
 }

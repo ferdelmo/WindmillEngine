@@ -65,7 +65,8 @@ struct UniformTexture : public UniformInterface {
 	}
 
 	~UniformTexture() {
-		delete obj;
+		//the manager will delete the textures created
+		//delete obj;
 	}
 
 	UniformTexture(Texture* obj) {

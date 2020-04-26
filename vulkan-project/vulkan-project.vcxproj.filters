@@ -110,6 +110,9 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\Managers\MeshManager.cpp">
       <Filter>src\RenderEngine\Renderer\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RenderEngine\Renderer\Managers\TextureManager.cpp">
+      <Filter>src\RenderEngine\Renderer\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
@@ -197,6 +200,9 @@
       <Filter>src\RenderEngine\Renderer\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\Managers\MeshManager.h">
+      <Filter>src\RenderEngine\Renderer\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RenderEngine\Renderer\Managers\TextureManager.h">
       <Filter>src\RenderEngine\Renderer\Managers</Filter>
     </ClInclude>
   </ItemGroup>

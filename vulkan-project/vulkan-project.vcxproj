@@ -33,6 +33,7 @@
     <ClCompile Include="..\src\RenderEngine\Renderer\Image.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Managers\MaterialManager.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Managers\MeshManager.cpp" />
+    <ClCompile Include="..\src\RenderEngine\Renderer\Managers\TextureManager.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Material.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\MaterialInstance.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Mesh.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="..\src\RenderEngine\Renderer\Image.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Managers\MaterialManager.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Managers\MeshManager.h" />
+    <ClInclude Include="..\src\RenderEngine\Renderer\Managers\TextureManager.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Material.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\MaterialInstance.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Mesh.h" />

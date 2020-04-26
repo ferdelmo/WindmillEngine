@@ -2,6 +2,7 @@
 #include "RenderEngine/Renderer/Managers/MaterialManager.h"
 #include "RenderEngine/Renderer/MaterialInstance.h"
 #include "RenderEngine/Renderer/SingleThreadRenderer/SingleThreadRenderer.h"
+#include "RenderEngine/Renderer/Managers/TextureManager.h"
 
 #include "Engine/World.h"
 
@@ -22,10 +23,9 @@ MaterialInstance* GetBasicLightMaterial(const Camera& cam, const std::string tex
         UniformInfo* fragment1 = UniformInfo::GenerateInfo(World::GetActiveWorld()->GetLights().lights, "Lights", 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(fragment1);
 
-        Texture* texImage = new Texture();
-        texImage->Initialize(tex);
+        UniformInfo* texture = UniformInfo::GenerateInfoTexture(TextureManager::GetInstance().LoadTexture(tex),
+            "Texture", 2, VK_SHADER_STAGE_FRAGMENT_BIT);
 
-        UniformInfo* texture = UniformInfo::GenerateInfoTexture(texImage, "Texture", 2, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(texture);
 
         UniformInfo* ambientUniform = UniformInfo::GenerateInfo(World::GetActiveWorld()->GetLights().ambient, "AmbientLight", 3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
