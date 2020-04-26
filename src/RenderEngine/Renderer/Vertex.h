@@ -119,3 +119,74 @@ struct VertexNormal {
 		return attributeDescriptions;
 	}
 };
+
+/*
+	Data passed to the Vertex shader
+*/
+struct VertexNormalMapping {
+	glm::vec3 pos;
+	glm::vec3 color;
+	glm::vec2 texCoord;
+	glm::vec3 normal;
+	glm::vec3 tangent;
+	glm::vec3 bitangent;
+
+	/*
+		bind the data to the data vertex shader receive
+	*/
+	static VkVertexInputBindingDescription getBindingDescription() {
+		VkVertexInputBindingDescription bindingDescription = {};
+		bindingDescription.binding = 0;
+		bindingDescription.stride = sizeof(VertexNormalMapping);
+		bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+		//VK_VERTEX_INPUT_RATE_INSTANCE -> move the data entry after each instance for instanced rendering
+		return bindingDescription;
+	}
+	/*
+		describes how to extrat a vertex attribute from a chunk of vertex data
+	*/
+	static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions() {
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions = { {}, {}, {}, {}, {}, {} };
+
+		attributeDescriptions[0].binding = 0;
+		attributeDescriptions[0].location = 0;
+		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[0].offset = offsetof(VertexNormalMapping, pos);
+
+		/*
+			FORMAT:
+			float: VK_FORMAT_R32_SFLOAT
+			vec2: VK_FORMAT_R32G32_SFLOAT
+			vec3: VK_FORMAT_R32G32B32_SFLOAT
+			vec4: VK_FORMAT_R32G32B32A32_SFLOAT
+		*/
+
+		attributeDescriptions[1].binding = 0;
+		attributeDescriptions[1].location = 1;
+		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[1].offset = offsetof(VertexNormalMapping, color);
+
+
+		attributeDescriptions[2].binding = 0;
+		attributeDescriptions[2].location = 2;
+		attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[2].offset = offsetof(VertexNormalMapping, texCoord);
+
+		attributeDescriptions[3].binding = 0;
+		attributeDescriptions[3].location = 3;
+		attributeDescriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[3].offset = offsetof(VertexNormalMapping, normal);
+
+		attributeDescriptions[4].binding = 0;
+		attributeDescriptions[4].location = 4;
+		attributeDescriptions[4].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[4].offset = offsetof(VertexNormalMapping, tangent);
+
+		attributeDescriptions[5].binding = 0;
+		attributeDescriptions[5].location = 5;
+		attributeDescriptions[5].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[5].offset = offsetof(VertexNormalMapping, bitangent);
+
+		return attributeDescriptions;
+	}
+};

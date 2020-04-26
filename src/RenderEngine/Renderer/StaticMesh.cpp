@@ -140,7 +140,7 @@ std::vector<Index> StaticMesh::GetIndices() {
 	return _mesh->mesh->indices;
 }
 
-std::vector<VertexNormal> StaticMesh::GetVertices() {
+std::vector<VertexNormalMapping> StaticMesh::GetVertices() {
 	return _mesh->mesh->vertices;
 }
 

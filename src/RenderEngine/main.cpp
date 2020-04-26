@@ -294,7 +294,7 @@ int main() {
     */
     PointLight light;
     light.color = glm::vec3(1, 1, 1);
-    light.position = glm::vec3(0, 5, 5.0f);
+    light.position = glm::vec3(0, -5, 5.0f);
     light.power = 1000;
 
 
@@ -317,7 +317,7 @@ int main() {
     world.SetLights(l);
 
     Camera cam = Camera(glm::vec3(0, -5, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-        90, 16 / 9.0f, 0.1f, 1000.0f);
+        90, 16 / 9.0f, 0.01f, 1000.0f);
 
 
     world.SetCamera(cam);
@@ -385,19 +385,14 @@ int main() {
             if (objs[i] == nullptr) {
                 objs[i] = new GameObject();
 
-                StaticMeshComponent* mesh = nullptr;
-                if (i < 3) {
-                    mesh = new StaticMeshComponent("../resources/objs/cube.obj",
-                            GetBasicLightMaterial(world.GetCamera(), "../resources/textures/texture.jpg"));
-                }
-                else {
-                    mesh = new StaticMeshComponent("../resources/objs/cube.obj",
-                        GetBasicLightMaterial(world.GetCamera(), "../resources/textures/test.png"));
-                }
+                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cylinder.obj",
+                    GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/texture.jpg",
+                        "../resources/textures/normalMap.jpg"));
 
                 objs[i]->AddComponent(mesh);
 
                 objs[i]->transform.scale = glm::vec3(1, 1, 1);
+                objs[i]->transform.rotation = glm::vec3(90, 0, 0);
 
                 objs[i]->transform.position = glm::vec3(-4 + i *2, 0, 0);
                 world.AddObject(objs[i]);

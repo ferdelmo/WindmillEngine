@@ -78,7 +78,7 @@ public:
 
 	std::vector<Index> GetIndices();
 
-	std::vector<VertexNormal> GetVertices();
+	std::vector<VertexNormalMapping> GetVertices();
 
 	MVP& GetMVP();
 
