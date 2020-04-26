@@ -4,12 +4,37 @@
 #include <stdexcept>
 
 
+bool FindSimilarVertex(
+    // inputs
+    std::vector<glm::vec3>& vertices,
+    std::vector<glm::vec2>& uvs,
+    std::vector<glm::vec3>& normals,
+
+    glm::vec3 vertice,
+    glm::vec2 uv,
+    glm::vec3 normal,
+    int& found) {
+
+    bool foundIndex = false;
+    for (int i = 0; i < vertices.size() && !foundIndex; i++) {
+        if (vertices[i] == vertice &&
+            uvs[i] == uv &&
+            normals[i] == normal) {
+            foundIndex = true;
+            found = i;
+            break;
+        }
+    }
+
+    return foundIndex;
+}
+
 Mesh::Mesh() {
     vertices = {};
     indices = {};
 }
 
-Mesh* Mesh::LoadMesh(std::string path, float scale) {
+Mesh* Mesh::LoadMesh(std::string path) {
 	Mesh* mesh = new Mesh();
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -50,34 +75,53 @@ Mesh* Mesh::LoadMesh(std::string path, float scale) {
 
     ComputeTangentBasis(vertices, uvs, normals, tangents, bitangents);
 
+    std::vector<glm::vec3> out_vertices;
+    std::vector<glm::vec2> out_uvs;
+    std::vector<glm::vec3> out_normals;
+
+    std::vector<glm::vec3> out_tangents;
+    std::vector<glm::vec3> out_bitangents;
+
+    std::vector<Index> out_indices;
+
     for(int i=0; i<vertices.size(); i++) {
+        int index = 0;
+        if (FindSimilarVertex(out_vertices, out_uvs, out_normals,
+            vertices[i], uvs[i], normals[i], index)) {
+
+            out_indices.push_back(index);
+
+            out_tangents[index] += tangents[i];
+            out_bitangents[index] += bitangents[i];
+
+        }
+        else {
+
+            out_vertices.push_back(vertices[i]);
+            out_uvs.push_back(uvs[i]);
+            out_normals.push_back(normals[i]);
+            out_tangents.push_back(tangents[i]);
+            out_bitangents.push_back(bitangents[i]);
+            out_indices.push_back(out_vertices.size() - 1);
+        }
+    }
+
+    for (int i = 0; i < out_vertices.size(); i++) {
         VertexNormalMapping vertex = {};
-
-        vertex.pos = vertices[i];
-        vertex.pos *= scale;
-
-        vertex.texCoord = uvs[i];
-            
-        vertex.normal = normals[i];
-
-        vertex.tangent = tangents[i];
-        vertex.bitangent = bitangents[i];
-
-        mesh->vertices.push_back(vertex);
-        mesh->indices.push_back(mesh->indices.size());
-    }
-    /*
-    // calculate normals
-    for (int i = 0; i < mesh->indices.size(); i+=3) {
-        glm::vec3 first = mesh->vertices[mesh->indices[i]+1].pos-mesh->vertices[mesh->indices[i]+0].pos;
-
-        glm::vec3 sec = mesh->vertices[mesh->indices[i] + 2].pos - mesh->vertices[mesh->indices[i] + 0].pos;
+        vertex.pos = out_vertices[i];
+        vertex.texCoord = out_uvs[i];
+        vertex.normal = out_normals[i];
+        vertex.bitangent = out_bitangents[i];
+        vertex.tangent = out_tangents[i];
         
-        mesh->vertices[mesh->indices[i] + 0].normal = glm::cross(first, sec);
-        mesh->vertices[mesh->indices[i] + 1].normal = glm::cross(first, sec);
-        mesh->vertices[mesh->indices[i] + 2].normal = glm::cross(first, sec);
+        mesh->vertices.push_back(vertex);
     }
-    */
+
+    for (int i = 0; i < out_indices.size(); i++) {
+
+        mesh->indices.push_back(out_indices[i]);
+    }
+
 	return mesh;
 }
 
@@ -114,6 +158,10 @@ void Mesh::ComputeTangentBasis(
         glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
         glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
 
+        glm::vec3 normal = glm::normalize((vertices[i + 0] + vertices[i + 1] + vertices[i + 2]) / 3.0f);
+
+        tangent = glm::normalize(tangent - normal * glm::dot(normal, tangent));
+        bitangent = glm::normalize(bitangent - normal * glm::dot(normal, bitangent));
         // Set the same tangent for all three vertices of the triangle.
         // They will be merged later, in vboindexer.cpp
         tangents.push_back(tangent);

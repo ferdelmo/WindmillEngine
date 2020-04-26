@@ -295,7 +295,7 @@ int main() {
     PointLight light;
     light.color = glm::vec3(1, 1, 1);
     light.position = glm::vec3(0, -5, 5.0f);
-    light.power = 1000;
+    light.power = 450;
 
 
     PointLight light2;
@@ -391,7 +391,7 @@ int main() {
 
                 objs[i]->AddComponent(mesh);
 
-                objs[i]->transform.scale = glm::vec3(1, 1, 1);
+                objs[i]->transform.scale = glm::vec3(.5, .5, .5);
                 objs[i]->transform.rotation = glm::vec3(90, 0, 0);
 
                 objs[i]->transform.position = glm::vec3(-4 + i *2, 0, 0);

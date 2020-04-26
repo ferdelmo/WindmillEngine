@@ -38,7 +38,7 @@ layout(location = 0) out vec4 outColor;
 void main() {
 
     float kd = 0.4;
-	float ks = 0.0;
+	float ks = 0.1;
 
 
 
@@ -86,7 +86,6 @@ void main() {
 		float cosAlpha = clamp(dot(E, R), 0, 1);
 
 		vec3 specular = pl.color * pl.power * pow(cosAlpha,10) / (distance * distance);
-
 
 		lightSum = kd*diffuse + ks*specular;
 	}

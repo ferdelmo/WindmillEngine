@@ -63,6 +63,9 @@ StaticMesh::~StaticMesh() {
 }
 
 void StaticMesh::Update(float deltaTime) {
+	_ubo.view = World::GetActiveWorld()->GetCamera().GetView();
+	_ubo.proj = World::GetActiveWorld()->GetCamera().GetProjection();
+
 	std::vector<MVP> uniform = { _ubo };
 	_uniforms.at("MVP")->GetBuffer()->Fill(uniform);
 

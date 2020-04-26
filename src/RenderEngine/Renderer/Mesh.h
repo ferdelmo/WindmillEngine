@@ -11,7 +11,7 @@ public:
 
 	Mesh();
 
-	static Mesh* LoadMesh(std::string path, float scale);
+	static Mesh* LoadMesh(std::string path);
 
 private:
     static void ComputeTangentBasis(
