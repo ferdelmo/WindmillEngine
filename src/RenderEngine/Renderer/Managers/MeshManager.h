@@ -14,9 +14,9 @@ class MeshManager
 public:
 	struct MeshInfo {
 		std::string path = "";
-		Mesh* mesh = nullptr;
-		Buffer* vertex = nullptr;
-		Buffer* index = nullptr;
+		Mesh* mesh;
+		Buffer vertex;
+		Buffer index;
 		int references = 0;
 	};
 

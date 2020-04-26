@@ -5,6 +5,8 @@
 #include "Buffer.h"
 #include "Texture.h"
 
+#include "Managers/TextureManager.h"
+
 #define MAX_LIGHTS 10
 
 typedef enum class UniformTypes {
@@ -67,6 +69,7 @@ struct UniformTexture : public UniformInterface {
 	~UniformTexture() {
 		//the manager will delete the textures created
 		//delete obj;
+		TextureManager::GetInstance().UnloadTexture(obj->GetPath());
 	}
 
 	UniformTexture(Texture* obj) {

@@ -1,5 +1,8 @@
 #include "TextureManager.h"
 
+#include <iostream>
+
+
 TextureManager* TextureManager::_instance = nullptr;
 
 TextureManager::TextureManager() {
@@ -31,7 +34,9 @@ Texture* TextureManager::LoadTexture(std::string path) {
 		_textures[path].texture.Initialize(path);
 	}
 
-	//_textures[path].references++;
+	_textures[path].references++;
+
+	std::cout << _textures[path].references << std::endl;
 	
 	return &_textures[path].texture;
 }
@@ -42,5 +47,5 @@ void TextureManager::UnloadTexture(std::string path) {
 		_textures[path].references--;
 	}
 
-	//std::cout << _textures[path].references << std::endl;
+	std::cout << _textures[path].references << std::endl;
 }

@@ -43,10 +43,17 @@ struct MaterialUniformTexture : public MaterialUniform {
 	~MaterialUniformTexture() {
 		//textures are deleted from the texture manager
 		//delete tex;
+		TextureManager::GetInstance().UnloadTexture(this->tex->GetPath());
 	}
 
 	virtual Texture* GetTexture() override { return tex; }
-	virtual void SetTexture(Texture* tex) { this->tex = tex; }
+	virtual void SetTexture(Texture* tex) {
+		/*
+		if (this->tex != nullptr) {
+			TextureManager::GetInstance().UnloadTexture(this->tex->GetPath());
+		}
+		*/
+		this->tex = tex; }
 };
 
 

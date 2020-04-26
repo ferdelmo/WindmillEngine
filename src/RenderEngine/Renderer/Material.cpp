@@ -21,8 +21,6 @@ void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vert
 	VkVertexInputBindingDescription inputBind,
 	std::vector<VkVertexInputAttributeDescription> inputAttr) {
 
-	std::cout << "MATERIAL CREATED" << std::endl;
-
 	_vert.Initialize(vert, VK_SHADER_STAGE_VERTEX_BIT, vertBinds);
 	_frag.Initialize(frag, VK_SHADER_STAGE_FRAGMENT_BIT, fragBinds);
 

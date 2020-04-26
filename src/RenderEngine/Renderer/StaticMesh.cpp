@@ -105,11 +105,11 @@ void StaticMesh::SetCamera(const Camera& cam) {
 }
 
 VkBuffer& StaticMesh::GetVertexBuffer() {
-	return _mesh->vertex->GetBuffer();
+	return _mesh->vertex.GetBuffer();
 }
 
 VkBuffer& StaticMesh::GetIndexBuffer() {
-	return _mesh->index->GetBuffer();
+	return _mesh->index.GetBuffer();
 }
 /*
 VkBuffer& StaticMesh::GetUniformBuffer() {
@@ -123,9 +123,9 @@ void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->GetPipeline().GetPipeline());
 
-	vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh->vertex->GetBuffer(), offsets);
+	vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh->vertex.GetBuffer(), offsets);
 
-	vkCmdBindIndexBuffer(cmd, _mesh->index->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+	vkCmdBindIndexBuffer(cmd, _mesh->index.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
 	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, 
 		_material->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSet, 0, nullptr);
