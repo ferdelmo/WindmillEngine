@@ -138,6 +138,12 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader
     depthStencil.front = {}; // Optional
     depthStencil.back = {}; // Optional
 
+    std::vector<VkDynamicState> dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+
+    VkPipelineDynamicStateCreateInfo dynamicCreateInfo = {};
+    dynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+    dynamicCreateInfo.pDynamicStates = dynamicStateEnables.data();
+    dynamicCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -153,6 +159,7 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader
     pipelineInfo.renderPass = renderPass->GetRenderPass();
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    pipelineInfo.pDynamicState = &dynamicCreateInfo;
 
     pipelineInfo.pDepthStencilState = &depthStencil;
 

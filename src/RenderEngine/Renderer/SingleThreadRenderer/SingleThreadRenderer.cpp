@@ -237,7 +237,24 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    VkViewport viewport = {};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = (float)GetExtent().width;
+    viewport.height = (float)GetExtent().height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D scissor = {};
+    scissor.offset = { 0, 0 };
+    scissor.extent = GetExtent();
+
+
     vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport);
+
+    vkCmdSetScissor(commandBuffers[i], 0, 1, &scissor);
 
     // std::cout << "THERE ARE: " << objects.size() << std::endl;
 
@@ -426,6 +443,7 @@ void SingleThreadRenderer::CleanupSwapChain() {
 
 void SingleThreadRenderer::RecreateSwapChain() {
     int width = 0, height = 0;
+
     glfwGetFramebufferSize(VulkanInstance::GetInstance().window, &width, &height);
     while (width == 0 || height == 0) {
         glfwGetFramebufferSize(VulkanInstance::GetInstance().window, &width, &height);
@@ -434,9 +452,15 @@ void SingleThreadRenderer::RecreateSwapChain() {
 
     vkDeviceWaitIdle(VulkanInstance::GetInstance().device);
 
+    VulkanInstance::GetInstance().width = width;
+    VulkanInstance::GetInstance().height = height;
+
     CleanupSwapChain();
 
     CreateSwapChain();
+
+    renderPass->ResizeImages();
+
     CreateImageViews();
     CreateFramebuffers();
     CreateCommandBuffers();

@@ -340,7 +340,7 @@ int main() {
     floor->AddComponent(mesh);
 
     floor->transform.scale = glm::vec3(20, 20, 1);
-    floor->transform.rotation = glm::vec3(0, 0, 0);
+    floor->transform.rotation = glm::quat(0,0,0,0);
 
     floor->transform.position = glm::vec3(0, 0, -.5f);
     world.AddObject(floor);
@@ -380,7 +380,7 @@ int main() {
                 objs[i] = new GameObject();
 
                 objs[i]->transform.scale = glm::vec3(2, 2, 2);
-                objs[i]->transform.rotation = glm::vec3(0, 0, 0);
+                objs[i]->transform.rotation = glm::quat(glm::vec3(0,45,45));
 
                 objs[i]->transform.position = glm::vec3(-5 + i * 5, 0, 1);
 
@@ -423,6 +423,7 @@ int main() {
         currentTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
 
+        /*
         if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_D)) {
             objs[1]->transform.position += glm::vec3(2.5f, 0, 0) * deltaTime;
         }
@@ -430,9 +431,10 @@ int main() {
         if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_A)) {
             objs[1]->transform.position += glm::vec3(-2.5f, 0, 0) * deltaTime;
         }
+        */
 
 
-        //world.GetCamera().Update(deltaTime);
+        world.GetCamera().Update(deltaTime);
 
         // THIS SHOULD BE CHANGE, CALL THE PHYSICS UPDATE A CONSTANT N TIMES PER SECOND,
         // TO ENSURE THE SAME BEHAVIOUR IN DIFFERENT MACHINES
@@ -473,6 +475,8 @@ int main() {
     renderer.CleanUp();
 
     delete renderPass;
+
+    Physics::PhysicsEngine::CleanUp();
 
     //clean materials
     MaterialManager::CleanUp();

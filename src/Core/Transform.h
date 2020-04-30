@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Core/Vector3.h"
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 /*
 	Class to represent a transform, compose by position, rotation and scale
@@ -16,6 +17,6 @@ class Transform
 public:
 	glm::vec3 position;
 	glm::vec3 scale;
-	glm::vec3 rotation;
+	glm::quat rotation;
 };
 

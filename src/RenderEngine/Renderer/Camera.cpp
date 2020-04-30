@@ -189,6 +189,8 @@ void Camera::FOVFirstPersonCamera(float deltaTime) {
 
 	//std::cout << "FOV: " << fov << std::endl;
 
+	aspectRatio = VulkanInstance::GetInstance().width * 1.0f / VulkanInstance::GetInstance().height;
+
 	_proj = glm::perspective(glm::radians(fov), aspectRatio, near, far);
 	_proj[1][1] *= -1;
 }

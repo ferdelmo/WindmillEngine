@@ -28,6 +28,7 @@
     <ClCompile Include="..\src\Input\InputManager.cpp" />
     <ClCompile Include="..\src\PhysicsEngine\Collider.cpp" />
     <ClCompile Include="..\src\PhysicsEngine\PhysicsEngine.cpp" />
+    <ClCompile Include="..\src\PhysicsEngine\Shapes\Box.cpp" />
     <ClCompile Include="..\src\PhysicsEngine\Shapes\Shape.cpp" />
     <ClCompile Include="..\src\PhysicsEngine\Shapes\Sphere.cpp" />
     <ClCompile Include="..\src\RenderEngine\main.cpp" />
@@ -63,6 +64,7 @@
     <ClInclude Include="..\src\Input\InputManager.h" />
     <ClInclude Include="..\src\PhysicsEngine\Collider.h" />
     <ClInclude Include="..\src\PhysicsEngine\PhysicsEngine.h" />
+    <ClInclude Include="..\src\PhysicsEngine\Shapes\Box.h" />
     <ClInclude Include="..\src\PhysicsEngine\Shapes\Shape.h" />
     <ClInclude Include="..\src\PhysicsEngine\Shapes\Sphere.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Buffer.h" />

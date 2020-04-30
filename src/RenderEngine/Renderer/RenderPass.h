@@ -39,5 +39,7 @@ public:
 	void CreateDepthResources();
 
 	void CreateMSAAResources();
+
+	void ResizeImages();
 };
 
