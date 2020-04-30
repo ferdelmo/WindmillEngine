@@ -32,6 +32,12 @@
     <Filter Include="src\RenderEngine\Renderer\Managers">
       <UniqueIdentifier>{3c3ff543-d7ab-43db-bf72-cb26bd04348c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\PhysicsEngine">
+      <UniqueIdentifier>{5ca925f9-6189-4e71-bd23-9ab5960f3239}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\PhysicsEngine\Shapes">
+      <UniqueIdentifier>{561294b6-97ff-437d-a706-767e926af53d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -112,6 +118,21 @@
     </ClCompile>
     <ClCompile Include="..\src\RenderEngine\Renderer\Managers\TextureManager.cpp">
       <Filter>src\RenderEngine\Renderer\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PhysicsEngine\PhysicsEngine.cpp">
+      <Filter>src\PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PhysicsEngine\Shapes\Shape.cpp">
+      <Filter>src\PhysicsEngine\Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PhysicsEngine\Shapes\Sphere.cpp">
+      <Filter>src\PhysicsEngine\Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PhysicsEngine\Collider.cpp">
+      <Filter>src\PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine\SphereColliderComponent.cpp">
+      <Filter>src\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +225,21 @@
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\Managers\TextureManager.h">
       <Filter>src\RenderEngine\Renderer\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PhysicsEngine\PhysicsEngine.h">
+      <Filter>src\PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PhysicsEngine\Shapes\Shape.h">
+      <Filter>src\PhysicsEngine\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PhysicsEngine\Shapes\Sphere.h">
+      <Filter>src\PhysicsEngine\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PhysicsEngine\Collider.h">
+      <Filter>src\PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\SphereColliderComponent.h">
+      <Filter>src\Engine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
