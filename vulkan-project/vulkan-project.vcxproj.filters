@@ -38,6 +38,12 @@
     <Filter Include="src\PhysicsEngine\Shapes">
       <UniqueIdentifier>{561294b6-97ff-437d-a706-767e926af53d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\PhysicsEngine\Utils">
+      <UniqueIdentifier>{54099b32-8727-47eb-a783-3dc5d7990e9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\Components">
+      <UniqueIdentifier>{2cb90aa6-2797-4106-ac7f-4f9eb4a1577c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RenderEngine\main.cpp">
@@ -81,9 +87,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Core\Transform.cpp">
       <Filter>src\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Engine\StaticMeshComponent.cpp">
-      <Filter>src\Engine</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Engine\World.cpp">
       <Filter>src\Engine</Filter>
@@ -131,12 +134,19 @@
     <ClCompile Include="..\src\PhysicsEngine\Collider.cpp">
       <Filter>src\PhysicsEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Engine\SphereColliderComponent.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\PhysicsEngine\Shapes\Box.cpp">
       <Filter>src\PhysicsEngine\Shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Engine\StaticMeshComponent.cpp">
+      <Filter>src\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine\SphereColliderComponent.cpp">
+      <Filter>src\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine\BoxColliderComponent.cpp">
+      <Filter>src\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PhysicsEngine\Utils\CollisionShapes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
@@ -183,12 +193,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Core\Vector3.h">
       <Filter>src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Engine\Component.h">
-      <Filter>src\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Engine\StaticMeshComponent.h">
-      <Filter>src\Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Engine\World.h">
       <Filter>src\Engine</Filter>
@@ -241,11 +245,23 @@
     <ClInclude Include="..\src\PhysicsEngine\Collider.h">
       <Filter>src\PhysicsEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Engine\SphereColliderComponent.h">
-      <Filter>src\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\PhysicsEngine\Shapes\Box.h">
       <Filter>src\PhysicsEngine\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\Component.h">
+      <Filter>src\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\StaticMeshComponent.h">
+      <Filter>src\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\SphereColliderComponent.h">
+      <Filter>src\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine\BoxColliderComponent.h">
+      <Filter>src\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PhysicsEngine\Utils\CollisionShapes.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

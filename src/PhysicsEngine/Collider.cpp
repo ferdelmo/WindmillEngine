@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Shapes/Sphere.h"
+#include "Shapes/Box.h"
 
 #include <iostream>
 
@@ -10,6 +11,10 @@ using namespace Physics;
 
 Collider::Collider(glm::vec3 position, float r) {
 	_shape = new Sphere(position, r);
+}
+
+Collider::Collider(glm::vec3 position, glm::vec3 extent) {
+	_shape = new Box(glm::mat4(1), position, extent);
 }
 
 Collider::~Collider() {

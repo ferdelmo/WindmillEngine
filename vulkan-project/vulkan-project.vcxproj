@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\lib\objloader\tiny_obj_loader.cc" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
+    <ClCompile Include="..\src\Engine\BoxColliderComponent.cpp" />
     <ClCompile Include="..\src\Engine\GameObject.cpp" />
     <ClCompile Include="..\src\Engine\SphereColliderComponent.cpp" />
     <ClCompile Include="..\src\Engine\StaticMeshComponent.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="..\src\PhysicsEngine\Shapes\Box.cpp" />
     <ClCompile Include="..\src\PhysicsEngine\Shapes\Shape.cpp" />
     <ClCompile Include="..\src\PhysicsEngine\Shapes\Sphere.cpp" />
+    <ClCompile Include="..\src\PhysicsEngine\Utils\CollisionShapes.cpp" />
     <ClCompile Include="..\src\RenderEngine\main.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Buffer.cpp" />
     <ClCompile Include="..\src\RenderEngine\Renderer\Camera.cpp" />
@@ -56,6 +58,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\Vector3.h" />
+    <ClInclude Include="..\src\Engine\BoxColliderComponent.h" />
     <ClInclude Include="..\src\Engine\Component.h" />
     <ClInclude Include="..\src\Engine\GameObject.h" />
     <ClInclude Include="..\src\Engine\SphereColliderComponent.h" />
@@ -67,6 +70,7 @@
     <ClInclude Include="..\src\PhysicsEngine\Shapes\Box.h" />
     <ClInclude Include="..\src\PhysicsEngine\Shapes\Shape.h" />
     <ClInclude Include="..\src\PhysicsEngine\Shapes\Sphere.h" />
+    <ClInclude Include="..\src\PhysicsEngine\Utils\CollisionShapes.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Buffer.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\Camera.h" />
     <ClInclude Include="..\src\RenderEngine\Renderer\DescriptorSetLayout.h" />

@@ -22,6 +22,7 @@
 #include "Engine/GameObject.h"
 #include "Engine/StaticMeshComponent.h"
 #include "Engine/SphereColliderComponent.h"
+#include "Engine/BoxColliderComponent.h"
 
 
 #include "PhysicsEngine/PhysicsEngine.h"
@@ -379,8 +380,8 @@ int main() {
             //if (objs[i] == nullptr) {
                 objs[i] = new GameObject();
 
-                objs[i]->transform.scale = glm::vec3(2, 2, 2);
-                objs[i]->transform.rotation = glm::quat(glm::vec3(0,45,45));
+                objs[i]->transform.scale = glm::vec3(1, 1, 1);
+                objs[i]->transform.rotation = glm::quat();
 
                 objs[i]->transform.position = glm::vec3(-5 + i * 5, 0, 1);
 
@@ -393,10 +394,18 @@ int main() {
                     GetBasicColorMaterial(world.GetCamera(),
                         { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
 
-                SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
+                //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
+                if (true || i == 1) {
+                    BoxColliderComponent* col = new BoxColliderComponent(objs[i]->transform.position, 
+                        objs[i]->transform.scale/2.0f);
+                    objs[i]->AddComponent(col);
+                }
+                else {
+                    SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
+                    objs[i]->AddComponent(col);
+                }
 
                 objs[i]->AddComponent(mesh);
-                objs[i]->AddComponent(col);
                 world.AddObject(objs[i]);
 
                 mesh->Initialize();
@@ -423,7 +432,7 @@ int main() {
         currentTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
 
-        /*
+        
         if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_D)) {
             objs[1]->transform.position += glm::vec3(2.5f, 0, 0) * deltaTime;
         }
@@ -431,10 +440,10 @@ int main() {
         if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_A)) {
             objs[1]->transform.position += glm::vec3(-2.5f, 0, 0) * deltaTime;
         }
-        */
+        
 
 
-        world.GetCamera().Update(deltaTime);
+        //world.GetCamera().Update(deltaTime);
 
         // THIS SHOULD BE CHANGE, CALL THE PHYSICS UPDATE A CONSTANT N TIMES PER SECOND,
         // TO ENSURE THE SAME BEHAVIOUR IN DIFFERENT MACHINES

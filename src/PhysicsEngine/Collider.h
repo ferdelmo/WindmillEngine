@@ -13,6 +13,8 @@ namespace Physics {
 	public: 
 		Collider(glm::vec3 position, float r);
 
+		Collider(glm::vec3 position, glm::vec3 extent);
+
 		virtual ~Collider();
 
 		/*
