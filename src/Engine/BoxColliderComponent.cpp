@@ -16,6 +16,7 @@ BoxColliderComponent::~BoxColliderComponent() {
 }
 
 void BoxColliderComponent::Start() {
+	_col.SetGameObject(_owner);
 	PhysicsEngine::GetInstance().AddCollider(&_col);
 }
 

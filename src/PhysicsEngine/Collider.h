@@ -2,8 +2,17 @@
 
 #include <vector>
 #include "Shapes/Shape.h"
+#include "Core/Delegate.h"
+#include "Engine/GameObject.h"
+
 
 namespace Physics {
+
+	class Collider;
+
+
+	typedef std::function<void(GameObject*, Collider*)> BeginOverlapEvent;
+	typedef std::function<void(GameObject*, Collider*)> EndOverlapEvent;
 
 	/*
 		Collider represent by a shape
@@ -36,10 +45,23 @@ namespace Physics {
 
 		std::vector<Collider*>& GetOverlappingColliders();
 
+		void SetGameObject(GameObject* go);
+		GameObject* GetGameObject() const;
+
+		MultipleDelegate<GameObject*, Collider*>& GetBeginOverlapEvents();
+		MultipleDelegate<GameObject*, Collider*>& GetEndOverlapEvents();
+
 	private:
+		// shape of the collider
 		Shape* _shape;
 
 		std::vector<Collider*> _overlappingColliders;
+
+		// Gameobject associated
+		GameObject* _owner = nullptr;
+
+		MultipleDelegate<GameObject*, Collider*> bo;
+		MultipleDelegate<GameObject*, Collider*> eo;
 	};
 }
 

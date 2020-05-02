@@ -146,7 +146,10 @@
     <ClCompile Include="..\src\Engine\BoxColliderComponent.cpp">
       <Filter>src\Engine\Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\PhysicsEngine\Utils\CollisionShapes.cpp" />
+    <ClCompile Include="..\src\Core\Delegate.cpp" />
+    <ClCompile Include="..\src\PhysicsEngine\Utils\CollisionShapes.cpp">
+      <Filter>src\PhysicsEngine\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\RenderEngine\VulkanInstance.h">
@@ -260,8 +263,11 @@
     <ClInclude Include="..\src\Engine\BoxColliderComponent.h">
       <Filter>src\Engine\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\PhysicsEngine\Utils\CollisionShapes.h">
+    <ClInclude Include="..\src\Core\Delegate.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PhysicsEngine\Utils\CollisionShapes.h">
+      <Filter>src\PhysicsEngine\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

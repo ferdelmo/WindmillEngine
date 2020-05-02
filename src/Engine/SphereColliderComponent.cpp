@@ -4,6 +4,8 @@
 
 #include "PhysicsEngine/PhysicsEngine.h"
 
+#include <iostream>
+
 using namespace Physics;
 
 SphereColliderComponent::SphereColliderComponent(glm::vec3 position, float r) :
@@ -16,6 +18,10 @@ SphereColliderComponent::~SphereColliderComponent() {
 }
 
 void SphereColliderComponent::Start() {
+	_col.SetGameObject(_owner);
+	_col.GetBeginOverlapEvents().Bind([this](GameObject* go, Collider* col) {
+		std::cout << _owner << " colliding with gameobject " << go << std::endl;
+		});
 	PhysicsEngine::GetInstance().AddCollider(&_col);
 }
 

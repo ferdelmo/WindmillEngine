@@ -28,6 +28,7 @@ void Collider::BeginOverlap(Collider* col) {
 
 	std::cout << this << " BEGIN OVERLAP WITH " << col << std::endl;
 
+	bo.Invoke(col->_owner, col);
 	_overlappingColliders.push_back(col);
 }
 
@@ -48,6 +49,8 @@ void Collider::EndOverlap(Collider* col) {
 		_overlappingColliders.erase(it);
 	}
 
+	eo.Invoke(col->_owner, col);
+
 	std::cout << this << " END OVERLAP WITH " << col << std::endl;
 }
 
@@ -58,4 +61,20 @@ Shape* Collider::GetShape() {
 
 std::vector<Collider*>& Collider::GetOverlappingColliders() {
 	return _overlappingColliders;
+}
+
+
+void Collider::SetGameObject(GameObject* go) {
+	this->_owner = go;
+}
+GameObject* Collider::GetGameObject() const {
+	return _owner;
+}
+
+
+MultipleDelegate<GameObject*, Collider*>& Collider::GetBeginOverlapEvents() {
+	return bo;
+}
+MultipleDelegate<GameObject*, Collider*>& Collider::GetEndOverlapEvents() {
+	return eo;
 }

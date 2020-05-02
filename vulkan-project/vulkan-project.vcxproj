@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\objloader\tiny_obj_loader.cc" />
+    <ClCompile Include="..\src\Core\Delegate.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
     <ClCompile Include="..\src\Engine\BoxColliderComponent.cpp" />
     <ClCompile Include="..\src\Engine\GameObject.cpp" />
@@ -56,6 +57,7 @@
     <ClCompile Include="..\src\RenderEngine\VulkanInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\Delegate.h" />
     <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\Vector3.h" />
     <ClInclude Include="..\src\Engine\BoxColliderComponent.h" />

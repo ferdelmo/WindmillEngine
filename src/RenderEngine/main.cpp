@@ -395,7 +395,7 @@ int main() {
                         { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
 
                 //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
-                if (true || i == 1) {
+                if (i == 1) {
                     BoxColliderComponent* col = new BoxColliderComponent(objs[i]->transform.position, 
                         objs[i]->transform.scale/2.0f);
                     objs[i]->AddComponent(col);
