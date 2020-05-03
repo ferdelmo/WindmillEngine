@@ -12,7 +12,7 @@ GameObject::~GameObject() {
 void GameObject::AddComponent(Component* component) {
 	if (component != nullptr) {
 		component->SetOwner(this);
-		component->Start();
+		component->Initialize();
 		_components.push_back(component);
 	}
 }

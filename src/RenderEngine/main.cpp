@@ -338,15 +338,13 @@ int main() {
         GetBasicColorMaterial(world.GetCamera(),
             { {1, 1, 1}, 0.4f, {1, 1, 1}, 0.15f, 5 }));
 
-    floor->AddComponent(mesh);
-
     floor->transform.scale = glm::vec3(20, 20, 1);
     floor->transform.rotation = glm::quat(0,0,0,0);
 
     floor->transform.position = glm::vec3(0, 0, -.5f);
     world.AddObject(floor);
 
-    mesh->Initialize();
+    floor->AddComponent(mesh);
 
     float realTimeExecuted = 0;
 
@@ -379,11 +377,12 @@ int main() {
         //callbacks[i] = [&world, &objs, i, &colors, &colorsSpecular](CallbackAction ca) {
             //if (objs[i] == nullptr) {
                 objs[i] = new GameObject();
+                world.AddObject(objs[i]);
 
                 objs[i]->transform.scale = glm::vec3(1, 1, 1);
                 objs[i]->transform.rotation = glm::quat();
 
-                objs[i]->transform.position = glm::vec3(-5 + i * 5, 0, 1);
+                objs[i]->transform.position = glm::vec3(-2 + i * 2, 0, 1);
 
                 /* StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
                     GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
@@ -406,9 +405,6 @@ int main() {
                 }
 
                 objs[i]->AddComponent(mesh);
-                world.AddObject(objs[i]);
-
-                mesh->Initialize();
             /*}
             else {
                 world.RemoveObject(objs[i]);
