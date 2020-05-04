@@ -15,9 +15,19 @@ struct PointLight{
 	vec3 LightPosition_cameraspace;
 	float aux2;
 };
+
+struct DirectionalLight {
+	vec3 direction;
+	float power;
+	vec3 color;
+	float aux1;
+};
+
 layout(binding = 1) uniform Lights{
 	PointLight[10] lights;
+	DirectionalLight[10] directional;
 	int num_lights;
+	int num_directional;
 } lightsStruct;
 
 

@@ -152,11 +152,11 @@ struct UniformColor {
 */
 struct PointLight {
 	glm::vec3 position;
-	float power;
+	float power = 0;
 	glm::vec3 color;
-	float aux1;
+	float aux1 = 0;
 	glm::vec3 LightPosition_cameraspace;
-	float aux2; //used for aligment, but obiusly not the best option
+	float aux2 = 0; //used for aligment, but obiusly not the best option
 
 	PointLight(glm::vec3 _pos = glm::vec3(0), float _power = 0, glm::vec3 _color = glm::vec3(1)) :
 		position(_pos), power(_power), color(_color), 
@@ -165,10 +165,29 @@ struct PointLight {
 	}
 };
 
+/* Struct to represent a directional light */
+struct DirectionalLight {
+	glm::vec3 direction;
+	float power = 0;
+	glm::vec3 color;
+	// used for aligment
+	float aux1 = 0;
+
+	DirectionalLight() {
+
+	}
+
+	DirectionalLight(glm::vec3 direction, glm::vec3 color, float power) : direction(direction),
+		color(color), power(power) {
+
+	}
+};
+
 /* Struct to represent the lights in the scene */
 struct Lights {
 	PointLight lights[MAX_LIGHTS];
-	alignas(4) int num_lights = 0;
+	DirectionalLight directionalLights[MAX_LIGHTS];
+	alignas(4) int num_lights = 0, num_directional = 0;
 };
 
 /* Struct to represent ambient light*/
@@ -176,6 +195,7 @@ struct AmbientLight{
 	glm::vec3 color = { 0,0,0 };
 	float coef = 0.0f;
 };
+
 
 /* struct to represent phong shading info */
 struct PhongShading {

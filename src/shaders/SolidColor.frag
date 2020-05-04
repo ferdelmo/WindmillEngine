@@ -17,9 +17,18 @@ struct PointLight{
 	float aux2;
 };
 
+struct DirectionalLight {
+	vec3 direction;
+	float power;
+	vec3 color;
+	float aux1;
+};
+
 layout(binding = 1) uniform Lights{
 	PointLight[10] lights;
+	DirectionalLight[10] directional;
 	int num_lights;
+	int num_directional;
 } lightsStruct;
 
 layout(binding = 2) uniform AmbientLight{
@@ -53,8 +62,6 @@ void main() {
 	
 	float depth = texture(shadowMap, texCoord).r;
 
-	outColor = vec4(vec3(1.0-LinearizeDepth(depth)), 1.0);
-	return;
 	
 
 	float kd = phong.kd;
@@ -96,6 +103,37 @@ void main() {
 		lightSum = kd*diffuse*phong.difusseColor + ks*specular*phong.specularColor;
 	}
 
-	outColor.xyz = lightSum + finalColor;
+	vec3 directionalSum = {0, 0, 0};
+	// directional light
+	for(int i = 0; i < lightsStruct.num_directional; i++) {
+		DirectionalLight dl = lightsStruct.directional[i];
+		
+		vec3 LightDirection_cameraspace = normalize(dl.direction);
+
+		// Direction of the light (from the fragment to the light)
+		vec3 l = LightDirection_cameraspace;
+
+		float cosTheta = clamp(dot(n, l), 0, 1);
+
+		vec3 diffuse = dl.color * dl.power * cosTheta;
+
+
+		// Eye vector (towards the camera)
+		vec3 E = normalize(EyeDirection_cameraspace);
+
+		// Direction in which the triangle reflects the light
+		vec3 R = reflect(-l,n);
+
+		float cosAlpha = clamp(dot(E, R), 0, 1);
+
+		vec3 specular = dl.color * dl.power * pow(cosAlpha, phong.alpha);
+
+		/*
+			sum of diffuse and specular componenets
+		*/
+		directionalSum += kd*diffuse*phong.difusseColor + ks*specular*phong.specularColor;
+	}
+
+	outColor.xyz = lightSum + directionalSum + finalColor;
 	outColor.w = 1;
 }

@@ -18,10 +18,21 @@ struct PointLight{
 	vec3 LightPosition_cameraspace;
 	float aux2;
 };
+
+struct DirectionalLight {
+	vec3 direction;
+	float power;
+	vec3 color;
+	float aux1;
+};
+
 layout(binding = 1) uniform Lights{
 	PointLight[10] lights;
+	DirectionalLight[10] directional;
 	int num_lights;
+	int num_directional;
 } lightsStruct;
+
 
 layout(binding = 2) uniform AmbientLight{
 	vec3 color;
@@ -64,14 +75,15 @@ void main() {
 	vec3 n = normalize(normalTex); 
 	// Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 
-	vec3 ambient = ambientLight.color * ambientLight.coef;
 	vec3 texColor = texture(texSampler, fragTexCoord).rgb;
+	vec3 ambient = ambientLight.color * ambientLight.coef * texColor;
 
 
 	vec3 EyeDirection_tangentspace = TBN * EyeDirection_cameraspace;
 
 	vec3 lightSum = {0, 0, 0};
 
+	// point lights
 	for(int i = 0; i < lightsStruct.num_lights; i++) {
 		PointLight pl = lightsStruct.lights[i];
 		
@@ -100,9 +112,41 @@ void main() {
 		/*
 			sum of diffuse and specular componenets
 		*/
-		lightSum = kd*diffuse*texColor*phong.difusseColor + ks*specular*phong.specularColor;
+		lightSum += kd*diffuse*texColor*phong.difusseColor + ks*specular*phong.specularColor;
 	}
 
-	outColor.xyz = lightSum + ambient;
+
+	vec3 directionalSum = {0, 0, 0};
+	// directional light
+	for(int i = 0; i < lightsStruct.num_directional; i++) {
+		DirectionalLight dl = lightsStruct.directional[i];
+		
+		vec3 LightDirection_cameraspace = normalize(dl.direction);
+
+		// Direction of the light (from the fragment to the light)
+		vec3 l = TBN * LightDirection_cameraspace;
+
+		float cosTheta = clamp(dot(n, l), 0, 1);
+
+		vec3 diffuse = dl.color * dl.power * cosTheta;
+
+
+		// Eye vector (towards the camera)
+		vec3 E = normalize(EyeDirection_tangentspace);
+
+		// Direction in which the triangle reflects the light
+		vec3 R = reflect(-l,n);
+
+		float cosAlpha = clamp(dot(E, R), 0, 1);
+
+		vec3 specular = dl.color * dl.power * pow(cosAlpha, phong.alpha);
+
+		/*
+			sum of diffuse and specular componenets
+		*/
+		directionalSum += kd*diffuse*texColor*phong.difusseColor + ks*specular*phong.specularColor;
+	}
+
+	outColor.xyz = lightSum + ambient + directionalSum;
 	outColor.w = 1;
 }

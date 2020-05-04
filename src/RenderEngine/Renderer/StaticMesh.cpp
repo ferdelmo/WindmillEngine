@@ -103,9 +103,17 @@ void StaticMesh::Update(float deltaTime) {
 
 		Lights l = world->GetLights().lights;
 
+		// dont do this here, operate it only one time
+
 		for (int i = 0; i < l.num_lights; i++) {
 			l.lights[i].LightPosition_cameraspace = (_ubo.view * glm::vec4(l.lights[i].position, 1));
 		}
+
+		for (int i = 0; i < l.num_directional; i++) {
+			l.directionalLights[i].direction = (_ubo.view * glm::vec4(-l.directionalLights[i].direction, 0));
+		}
+
+
 		std::vector<Lights> lights = { l };
 		_uniforms.at("Lights")->GetBuffer()->Fill(lights);
 	}

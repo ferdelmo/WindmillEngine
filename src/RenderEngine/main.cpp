@@ -284,9 +284,18 @@ int main() {
     Lights lights;
     lights.lights[0] = light;
 
-    lights.num_lights = 1;
+    DirectionalLight dl;
+    dl.color = { 1,1,1 };
+    dl.power = 1;
+    dl.direction = { 1,1,-1 };
 
-    AmbientLight ambient = { {1,1,1}, .1f };
+    lights.directionalLights[0] = dl;
+
+
+    lights.num_lights = 1;
+    lights.num_directional = 1;
+
+    AmbientLight ambient = { {1,1,1}, .0f };
 
     SceneLight l = { lights, ambient };
     World world;
@@ -398,7 +407,7 @@ int main() {
         objs[i]->transform.scale = glm::vec3(1, 1, 1);
         objs[i]->transform.rotation = glm::quat();
 
-        objs[i]->transform.position = glm::vec3(-2 + i * 2, 0, 4);
+        objs[i]->transform.position = glm::vec3(-2 + i * 2, 0, 2);
 
         StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj",
             GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/texture.jpg",
