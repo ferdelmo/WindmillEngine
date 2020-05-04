@@ -14,3 +14,9 @@ MaterialInstance* GetBasicColorMaterial(const Camera& cam, const PhongShading& p
 
 MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const std::string tex, 
 	const std::string normal, const PhongShading& phong);
+
+
+MaterialInstance* GetQuadMaterial();
+
+MaterialInstance* GetShadowMapMaterial();
+

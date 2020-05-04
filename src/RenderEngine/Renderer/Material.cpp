@@ -2,6 +2,7 @@
 #include "RenderPass.h"
 #include "Uniform.h"
 #include "SingleThreadRenderer/SingleThreadRenderer.h"
+#include "Image.h"
 #include <string>
 #include <iostream>
 
@@ -22,7 +23,9 @@ void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vert
 	std::vector<VkVertexInputAttributeDescription> inputAttr) {
 
 	_vert.Initialize(vert, VK_SHADER_STAGE_VERTEX_BIT, vertBinds);
-	_frag.Initialize(frag, VK_SHADER_STAGE_FRAGMENT_BIT, fragBinds);
+	if (frag != "") {
+		_frag.Initialize(frag, VK_SHADER_STAGE_FRAGMENT_BIT, fragBinds);
+	}
 
 	SingleThreadRenderer& rt = SingleThreadRenderer::GetInstance();
 
@@ -38,7 +41,12 @@ void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vert
 	scissor.offset = { 0, 0 };
 	scissor.extent = rt.GetExtent();
 
-	_pipeline.Initialize(renderPass, &_vert, &_frag, rt.GetFormat(), inputBind, inputAttr, viewport, scissor);
+	if (frag != "") {
+		_pipeline.Initialize(renderPass, &_vert, &_frag, rt.GetFormat(), inputBind, inputAttr, viewport, scissor);
+	}
+	else {
+		_pipeline.Initialize(renderPass, &_vert, rt.GetFormat(), inputBind, inputAttr, viewport, scissor);
+	}
 
 	//_texture.Initialize("../resources/textures/texture.jpg");
 
@@ -136,17 +144,18 @@ MapUniforms Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, Vk
 			index++;
 		}
 		else if (entry.second->obj->GetTypeUniform() == UniformTypes::TEXTURE) {
+			if (entry.second->name != "ShadowMap") {
+				std::pair<std::string, MaterialUniform*> pair;
+				pair.first = entry.second->name;
+				Texture* obj = ((UniformTexture*)entry.second->obj)->obj;
 
-			std::pair<std::string, MaterialUniform*> pair;
-			pair.first = entry.second->name;
-			Texture* obj = ((UniformTexture*)entry.second->obj)->obj;
+				pair.second = new MaterialUniformTexture(obj);
 
-			pair.second = new MaterialUniformTexture(obj);
-
-			resul.insert(pair);
+				resul.insert(pair);
+			}
 
 			VkDescriptorImageInfo imageInfo = {};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfo.imageLayout = entry.second->obj->GetImageLayout();
 			imageInfo.imageView = *entry.second->obj->GetImageView();
 			imageInfo.sampler = *entry.second->obj->GetImageSampler();
 

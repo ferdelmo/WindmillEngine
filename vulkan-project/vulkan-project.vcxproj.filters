@@ -26,12 +26,10 @@
     <Filter Include="src\Input">
       <UniqueIdentifier>{2e4016f8-e5d9-4b99-ad65-8cef79a8379f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\RenderEngine\SingleThreadRenderer">
-      <UniqueIdentifier>{cc20b3b3-a158-43ad-b792-7ef9bacc1725}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\RenderEngine\Renderer\Managers">
       <UniqueIdentifier>{3c3ff543-d7ab-43db-bf72-cb26bd04348c}</UniqueIdentifier>
     </Filter>
+<<<<<<< Updated upstream
     <Filter Include="src\PhysicsEngine">
       <UniqueIdentifier>{5ca925f9-6189-4e71-bd23-9ab5960f3239}</UniqueIdentifier>
     </Filter>
@@ -43,6 +41,10 @@
     </Filter>
     <Filter Include="src\Engine\Components">
       <UniqueIdentifier>{2cb90aa6-2797-4106-ac7f-4f9eb4a1577c}</UniqueIdentifier>
+=======
+    <Filter Include="src\RenderEngine\Renderer\SingleThreadRenderer">
+      <UniqueIdentifier>{cc20b3b3-a158-43ad-b792-7ef9bacc1725}</UniqueIdentifier>
+>>>>>>> Stashed changes
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,7 +110,7 @@
       <Filter>src\RenderEngine\Renderer\Utils</Filter>
     </ClCompile>
     <ClCompile Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.cpp">
-      <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
+      <Filter>src\RenderEngine\Renderer\SingleThreadRenderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\RenderEngine\Renderer\MaterialInstance.cpp">
       <Filter>src\RenderEngine\Renderer</Filter>
@@ -222,7 +224,7 @@
       <Filter>src\RenderEngine\Renderer\Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\SingleThreadRenderer\SingleThreadRenderer.h">
-      <Filter>src\RenderEngine\SingleThreadRenderer</Filter>
+      <Filter>src\RenderEngine\Renderer\SingleThreadRenderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\RenderEngine\Renderer\MaterialInstance.h">
       <Filter>src\RenderEngine\Renderer</Filter>

@@ -17,10 +17,14 @@ layout(location = 3) in vec3 normal_modelspace;
 
 layout(location = 0) out vec3 worldPos;
 layout(location = 1) out vec3 EyeDirection_cameraspace; 
-layout(location = 2) out vec3 Normal_cameraspace;  
+layout(location = 2) out vec3 Normal_cameraspace; 
+layout(location = 3) out vec2 texCoord; 
 
 void main() {
     gl_Position = mvp.proj * mvp.view * mvp.model * vec4(position, 1.0);
+    
+    texCoord = inTexCoord;
+
     worldPos =  (mvp.model * vec4(position, 1.0)).xyz;
 
 	vec3 vertexPosition_cameraspace = ( mvp.view * mvp.model * vec4(position,1)).xyz;

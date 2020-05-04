@@ -20,6 +20,7 @@ class VulkanInstance;
 */
 class StaticMesh : public Renderizable
 {
+	//THIS SHOULD BE CHANGE AFTER SOME TEST
 private:
 	MeshManager::MeshInfo* _mesh;
 
@@ -35,6 +36,12 @@ private:
 
 	//instance for the parameters
 	MaterialInstance* _materialInstance = nullptr;
+
+	MaterialInstance* _shadowMap = nullptr;
+	MapUniforms _uniformsShadowMap;
+
+	VkDescriptorPool _descriptorPoolShadowMap = VK_NULL_HANDLE;
+	VkDescriptorSet _descriptorSetShadowMap = VK_NULL_HANDLE;
 
 public:
 	/*
@@ -76,9 +83,15 @@ public:
 	*/
 	void BindCommandsToBuffer(VkCommandBuffer& cmd) override;
 
-	std::vector<Index> GetIndices();
 
-	std::vector<VertexNormalMapping> GetVertices();
+	/*
+		Bind to a command the draw orders
+	*/
+	void BindCommandsToBufferShadow(VkCommandBuffer& cmd);
+
+	std::vector<Index>& GetIndices();
+
+	std::vector<VertexNormalMapping>& GetVertices();
 
 	MVP& GetMVP();
 

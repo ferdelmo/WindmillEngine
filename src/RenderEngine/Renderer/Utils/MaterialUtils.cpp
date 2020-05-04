@@ -3,6 +3,12 @@
 #include "RenderEngine/Renderer/MaterialInstance.h"
 #include "RenderEngine/Renderer/SingleThreadRenderer/SingleThreadRenderer.h"
 #include "RenderEngine/Renderer/Managers/TextureManager.h"
+#include "RenderEngine/Renderer/RenderPass.h"
+#include "RenderEngine/Renderer/Image.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/compatibility.hpp>
 
 #include "Engine/World.h"
 
@@ -78,6 +84,15 @@ MaterialInstance* GetBasicColorMaterial(const Camera& cam, const PhongShading& p
             3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(phongUniform);
 
+        UniformInfo* shadowMap = UniformInfo::GenerateInfoImage(
+            SingleThreadRenderer::GetInstance().GetDepthRenderPass()->GetDepthImage(),
+            &SingleThreadRenderer::GetInstance().depthSampler,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            "ShadowMap",
+            4, VK_SHADER_STAGE_FRAGMENT_BIT);
+
+        fragmentDescriptor.push_back(shadowMap);
+
         Material* resul = new Material(materialName);
         resul->Initialize("../resources/shaders/SolidColor.vert.spv", vertexDescriptor,
             "../resources/shaders/SolidColor.frag.spv", fragmentDescriptor,
@@ -152,3 +167,69 @@ MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const st
 
         return aux;
     }
+
+
+MaterialInstance* GetBasicLightMaterialNormalMapping() {
+    std::string materialName = "GetQuadMaterial";
+    Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
+    if (resul == nullptr) {
+        std::vector<UniformInfo*> vertexDescriptor(0);
+
+
+        std::vector<UniformInfo*> fragmentDescriptor(0);
+
+        UniformInfo* shadowMap = UniformInfo::GenerateInfoImage(
+            SingleThreadRenderer::GetInstance().GetDepthRenderPass()->GetDepthImage(),
+            &SingleThreadRenderer::GetInstance().depthSampler,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            "ShadowMap",
+            0, VK_SHADER_STAGE_FRAGMENT_BIT);
+
+        fragmentDescriptor.push_back(shadowMap);
+
+        Material* resul = new Material(materialName);
+        resul->Initialize("../resources/shaders/Quad.vert.spv", vertexDescriptor,
+            "../resources/shaders/Quad.frag.spv", fragmentDescriptor,
+            SingleThreadRenderer::GetInstance().GetRenderPass(),
+            VertexNormalMapping::getBindingDescription(),
+            VertexNormalMapping::getAttributeDescriptions());
+
+        MaterialManager::GetInstance().AddMaterial(materialName, resul);
+    }
+
+    MaterialInstance* aux = new MaterialInstance(materialName);
+
+    return aux;
+}
+
+
+MaterialInstance* GetShadowMapMaterial() {
+    std::string materialName = "ShadowMapMaterial";
+    Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
+    if (resul == nullptr) {
+        std::vector<UniformInfo*> vertexDescriptor(0);
+        MVP aux;
+        // MVP FOR THE DIRECTIONAL LIGHT
+        aux.model = glm::mat4(1.0f);
+        aux.proj = World::GetActiveWorld()->GetCamera().GetProjection();
+        aux.view = World::GetActiveWorld()->GetCamera().GetView();
+        UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+        vertexDescriptor.push_back(vertexInfo);
+
+
+        std::vector<UniformInfo*> fragmentDescriptor(0);
+
+        Material* resul = new Material(materialName);
+        resul->Initialize("../resources/shaders/ShadowMap.vert.spv", vertexDescriptor,
+            "", fragmentDescriptor,
+            SingleThreadRenderer::GetInstance().GetDepthRenderPass(),
+            VertexNormalMapping::getBindingDescription(),
+            VertexNormalMapping::getAttributeDescriptions());
+
+        MaterialManager::GetInstance().AddMaterial(materialName, resul);
+    }
+
+    MaterialInstance* aux = new MaterialInstance(materialName);
+
+    return aux;
+}

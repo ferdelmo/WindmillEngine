@@ -41,5 +41,7 @@ public:
 	void CreateMSAAResources();
 
 	void ResizeImages();
+
+	static RenderPass* GenerateOnlyDepthRenderPass();
 };
 

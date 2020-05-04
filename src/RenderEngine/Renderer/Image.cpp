@@ -16,6 +16,9 @@ Image::~Image() {
 void Image::Initialize(const int width, const int height, VkFormat format, VkImageTiling tiling,
 	VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImageAspectFlags aspectFlags) {
 
+	_width = width;
+	_height = height;
+
 	_format = format;
 
 	CreateImage(width, height, format, tiling, usage, properties);
@@ -113,6 +116,9 @@ Image* Image::CreateImage(const int width, const int height, VkFormat format, Vk
 	Image* resul = new Image();
 
 	resul->_format = format;
+
+	resul->_width = width;
+	resul->_height = height;
 
 	VkImageCreateInfo imageInfo = {};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

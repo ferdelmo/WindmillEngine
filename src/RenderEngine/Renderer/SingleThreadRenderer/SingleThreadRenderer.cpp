@@ -10,6 +10,19 @@
 #include "RenderEngine/Renderer/RenderPass.h"
 
 #include "RenderEngine/Renderer/Renderizable.h"
+#include "RenderEngine/Renderer/StaticMesh.h"
+
+#include "RenderEngine/Renderer/Utils/MaterialUtils.h"
+#include "RenderEngine/Renderer/Material.h"
+#include "RenderEngine/Renderer/MaterialInstance.h"
+
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/compatibility.hpp>
+
+#include "Engine/World.h"
+
 
 SingleThreadRenderer::SingleThreadRenderer() : _initialized(false), objects(0), objectsToAdd() {
     updateCommands = std::vector<bool>();
@@ -191,16 +204,25 @@ void SingleThreadRenderer::DrawFrame() {
 void SingleThreadRenderer::InitializeSwapChain() {
 
     CreateSwapChain();
+
+    renderPass = new RenderPass();
+    renderPass->Initialize();
+    depthRenderPass = RenderPass::GenerateOnlyDepthRenderPass();
+
     CreateImageViews();
 }
 
-void SingleThreadRenderer::Initialize(RenderPass* renderPass) {
+void SingleThreadRenderer::Initialize() {
+
+
     if (_initialized) {
         throw std::runtime_error("RenderThread::Initizalize: Alredy initialized!");
         return;
     }
 
-    this->renderPass = renderPass;
+    _shadowMaterial = GetShadowMapMaterial();
+
+    _uniforms = _shadowMaterial->GetMaterial()->GenerateDescriptorSet(_descriptorPool, _descriptorSet);
 
     CreateFramebuffers();
     CreateCommandPool();
@@ -208,6 +230,25 @@ void SingleThreadRenderer::Initialize(RenderPass* renderPass) {
     CreateSyncObjects();
 
     _initialized = true;
+
+    VkSamplerCreateInfo samplerInfo = {};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeV = samplerInfo.addressModeU;
+    samplerInfo.addressModeW = samplerInfo.addressModeU;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.maxAnisotropy = 1.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 1.0f;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+
+    if (vkCreateSampler(VulkanInstance::GetInstance().device, &samplerInfo, nullptr, &depthSampler) != VK_SUCCESS) {
+        throw std::runtime_error("Texture::CreateTextureSampler: failed to create texture sampler!");
+    }
 }
 
 void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
@@ -222,6 +263,79 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+
+    // The final pass to render
+    VkRenderPassBeginInfo renderPassInfoDepth = {};
+    renderPassInfoDepth.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfoDepth.renderPass = depthRenderPass->GetRenderPass();
+    renderPassInfoDepth.framebuffer = depthBuffer;
+    renderPassInfoDepth.renderArea.offset = { 0, 0 };
+    renderPassInfoDepth.renderArea.extent.width = depthRenderPass->GetDepthImage()->GetWidth();
+    renderPassInfoDepth.renderArea.extent.height = depthRenderPass->GetDepthImage()->GetHeight();
+
+    /* Clear the 2 attachments, color and depth */
+    VkClearValue clearValuesDepth;
+    clearValuesDepth.depthStencil = { 1.0f, 0 };
+
+    renderPassInfoDepth.clearValueCount = 1;
+    renderPassInfoDepth.pClearValues = &clearValuesDepth;
+
+    vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfoDepth, VK_SUBPASS_CONTENTS_INLINE);
+
+    VkViewport viewport = {};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = (float)GetExtent().width;
+    viewport.height = (float)GetExtent().height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D scissor = {};
+    scissor.offset = { 0, 0 };
+    scissor.extent = GetExtent();
+
+
+    vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport);
+
+    vkCmdSetScissor(commandBuffers[i], 0, 1, &scissor);
+
+    // Set depth bias (aka "Polygon offset")
+    // Required to avoid shadow mapping artefacts
+    /*
+    vkCmdSetDepthBias(
+        drawCmdBuffers[i],
+        depthBiasConstant,
+        0.0f,
+        depthBiasSlope);
+    */
+
+    // Generate a specific constat pipeline for the shadow map
+    //vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
+    
+    //same with the descriptor layout and descriptor set?
+    //vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.offscreen, 0, NULL);
+
+    float depthBiasConstant = 1.25f;
+
+    float depthBiasSlope = 1.75f;
+
+    for (auto& obj : objects) {
+        StaticMesh* mesh = (StaticMesh*)obj;
+        VkDeviceSize offsets[] = { 0 };
+        
+        mesh->BindCommandsToBufferShadow(commandBuffers[i]);
+    }
+    /*
+    vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &scenes[sceneIndex].vertices.buffer, offsets);
+    vkCmdBindIndexBuffer(drawCmdBuffers[i], scenes[sceneIndex].indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdDrawIndexed(drawCmdBuffers[i], scenes[sceneIndex].indexCount, 1, 0, 0, 0);
+    */
+
+    vkCmdEndRenderPass(commandBuffers[i]);
+
+
+
+    // The final pass to render
     VkRenderPassBeginInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = renderPass->GetRenderPass();
@@ -237,28 +351,28 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    VkViewport viewport = {};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)GetExtent().width;
-    viewport.height = (float)GetExtent().height;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
+    VkViewport viewport2 = {};
+    viewport2.x = 0.0f;
+    viewport2.y = 0.0f;
+    viewport2.width = (float)GetExtent().width;
+    viewport2.height = (float)GetExtent().height;
+    viewport2.minDepth = 0.0f;
+    viewport2.maxDepth = 1.0f;
 
-    VkRect2D scissor = {};
-    scissor.offset = { 0, 0 };
-    scissor.extent = GetExtent();
+    VkRect2D scissor2 = {};
+    scissor2.offset = { 0, 0 };
+    scissor2.extent = GetExtent();
 
 
     vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport);
+    vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport2);
 
-    vkCmdSetScissor(commandBuffers[i], 0, 1, &scissor);
+    vkCmdSetScissor(commandBuffers[i], 0, 1, &scissor2);
 
     // std::cout << "THERE ARE: " << objects.size() << std::endl;
-
     for (auto obj : objects) {
+        // ONLY FOR TEST
         obj->BindCommandsToBuffer(commandBuffers[i]);
     }
 
@@ -372,6 +486,20 @@ void SingleThreadRenderer::CreateFramebuffers() {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
+
+    // depth frame buffer
+    VkFramebufferCreateInfo framebufferInfo = {};
+    framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebufferInfo.renderPass = depthRenderPass->GetRenderPass();
+    framebufferInfo.attachmentCount = 1;
+    framebufferInfo.pAttachments = &depthRenderPass->GetDepthImage()->GetImageView();
+    framebufferInfo.width = depthRenderPass->GetDepthImage()->GetWidth();
+    framebufferInfo.height = depthRenderPass->GetDepthImage()->GetHeight();
+    framebufferInfo.layers = 1;
+
+    if (vkCreateFramebuffer(VulkanInstance::GetInstance().device, &framebufferInfo, nullptr, &depthBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create framebuffer!");
+    }
 }
 
 void SingleThreadRenderer::CreateCommandPool() {
@@ -433,6 +561,8 @@ void SingleThreadRenderer::CleanupSwapChain() {
         vkDestroyFramebuffer(VulkanInstance::GetInstance().device, framebuffer, nullptr);
     }
 
+    vkDestroyFramebuffer(VulkanInstance::GetInstance().device, depthBuffer, nullptr);
+
 
     for (auto imageView : swapChainImageViews) {
         vkDestroyImageView(VulkanInstance::GetInstance().device, imageView, nullptr);
@@ -484,6 +614,19 @@ void SingleThreadRenderer::CleanUp() {
     for (auto& entry : deleteInfoVector) {
         entry.func();
     }
+
+    for (auto& entry : _uniforms) {
+        delete entry.second;
+    }
+
+    vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
+
+    vkDestroySampler(VulkanInstance::GetInstance().device, depthSampler, nullptr);
+
+    delete _shadowMaterial;
+
+    delete renderPass;
+    delete depthRenderPass;
 }
 
 void SingleThreadRenderer::AddObject(Renderizable* obj) {

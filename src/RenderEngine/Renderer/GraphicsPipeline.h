@@ -41,6 +41,11 @@ public:
 		std::vector<VkVertexInputAttributeDescription> inputAttr,
 		VkViewport viewport, VkRect2D scissor);
 
+	void Initialize(RenderPass* renderPass, Shader* vertex, VkFormat format,
+		VkVertexInputBindingDescription inputBind,
+		std::vector<VkVertexInputAttributeDescription> inputAttr,
+		VkViewport viewport, VkRect2D scissor);
+
 	DescriptorSetLayout* GetDescriptorSetLayout() {
 		return _descriptorSetLayout;
 	}

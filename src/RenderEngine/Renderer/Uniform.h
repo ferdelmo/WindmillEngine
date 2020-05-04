@@ -4,6 +4,7 @@
 
 #include "Buffer.h"
 #include "Texture.h"
+#include "Image.h"
 
 #include "Managers/TextureManager.h"
 
@@ -23,6 +24,8 @@ struct UniformInterface {
 	virtual VkImageView* GetImageView() { return nullptr; };
 
 	virtual VkSampler* GetImageSampler() { return nullptr; };
+
+	virtual VkImageLayout GetImageLayout() { return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; };
 
 	virtual UniformTypes GetTypeUniform() { return UniformTypes::UNIFORM; };
 
@@ -84,6 +87,36 @@ struct UniformTexture : public UniformInterface {
 	UniformTypes GetTypeUniform() override { return UniformTypes::TEXTURE; }
 
 	Texture* GetTexture() {
+		return obj;
+	}
+};
+
+struct UniformImage : public UniformInterface {
+	Image* obj;
+	VkSampler* sampler;
+	VkImageLayout imageLayout;
+
+	~UniformImage() {
+		//the manager will delete the textures created
+		//delete obj;
+	}
+
+	UniformImage(Image* obj, VkSampler* sampler, VkImageLayout imageLayout) {
+		size = 0;
+		this->obj = obj;
+		this->sampler = sampler;
+		this->imageLayout = imageLayout;
+	}
+
+	virtual VkImageView* GetImageView() { return &obj->GetImageView(); };
+
+	virtual VkSampler* GetImageSampler() { return sampler; };
+
+	UniformTypes GetTypeUniform() override { return UniformTypes::TEXTURE; }
+
+	virtual VkImageLayout GetImageLayout() { return imageLayout; };
+
+	Image* GetImage() {
 		return obj;
 	}
 };
@@ -212,6 +245,18 @@ struct UniformInfo {
 		info->binding = binding;
 		info->type = type;
 		info->descriptorCount = objs.size();
+		info->stageFlags = stageFlags;
+		return info;
+	}
+
+	static UniformInfo* GenerateInfoImage(Image* obj, VkSampler* sampler, VkImageLayout imageLayout,
+		std::string name, uint16_t binding, VkShaderStageFlags stageFlags) {
+		UniformInfo* info = new UniformInfo();
+		info->obj = new UniformImage(obj, sampler, imageLayout);
+		info->name = name;
+		info->binding = binding;
+		info->type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		info->descriptorCount = 1;
 		info->stageFlags = stageFlags;
 		return info;
 	}

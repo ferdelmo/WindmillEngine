@@ -273,27 +273,6 @@ int main() {
     */
     SingleThreadRenderer& renderer = SingleThreadRenderer::GetInstance();
 
-    renderer.InitializeSwapChain();
-
-
-    RenderPass* renderPass = new RenderPass();
-    renderPass->Initialize();
-
-    renderer.Initialize(renderPass);
-
-    /*
-        Keyboard Callbacks
-    */
-    bool end = false;
-    KeyboardCallback quit = [&end](CallbackAction ca) {
-        std::cout << "ESC PULSADA" << std::endl;
-        end = true;
-    };
-
-    InputManager::GetInstance().SetWindow(VulkanInstance::GetInstance().window);
-
-    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_ESCAPE, CallbackAction::KEY_PRESSED, quit);
-
     /*
         Initialize world
     */
@@ -315,10 +294,29 @@ int main() {
     world.SetLights(l);
 
     Camera cam = Camera(glm::vec3(0, -5, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-        90, 16 / 9.0f, 0.01f, 1000.0f);
+        90, 16 / 9.0f, 0.1f, 256.0f);
 
 
     world.SetCamera(cam);
+
+
+    renderer.InitializeSwapChain();
+
+    renderer.Initialize();
+
+    /*
+        Keyboard Callbacks
+    */
+    bool end = false;
+    KeyboardCallback quit = [&end](CallbackAction ca) {
+        std::cout << "ESC PULSADA" << std::endl;
+        end = true;
+    };
+
+    InputManager::GetInstance().SetWindow(VulkanInstance::GetInstance().window);
+
+    InputManager::GetInstance().RegisterKeyboardCallback(GLFW_KEY_ESCAPE, CallbackAction::KEY_PRESSED, quit);
+
 
     //StaticMesh* mesh = new StaticMesh(vertices, indices, mat);
 
@@ -357,8 +355,6 @@ int main() {
     auto endFrame = std::chrono::high_resolution_clock::now();
     int logicTicks = 0;
 
-    glm::vec3 position(0);
-
     float vel = 40;
 
     bool add = false;
@@ -371,48 +367,62 @@ int main() {
     glm::vec3 colorsSpecular[5] = { {1,0,0}, {0, 1, 0}, {0, 0, 1}, {1,0,1}, {1,1,0} };
 
     KeyboardCallback callbacks[5];
-
+    /*
     for (int i = 0; i < 5; i++) {
         // create
-        //callbacks[i] = [&world, &objs, i, &colors, &colorsSpecular](CallbackAction ca) {
-            //if (objs[i] == nullptr) {
-                objs[i] = new GameObject();
-                world.AddObject(objs[i]);
+        objs[i] = new GameObject();
 
-                objs[i]->transform.scale = glm::vec3(1, 1, 1);
-                objs[i]->transform.rotation = glm::quat();
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj", colors[i]);
 
-                objs[i]->transform.position = glm::vec3(-2 + i * 2, 0, 1);
+        objs[i]->AddComponent(mesh);
 
-                /* StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
-                    GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
-                        "../resources/textures/Brick_Tile_normal.png", 
-                        { glm::vec3{1, 1, 1}, 0.2f, glm::vec3{0, 1, 1}, 0.1f, 20 }));*/
+        objs[i]->transform.scale = glm::vec3(10, 10, 10);
 
-                StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
-                    GetBasicColorMaterial(world.GetCamera(),
-                        { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
+        objs[i]->transform.position = glm::vec3(-40 + i * 20, 0, 0);
+        world.AddObject(objs[i]);
 
-                //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
-                if (i == 1) {
-                    BoxColliderComponent* col = new BoxColliderComponent(objs[i]->transform.position, 
-                        objs[i]->transform.scale/2.0f);
-                    objs[i]->AddComponent(col);
-                }
-                else {
-                    SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
-                    objs[i]->AddComponent(col);
-                }
-
-                objs[i]->AddComponent(mesh);
-            /*}
-            else {
-                world.RemoveObject(objs[i]);
-                delete objs[i];
-                objs[i] = nullptr;
-            }
+        mesh->Initialize();
+        callbacks[i] = [&world, &objs, i, &colors, mesh, &show](CallbackAction ca) {
+            mesh->SetVisibility(show[i]);
+            show[i] = !show[i];
         };
-        InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);*/
+        InputManager::GetInstance().RegisterKeyboardCallback(keys[i], CallbackAction::KEY_PRESSED, callbacks[i]);
+    }
+
+    */
+   
+    for (int i = 0; i < 5; i++) {
+        objs[i] = new GameObject();
+        world.AddObject(objs[i]);
+
+        objs[i]->transform.scale = glm::vec3(1, 1, 1);
+        objs[i]->transform.rotation = glm::quat();
+
+        objs[i]->transform.position = glm::vec3(-2 + i * 2, 0, 4);
+
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj",
+            GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/texture.jpg",
+                "../resources/textures/normalMap.jpg", 
+                { glm::vec3{1, 1, 1}, 0.2f, glm::vec3{0, 1, 1}, 0.1f, 1000 }));
+
+        /*
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+            GetBasicColorMaterial(world.GetCamera(),
+                { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
+                */
+        //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
+        
+        if (i == 1) {
+            BoxColliderComponent* col = new BoxColliderComponent(objs[i]->transform.position, 
+                objs[i]->transform.scale/2.0f);
+            objs[i]->AddComponent(col);
+        }
+        else {
+            SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
+            objs[i]->AddComponent(col);
+        }
+
+        objs[i]->AddComponent(mesh);
     }
 
     int i = 0;
@@ -428,7 +438,7 @@ int main() {
         currentTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
 
-        
+        /*
         if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_D)) {
             objs[1]->transform.position += glm::vec3(2.5f, 0, 0) * deltaTime;
         }
@@ -436,10 +446,11 @@ int main() {
         if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_A)) {
             objs[1]->transform.position += glm::vec3(-2.5f, 0, 0) * deltaTime;
         }
+        */
         
 
 
-        //world.GetCamera().Update(deltaTime);
+        world.GetCamera().Update(deltaTime);
 
         // THIS SHOULD BE CHANGE, CALL THE PHYSICS UPDATE A CONSTANT N TIMES PER SECOND,
         // TO ENSURE THE SAME BEHAVIOUR IN DIFFERENT MACHINES
@@ -478,8 +489,6 @@ int main() {
 
 
     renderer.CleanUp();
-
-    delete renderPass;
 
     Physics::PhysicsEngine::CleanUp();
 

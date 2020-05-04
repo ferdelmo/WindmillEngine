@@ -13,7 +13,8 @@ private:
 	VkImageView _imageView;
 
 	VkFormat _format;
-	 
+	
+	int _width, _height;
 
 	void CreateImageView(VkImageAspectFlags aspectFlags);
 
@@ -60,6 +61,14 @@ public:
 	static Image* CreateImage(const int width, const int height, VkFormat format, VkImageTiling tiling,
 		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImageAspectFlags aspectFlags, 
 		VkSampleCountFlagBits numSample = VK_SAMPLE_COUNT_1_BIT);
+
+	int GetWidth() const {
+		return _width;
+	}
+
+	int GetHeight() const {
+		return _height;
+	}
 
 };
 

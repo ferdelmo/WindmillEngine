@@ -9,6 +9,7 @@
 #include "DescriptorSetLayout.h"
 #include "MaterialInstance.h"
 #include "Material.h"
+#include "Utils/MaterialUtils.h"
 
 #include "Managers/MaterialManager.h"
 #include "Managers/TextureManager.h"
@@ -26,8 +27,10 @@ StaticMesh::StaticMesh(std::string path, std::string materialName)
 	_material = MaterialManager::GetInstance().GetMaterial(materialName);
 	_materialInstance = nullptr;
 
-
 	_uniforms = _material->GenerateDescriptorSet(_descriptorPool, _descriptorSet);
+
+	_shadowMap = GetShadowMapMaterial();
+	_uniformsShadowMap = _shadowMap->GetMaterial()->GenerateDescriptorSet(_descriptorPoolShadowMap, _descriptorSetShadowMap);
 }
 
 StaticMesh::StaticMesh(std::string path, MaterialInstance* mat)
@@ -50,6 +53,11 @@ StaticMesh::StaticMesh(std::string path, MaterialInstance* mat)
 			_material->UpdateDescriptorSet(_descriptorSet, entry.first, aux);
 		}
 	}
+
+
+
+	_shadowMap = GetShadowMapMaterial();
+	_uniformsShadowMap = _shadowMap->GetMaterial()->GenerateDescriptorSet(_descriptorPoolShadowMap, _descriptorSetShadowMap);
 }
 
 StaticMesh::~StaticMesh() {
@@ -60,6 +68,12 @@ StaticMesh::~StaticMesh() {
 	}
 
 	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
+
+	for (auto& entry : _uniformsShadowMap) {
+		delete entry.second;
+	}
+
+	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPoolShadowMap, nullptr);
 }
 
 void StaticMesh::Update(float deltaTime) {
@@ -70,6 +84,18 @@ void StaticMesh::Update(float deltaTime) {
 	_uniforms.at("MVP")->GetBuffer()->Fill(uniform);
 
 	World* world = World::GetActiveWorld();
+
+	MVP mvp;
+
+	glm::vec3 pos = world->GetLights().lights.lights[0].position;
+
+	mvp.model = _ubo.model;
+	mvp.view = glm::lookAt(pos, { 0,0,0 }, { 0,0,1 });
+	mvp.proj = World::GetActiveWorld()->GetCamera().GetProjection();
+
+	std::vector<MVP> uniformDepth = { mvp };
+
+	_uniformsShadowMap.at("MVP")->GetBuffer()->Fill(uniformDepth);
 
 	if (world != nullptr) {
 		std::vector<AmbientLight> ambient = { world->GetLights().ambient };
@@ -126,12 +152,13 @@ void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->GetPipeline().GetPipeline());
 
+	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+		_material->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSet, 0, nullptr);
+
 	vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh->vertex.GetBuffer(), offsets);
 
 	vkCmdBindIndexBuffer(cmd, _mesh->index.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, 
-		_material->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSet, 0, nullptr);
 
 	vkCmdDrawIndexed(cmd, static_cast<uint32_t>(_mesh->mesh->indices.size()), 1, 0, 0, 0);
 
@@ -139,11 +166,29 @@ void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 	//std::cout << "USING INDEX: " << _indexBuffer.GetBuffer() << std::endl;
 }
 
-std::vector<Index> StaticMesh::GetIndices() {
+
+void StaticMesh::BindCommandsToBufferShadow(VkCommandBuffer& cmd) {
+	VkDeviceSize offsets[] = { 0 };
+
+
+	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _shadowMap->GetMaterial()->GetPipeline().GetPipeline());
+
+	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+		_shadowMap->GetMaterial()->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSetShadowMap, 0, nullptr);
+
+	vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh->vertex.GetBuffer(), offsets);
+
+	vkCmdBindIndexBuffer(cmd, _mesh->index.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+
+
+	vkCmdDrawIndexed(cmd, static_cast<uint32_t>(_mesh->mesh->indices.size()), 1, 0, 0, 0);
+}
+
+std::vector<Index>& StaticMesh::GetIndices() {
 	return _mesh->mesh->indices;
 }
 
-std::vector<VertexNormalMapping> StaticMesh::GetVertices() {
+std::vector<VertexNormalMapping>& StaticMesh::GetVertices() {
 	return _mesh->mesh->vertices;
 }
 

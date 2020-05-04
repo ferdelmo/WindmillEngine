@@ -8,11 +8,13 @@
 #include <mutex>
 #include <functional>
 
+#include "RenderEngine/Renderer/Material.h"
+
 class VulkanInstance;
 class Image;
 class RenderPass;
 class Renderizable;
-
+class MaterialInstance;
 
 /*
 	Renderer to use in a single thread program, does not use mutex or other sync objects
@@ -20,7 +22,7 @@ class Renderizable;
 class SingleThreadRenderer
 {
 
-private:
+public:
 	bool _initialized = false;
 
 	/*
@@ -35,11 +37,15 @@ private:
 
 	VkCommandPool commandPool;
 
+	VkFramebuffer depthBuffer;
+
 	struct DeleteInfo {
 		Renderizable* obj;
 		std::vector<bool> check;
 		std::function<void()> func;
 	};
+
+
 
 	std::vector<bool> updateCommands;
 	std::vector<VkCommandBuffer> commandBuffers;
@@ -51,6 +57,7 @@ private:
 	size_t currentFrame = 0;
 
 	RenderPass* renderPass;
+	RenderPass* depthRenderPass;
 
 	std::vector<Renderizable*> objects;
 
@@ -59,6 +66,14 @@ private:
 	std::vector<Renderizable*> objectsToRemove;
 
 	std::vector<DeleteInfo> deleteInfoVector;
+
+
+	// USE FOR DEPTH INFO, RETHINK THE DECLARATION
+	VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
+	VkDescriptorSet _descriptorSet = VK_NULL_HANDLE;
+
+	MapUniforms _uniforms;
+	MaterialInstance* _shadowMaterial;
 
 	static SingleThreadRenderer* _instance;
 
@@ -79,8 +94,11 @@ private:
 	void CleanupSwapChain();
 
 	void RecreateSwapChain();
+	
 
 public:
+	VkSampler depthSampler;
+
 	const int MAX_FRAMES_IN_FLIGHT = 5;
 
 	static SingleThreadRenderer& GetInstance();
@@ -93,7 +111,7 @@ public:
 	void InitializeSwapChain();
 
 	/* Initialize the window, vulkan and other things */
-	void Initialize(RenderPass* renderPass);
+	void Initialize();
 
 	/* Draw a Frame, this should be call in the main loop */
 	void DrawFrame();
@@ -120,6 +138,10 @@ public:
 
 	RenderPass* GetRenderPass() const {
 		return renderPass;
+	}
+
+	RenderPass* GetDepthRenderPass() const {
+		return depthRenderPass;
 	}
 
 	std::atomic<int> frames;
