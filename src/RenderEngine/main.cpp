@@ -27,6 +27,9 @@
 
 #include "PhysicsEngine/PhysicsEngine.h"
 
+
+#include <glm/gtc/matrix_transform.hpp>
+
 const std::vector<VertexNormal> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f,0.0f}},
     {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f,0.0f}},
@@ -286,16 +289,16 @@ int main() {
 
     DirectionalLight dl;
     dl.color = { 1,1,1 };
-    dl.power = 1;
+    dl.power = 2;
     dl.direction = { 1,1,-1 };
 
     lights.directionalLights[0] = dl;
 
 
-    lights.num_lights = 1;
+    lights.num_lights = 0;
     lights.num_directional = 1;
 
-    AmbientLight ambient = { {1,1,1}, .0f };
+    AmbientLight ambient = { {1,1,1}, .1f };
 
     SceneLight l = { lights, ambient };
     World world;
@@ -407,18 +410,20 @@ int main() {
         objs[i]->transform.scale = glm::vec3(1, 1, 1);
         objs[i]->transform.rotation = glm::quat();
 
-        objs[i]->transform.position = glm::vec3(-2 + i * 2, 0, 2);
+        objs[i]->transform.position = glm::vec3(-7.5 + i * 2, 0, 2);
 
+        /*
         StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj",
             GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/texture.jpg",
                 "../resources/textures/normalMap.jpg", 
-                { glm::vec3{1, 1, 1}, 0.2f, glm::vec3{0, 1, 1}, 0.1f, 1000 }));
+                { glm::vec3{1, 1, 1}, 0.4f, colorsSpecular[i], 0.2f, 10 }));
+        */
 
-        /*
-        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj",
             GetBasicColorMaterial(world.GetCamera(),
                 { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
-                */
+        
+                
         //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
         
         if (i == 1) {
@@ -446,17 +451,6 @@ int main() {
 
         currentTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
-
-        /*
-        if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_D)) {
-            objs[1]->transform.position += glm::vec3(2.5f, 0, 0) * deltaTime;
-        }
-
-        if (InputManager::GetInstance().IsKeyPressed(GLFW_KEY_A)) {
-            objs[1]->transform.position += glm::vec3(-2.5f, 0, 0) * deltaTime;
-        }
-        */
-        
 
 
         world.GetCamera().Update(deltaTime);

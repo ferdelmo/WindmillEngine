@@ -285,14 +285,14 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)GetExtent().width;
-    viewport.height = (float)GetExtent().height;
+    viewport.width = (float)depthRenderPass->GetDepthImage()->GetWidth();
+    viewport.height = (float)depthRenderPass->GetDepthImage()->GetHeight();
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor = {};
     scissor.offset = { 0, 0 };
-    scissor.extent = GetExtent();
+    scissor.extent = renderPassInfoDepth.renderArea.extent;
 
 
     vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport);
@@ -301,13 +301,16 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
 
     // Set depth bias (aka "Polygon offset")
     // Required to avoid shadow mapping artefacts
-    /*
+
+    float depthBiasConstant = 1.25f;
+
+    float depthBiasSlope = 1.75f;
     vkCmdSetDepthBias(
-        drawCmdBuffers[i],
+        commandBuffers[i],
         depthBiasConstant,
         0.0f,
         depthBiasSlope);
-    */
+    
 
     // Generate a specific constat pipeline for the shadow map
     //vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
@@ -315,9 +318,6 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
     //same with the descriptor layout and descriptor set?
     //vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.offscreen, 0, NULL);
 
-    float depthBiasConstant = 1.25f;
-
-    float depthBiasSlope = 1.75f;
 
     for (auto& obj : objects) {
         StaticMesh* mesh = (StaticMesh*)obj;

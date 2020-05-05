@@ -167,6 +167,7 @@ struct PointLight {
 
 /* Struct to represent a directional light */
 struct DirectionalLight {
+	alignas(16) glm::mat4 depthBiasMVP;
 	glm::vec3 direction;
 	float power = 0;
 	glm::vec3 color;

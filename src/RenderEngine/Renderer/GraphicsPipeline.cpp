@@ -213,7 +213,7 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, VkForm
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
 
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = VK_CULL_MODE_FRONT_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 
     rasterizer.depthBiasEnable = VK_TRUE;
@@ -263,7 +263,8 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, VkForm
     depthStencil.front = {}; // Optional
     depthStencil.back = {}; // Optional
 
-    std::vector<VkDynamicState> dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+    std::vector<VkDynamicState> dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, 
+        VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_DEPTH_BIAS };
     VkPipelineDynamicStateCreateInfo dynamicStateCI = {};
     dynamicStateCI.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     dynamicStateCI.pDynamicStates = dynamicStateEnables.data();

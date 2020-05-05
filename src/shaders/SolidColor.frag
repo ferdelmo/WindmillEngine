@@ -18,6 +18,7 @@ struct PointLight{
 };
 
 struct DirectionalLight {
+	mat4 depthBiasMVP;
 	vec3 direction;
 	float power;
 	vec3 color;
@@ -52,16 +53,60 @@ layout(location = 0) out vec4 outColor;
 
 float LinearizeDepth(float depth)
 {
-  float n = 0.1; // camera z near
+  float n = 1; // camera z near
   float f = 256.0; // camera z far
   float z = depth;
   return (2.0 * n) / (f + n - z * (f - n));	
 }
 
+
+
+float textureProj(vec4 shadowCoord, vec2 off)
+{
+	float shadow = 1.0;
+	if ( shadowCoord.z > -1.0 && shadowCoord.z < 1.0 ) 
+	{
+		float dist = texture( shadowMap, shadowCoord.st + off ).r;
+		if ( shadowCoord.w > 0.0 && dist < shadowCoord.z ) 
+		{
+			shadow = 0;
+		}
+	}
+	return shadow;
+}
+
+float filterPCF(vec4 sc)
+{
+	ivec2 texDim = textureSize(shadowMap, 0);
+	float scale = 1.5;
+	float dx = scale * 1.0 / float(texDim.x);
+	float dy = scale * 1.0 / float(texDim.y);
+
+	float shadowFactor = 0.0;
+	int count = 0;
+	int range = 1;
+	
+	for (int x = -range; x <= range; x++)
+	{
+		for (int y = -range; y <= range; y++)
+		{
+			shadowFactor += textureProj(sc, vec2(dx*x, dy*y));
+			count++;
+		}
+	
+	}
+	return shadowFactor / count;
+}
+
 void main() {
 	
 	float depth = texture(shadowMap, texCoord).r;
-
+	//depth = LinearizeDepth(depth);
+	outColor.r = depth;
+	outColor.g = depth;
+	outColor.b = depth;
+	outColor.w = 1;
+	//return;
 	
 
 	float kd = phong.kd;
@@ -104,10 +149,18 @@ void main() {
 	}
 
 	vec3 directionalSum = {0, 0, 0};
+
 	// directional light
 	for(int i = 0; i < lightsStruct.num_directional; i++) {
 		DirectionalLight dl = lightsStruct.directional[i];
 		
+		vec4 ShadowCoord = dl.depthBiasMVP * vec4(worldPos, 1.0);
+
+
+		float visibility = textureProj(ShadowCoord/ShadowCoord.w, vec2(0,0));
+
+		//visibility = filterPCF(ShadowCoord/ShadowCoord.w);
+
 		vec3 LightDirection_cameraspace = normalize(dl.direction);
 
 		// Direction of the light (from the fragment to the light)
@@ -131,7 +184,8 @@ void main() {
 		/*
 			sum of diffuse and specular componenets
 		*/
-		directionalSum += kd*diffuse*phong.difusseColor + ks*specular*phong.specularColor;
+		directionalSum += visibility*(kd*diffuse*phong.difusseColor + ks*specular*phong.specularColor);
+
 	}
 
 	outColor.xyz = lightSum + directionalSum + finalColor;

@@ -20,6 +20,7 @@ struct PointLight{
 };
 
 struct DirectionalLight {
+	mat4 depthBiasMVP;
 	vec3 direction;
 	float power;
 	vec3 color;
@@ -116,6 +117,9 @@ void main() {
 	}
 
 
+
+	float visibility = 1.0;
+
 	vec3 directionalSum = {0, 0, 0};
 	// directional light
 	for(int i = 0; i < lightsStruct.num_directional; i++) {
@@ -144,7 +148,7 @@ void main() {
 		/*
 			sum of diffuse and specular componenets
 		*/
-		directionalSum += kd*diffuse*texColor*phong.difusseColor + ks*specular*phong.specularColor;
+		directionalSum += visibility*(kd*diffuse*texColor*phong.difusseColor + ks*specular*phong.specularColor);
 	}
 
 	outColor.xyz = lightSum + ambient + directionalSum;

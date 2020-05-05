@@ -17,6 +17,7 @@
 #include "Engine/World.h"
 
 #include <iostream>
+#include <glm/gtx/string_cast.hpp>
 
 /*
 	Constructor with a list of vertices and indices
@@ -90,8 +91,21 @@ void StaticMesh::Update(float deltaTime) {
 	glm::vec3 pos = world->GetLights().lights.lights[0].position;
 
 	mvp.model = _ubo.model;
-	mvp.view = glm::lookAt(pos, { 0,0,0 }, { 0,0,1 });
-	mvp.proj = World::GetActiveWorld()->GetCamera().GetProjection();
+
+	glm::vec3 dir = world->GetLights().lights.directionalLights[0].direction;
+	dir = glm::normalize(dir);
+
+	Camera c = world->GetCamera();
+	glm::vec3 auxPosition = c.position+c.lookAt*20.0f;
+
+	auxPosition += -dir * 50.0f;
+
+
+
+
+	mvp.view = glm::lookAt(-dir*100.0f, { 0,0,0 }, { 0,0,1 });
+	mvp.proj = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,-1000.0f,1000.0f);
+
 
 	std::vector<MVP> uniformDepth = { mvp };
 
@@ -109,10 +123,24 @@ void StaticMesh::Update(float deltaTime) {
 			l.lights[i].LightPosition_cameraspace = (_ubo.view * glm::vec4(l.lights[i].position, 1));
 		}
 
+		glm::mat4 biasMatrix(
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 1.0, 0.0,
+			0.5, 0.5, 0.0, 1.0
+		);
+
 		for (int i = 0; i < l.num_directional; i++) {
 			l.directionalLights[i].direction = (_ubo.view * glm::vec4(-l.directionalLights[i].direction, 0));
-		}
+			l.directionalLights[i].depthBiasMVP = biasMatrix * 
+				mvp.proj * mvp.view;
 
+		}
+		/*
+		for (auto& vert : _mesh->mesh->vertices) {
+			std::cout << "Position: " << glm::to_string(vert.pos) << " -> " <<
+				glm::to_string(l.directionalLights[0].depthBiasMVP * glm::vec4(vert.pos, 1)) << std::endl;
+		}*/
 
 		std::vector<Lights> lights = { l };
 		_uniforms.at("Lights")->GetBuffer()->Fill(lights);

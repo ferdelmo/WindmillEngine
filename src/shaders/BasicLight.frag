@@ -21,6 +21,7 @@ struct DirectionalLight {
 	float power;
 	vec3 color;
 	float aux1;
+	mat4 depthBiasMVP;
 };
 
 layout(binding = 1) uniform Lights{

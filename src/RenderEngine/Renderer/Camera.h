@@ -14,7 +14,7 @@
 */
 class Camera
 {
-private:
+public:
 	glm::mat4 _view;
 	glm::mat4 _proj;
 

@@ -14,8 +14,8 @@ Camera::Camera() {
 	_proj[1][1] *= -1;
 }
 
-Camera::Camera(glm::vec3 eyePosition, glm::vec3 center, glm::vec3 upAxis, float fov, float aspectRatio, float near, float far) :
-	aspectRatio(aspectRatio), near(near), far(far), fov(fov) {
+Camera::Camera(glm::vec3 eyePosition, glm::vec3 center, glm::vec3 upAxis, float fov, float aspectRatio, float near, float far)
+: aspectRatio(aspectRatio), near(near), far(far), fov(fov) {
 	_proj = glm::perspective(glm::radians(fov), aspectRatio, near, far);
 
 	position = eyePosition;
