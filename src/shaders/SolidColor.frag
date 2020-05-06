@@ -47,7 +47,7 @@ layout(binding = 3) uniform PhongShading {
 	vec3 aux;
 } phong;
 
-layout(binding = 4) uniform sampler2D shadowMap;
+layout(binding = 4) uniform sampler2D shadowMaps[10];
 
 layout(location = 0) out vec4 outColor;
 
@@ -61,7 +61,7 @@ float LinearizeDepth(float depth)
 
 
 
-float textureProj(vec4 shadowCoord, vec2 off)
+float textureProj(sampler2D shadowMap, vec4 shadowCoord, vec2 off)
 {
 	float shadow = 1.0;
 	if ( shadowCoord.z > -1.0 && shadowCoord.z < 1.0 ) 
@@ -75,7 +75,7 @@ float textureProj(vec4 shadowCoord, vec2 off)
 	return shadow;
 }
 
-float filterPCF(vec4 sc)
+float filterPCF(sampler2D shadowMap, vec4 sc)
 {
 	ivec2 texDim = textureSize(shadowMap, 0);
 	float scale = 1.5;
@@ -90,7 +90,7 @@ float filterPCF(vec4 sc)
 	{
 		for (int y = -range; y <= range; y++)
 		{
-			shadowFactor += textureProj(sc, vec2(dx*x, dy*y));
+			shadowFactor += textureProj(shadowMap, sc, vec2(dx*x, dy*y));
 			count++;
 		}
 	
@@ -99,14 +99,6 @@ float filterPCF(vec4 sc)
 }
 
 void main() {
-	
-	float depth = texture(shadowMap, texCoord).r;
-	//depth = LinearizeDepth(depth);
-	outColor.r = depth;
-	outColor.g = depth;
-	outColor.b = depth;
-	outColor.w = 1;
-	//return;
 	
 
 	float kd = phong.kd;
@@ -157,9 +149,9 @@ void main() {
 		vec4 ShadowCoord = dl.depthBiasMVP * vec4(worldPos, 1.0);
 
 
-		float visibility = textureProj(ShadowCoord/ShadowCoord.w, vec2(0,0));
+		float visibility = textureProj(shadowMaps[i], ShadowCoord/ShadowCoord.w, vec2(0,0));
 
-		//visibility = filterPCF(ShadowCoord/ShadowCoord.w);
+		//visibility = filterPCF(shadowMaps[i], ShadowCoord/ShadowCoord.w);
 
 		vec3 LightDirection_cameraspace = normalize(dl.direction);
 

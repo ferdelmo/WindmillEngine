@@ -1,6 +1,5 @@
 #include "Material.h"
 #include "RenderPass.h"
-#include "Uniform.h"
 #include "SingleThreadRenderer/SingleThreadRenderer.h"
 #include "Image.h"
 #include <string>
@@ -118,21 +117,21 @@ MapUniforms Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, Vk
 	int index = 0;
 	MapUniforms resul;
 	for (auto entry : _uniforms) {
-		if (entry.second->obj->GetTypeUniform() == UniformTypes::UNIFORM) {
+		if (entry.second->obj[0]->GetTypeUniform() == UniformTypes::UNIFORM) {
 			descriptorWritesBufferInfo.push_back(std::vector<VkDescriptorBufferInfo>());
 			VkWriteDescriptorSet aux = {};
 
 			std::pair<std::string, MaterialUniform*> pair;
 			pair.first = entry.second->name;
-			pair.second = new MaterialUniformBuffer(entry.second->obj->GetUniformBuffer());
+			pair.second = new MaterialUniformBuffer(entry.second->obj[0]->GetUniformBuffer());
 
 			resul.insert(pair);
 
 			for (int i = 0; i < entry.second->descriptorCount; i++) {
 				VkDescriptorBufferInfo bufferInfo;
 				bufferInfo.buffer = pair.second->GetBuffer()->GetBuffer();
-				bufferInfo.offset = i* entry.second->obj->size;
-				bufferInfo.range = entry.second->obj->size;
+				bufferInfo.offset = i* entry.second->obj[0]->size;
+				bufferInfo.range = entry.second->obj[0]->size;
 
 				descriptorWritesBufferInfo[index].push_back(bufferInfo);
 			}
@@ -150,21 +149,25 @@ MapUniforms Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, Vk
 
 			index++;
 		}
-		else if (entry.second->obj->GetTypeUniform() == UniformTypes::TEXTURE) {
+		else if (entry.second->obj[0]->GetTypeUniform() == UniformTypes::TEXTURE) {
 			if (entry.second->name != "ShadowMap") {
 				std::pair<std::string, MaterialUniform*> pair;
 				pair.first = entry.second->name;
-				Texture* obj = ((UniformTexture*)entry.second->obj)->obj;
+				Texture* obj = ((UniformTexture*)entry.second->obj[0])->obj;
 
 				pair.second = new MaterialUniformTexture(obj);
 
 				resul.insert(pair);
 			}
 
-			VkDescriptorImageInfo imageInfo = {};
-			imageInfo.imageLayout = entry.second->obj->GetImageLayout();
-			imageInfo.imageView = *entry.second->obj->GetImageView();
-			imageInfo.sampler = *entry.second->obj->GetImageSampler();
+			VkDescriptorImageInfo imageInfo[10];
+
+			for (int i = 0; i < entry.second->descriptorCount; i++) {
+				VkDescriptorImageInfo aux = {};
+				imageInfo[i].imageLayout = entry.second->obj[i]->GetImageLayout();
+				imageInfo[i].imageView = *entry.second->obj[i]->GetImageView();
+				imageInfo[i].sampler = *entry.second->obj[i]->GetImageSampler();
+			}
 
 			VkWriteDescriptorSet aux = {};
 			aux.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -173,7 +176,7 @@ MapUniforms Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, Vk
 			aux.dstArrayElement = 0;
 			aux.descriptorType = entry.second->type;
 			aux.descriptorCount = entry.second->descriptorCount;
-			aux.pImageInfo = &imageInfo;
+			aux.pImageInfo = imageInfo;
 			aux.pTexelBufferView = nullptr; // Optional
 			descriptorWrites.push_back(aux);
 		}

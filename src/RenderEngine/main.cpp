@@ -292,11 +292,17 @@ int main() {
     dl.power = 2;
     dl.direction = { 1,1,-1 };
 
+    DirectionalLight dl2;
+    dl2.color = { 1,1,1 };
+    dl2.power = .5f;
+    dl2.direction = { -1,1,-1 };
+
     lights.directionalLights[0] = dl;
+    lights.directionalLights[1] = dl2;
 
 
     lights.num_lights = 0;
-    lights.num_directional = 1;
+    lights.num_directional = 2;
 
     AmbientLight ambient = { {1,1,1}, .1f };
 
@@ -421,7 +427,7 @@ int main() {
 
         StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Ball.obj",
             GetBasicColorMaterial(world.GetCamera(),
-                { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
+                { colors[i], 0.4f, colorsSpecular[i], 0.4f, 10 }));
         
                 
         //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);

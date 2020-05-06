@@ -230,6 +230,15 @@ void SingleThreadRenderer::Initialize() {
     CreateSyncObjects();
 
     _initialized = true;
+    VkFormat depthFormat = Image::FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+        VK_IMAGE_TILING_OPTIMAL,
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+    for (int i = 0; i < MAX_LIGHTS; i++) {
+        depthImages.push_back(Image::CreateImage(SingleThreadRenderer::GetInstance().GetExtent().width * 2, SingleThreadRenderer::GetInstance().GetExtent().height * 2, 
+            depthFormat,
+            VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT| VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            VK_IMAGE_ASPECT_DEPTH_BIT, VK_SAMPLE_COUNT_1_BIT));
+    }
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -263,75 +272,168 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    static bool first = true;
+    if (first) {
+        for (int light = 0; light < MAX_LIGHTS; light++) {
+            VkImageSubresourceRange subresourceRange = {};
+            subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+            subresourceRange.baseMipLevel = 0;
+            subresourceRange.levelCount = 1;
+            subresourceRange.baseArrayLayer = 0;
+            subresourceRange.layerCount = 1;
 
-    // The final pass to render
-    VkRenderPassBeginInfo renderPassInfoDepth = {};
-    renderPassInfoDepth.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfoDepth.renderPass = depthRenderPass->GetRenderPass();
-    renderPassInfoDepth.framebuffer = depthBuffer;
-    renderPassInfoDepth.renderArea.offset = { 0, 0 };
-    renderPassInfoDepth.renderArea.extent.width = depthRenderPass->GetDepthImage()->GetWidth();
-    renderPassInfoDepth.renderArea.extent.height = depthRenderPass->GetDepthImage()->GetHeight();
+            // Change image layout of copied face to shader read
+            Image::SetImageLayout(
+                commandBuffers[i],
+                depthImages[light]->GetImage(),
+                VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                subresourceRange);
+        }
 
-    /* Clear the 2 attachments, color and depth */
-    VkClearValue clearValuesDepth;
-    clearValuesDepth.depthStencil = { 1.0f, 0 };
-
-    renderPassInfoDepth.clearValueCount = 1;
-    renderPassInfoDepth.pClearValues = &clearValuesDepth;
-
-    vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfoDepth, VK_SUBPASS_CONTENTS_INLINE);
-
-    VkViewport viewport = {};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)depthRenderPass->GetDepthImage()->GetWidth();
-    viewport.height = (float)depthRenderPass->GetDepthImage()->GetHeight();
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-
-    VkRect2D scissor = {};
-    scissor.offset = { 0, 0 };
-    scissor.extent = renderPassInfoDepth.renderArea.extent;
-
-
-    vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport);
-
-    vkCmdSetScissor(commandBuffers[i], 0, 1, &scissor);
-
-    // Set depth bias (aka "Polygon offset")
-    // Required to avoid shadow mapping artefacts
-
-    float depthBiasConstant = 1.25f;
-
-    float depthBiasSlope = 1.75f;
-    vkCmdSetDepthBias(
-        commandBuffers[i],
-        depthBiasConstant,
-        0.0f,
-        depthBiasSlope);
-    
-
-    // Generate a specific constat pipeline for the shadow map
-    //vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
-    
-    //same with the descriptor layout and descriptor set?
-    //vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.offscreen, 0, NULL);
-
-
-    for (auto& obj : objects) {
-        StaticMesh* mesh = (StaticMesh*)obj;
-        VkDeviceSize offsets[] = { 0 };
-        
-        mesh->BindCommandsToBufferShadow(commandBuffers[i], 0);
+        first = false;
     }
-    /*
-    vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &scenes[sceneIndex].vertices.buffer, offsets);
-    vkCmdBindIndexBuffer(drawCmdBuffers[i], scenes[sceneIndex].indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-    vkCmdDrawIndexed(drawCmdBuffers[i], scenes[sceneIndex].indexCount, 1, 0, 0, 0);
-    */
 
-    vkCmdEndRenderPass(commandBuffers[i]);
+    // CHANGE DYNAMICALLY DEPENDING ON THE NUMBER OF LIGHTS
+    for (int light = 0; light < 2; light++) {
+
+        // The shadow map pass
+        VkRenderPassBeginInfo renderPassInfoDepth = {};
+        renderPassInfoDepth.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfoDepth.renderPass = depthRenderPass->GetRenderPass();
+        renderPassInfoDepth.framebuffer = depthBuffer;
+        renderPassInfoDepth.renderArea.offset = { 0, 0 };
+        renderPassInfoDepth.renderArea.extent.width = depthRenderPass->GetDepthImage()->GetWidth();
+        renderPassInfoDepth.renderArea.extent.height = depthRenderPass->GetDepthImage()->GetHeight();
+
+        /* Clear the 2 attachments, color and depth */
+        VkClearValue clearValuesDepth;
+        clearValuesDepth.depthStencil = { 1.0f, 0 };
+
+        renderPassInfoDepth.clearValueCount = 1;
+        renderPassInfoDepth.pClearValues = &clearValuesDepth;
+
+        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfoDepth, VK_SUBPASS_CONTENTS_INLINE);
+
+        VkViewport viewport = {};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float)depthRenderPass->GetDepthImage()->GetWidth();
+        viewport.height = (float)depthRenderPass->GetDepthImage()->GetHeight();
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        VkRect2D scissor = {};
+        scissor.offset = { 0, 0 };
+        scissor.extent = renderPassInfoDepth.renderArea.extent;
+
+
+        vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport);
+
+        vkCmdSetScissor(commandBuffers[i], 0, 1, &scissor);
+
+        // Set depth bias (aka "Polygon offset")
+        // Required to avoid shadow mapping artefacts
+
+        float depthBiasConstant = 1.25f;
+
+        float depthBiasSlope = 1.75f;
+        vkCmdSetDepthBias(
+            commandBuffers[i],
+            depthBiasConstant,
+            0.0f,
+            depthBiasSlope);
+
+
+        // Generate a specific constat pipeline for the shadow map
+        //vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
+
+        //same with the descriptor layout and descriptor set?
+        //vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.offscreen, 0, NULL);
+
+
+        for (auto& obj : objects) {
+            StaticMesh* mesh = (StaticMesh*)obj;
+            VkDeviceSize offsets[] = { 0 };
+
+            mesh->BindCommandsToBufferShadow(commandBuffers[i], light);
+        }
+        /*
+        vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &scenes[sceneIndex].vertices.buffer, offsets);
+        vkCmdBindIndexBuffer(drawCmdBuffers[i], scenes[sceneIndex].indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdDrawIndexed(drawCmdBuffers[i], scenes[sceneIndex].indexCount, 1, 0, 0, 0);
+        */
+
+        vkCmdEndRenderPass(commandBuffers[i]);
+
+        // Make sure color writes to the framebuffer are finished before using it as transfer source
+        Image::SetImageLayout(
+            commandBuffers[i],
+            depthRenderPass->GetDepthImage()->GetImage(),
+            VK_IMAGE_ASPECT_DEPTH_BIT,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+        VkImageSubresourceRange subresourceRange = {};
+        subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        subresourceRange.baseMipLevel = 0;
+        subresourceRange.levelCount = 1;
+        subresourceRange.baseArrayLayer = 0;
+        subresourceRange.layerCount = 1;
+
+        // Change image layout of one cubemap face to transfer destination
+        Image::SetImageLayout(
+            commandBuffers[i],
+            depthImages[light]->GetImage(),
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            subresourceRange);
+
+        // Copy region for transfer from framebuffer to cube face
+        VkImageCopy copyRegion = {};
+
+        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        copyRegion.srcSubresource.baseArrayLayer = 0;
+        copyRegion.srcSubresource.mipLevel = 0;
+        copyRegion.srcSubresource.layerCount = 1;
+        copyRegion.srcOffset = { 0, 0, 0 };
+
+        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        copyRegion.dstSubresource.baseArrayLayer = 0;
+        copyRegion.dstSubresource.mipLevel = 0;
+        copyRegion.dstSubresource.layerCount = 1;
+        copyRegion.dstOffset = { 0, 0, 0 };
+
+        copyRegion.extent.width = depthImages[light]->GetWidth();
+        copyRegion.extent.height = depthImages[light]->GetHeight();
+        copyRegion.extent.depth = 1;
+
+        // Put image copy into command buffer
+        vkCmdCopyImage(
+            commandBuffers[i],
+            depthRenderPass->GetDepthImage()->GetImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            depthImages[light]->GetImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            1,
+            &copyRegion);
+
+        // Transform framebuffer color attachment back 
+        Image::SetImageLayout(
+            commandBuffers[i],
+            depthRenderPass->GetDepthImage()->GetImage(),
+            VK_IMAGE_ASPECT_DEPTH_BIT,
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
+        // Change image layout of copied face to shader read
+        Image::SetImageLayout(
+            commandBuffers[i],
+            depthImages[light]->GetImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            subresourceRange);
+    }
 
 
 
@@ -618,10 +720,14 @@ void SingleThreadRenderer::CleanUp() {
     for (auto& entry : _uniforms) {
         delete entry.second;
     }
-
+      
     vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
 
     vkDestroySampler(VulkanInstance::GetInstance().device, depthSampler, nullptr);
+
+    for (auto image : depthImages) {
+        delete image;
+    }
 
     delete _shadowMaterial;
 

@@ -46,6 +46,23 @@ public:
 	VkImageView& GetImageView();
 
 	VkFormat& GetFormat();
+	static void SetImageLayout(
+		VkCommandBuffer cmdbuffer,
+		VkImage image,
+		VkImageLayout oldImageLayout,
+		VkImageLayout newImageLayout,
+		VkImageSubresourceRange subresourceRange,
+		VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+		VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+
+	static void SetImageLayout(
+		VkCommandBuffer cmdbuffer,
+		VkImage image,
+		VkImageAspectFlags aspectMask,
+		VkImageLayout oldImageLayout,
+		VkImageLayout newImageLayout,
+		VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+		VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 
 	static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
@@ -60,7 +77,7 @@ public:
 	*/
 	static Image* CreateImage(const int width, const int height, VkFormat format, VkImageTiling tiling,
 		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImageAspectFlags aspectFlags, 
-		VkSampleCountFlagBits numSample = VK_SAMPLE_COUNT_1_BIT);
+		VkSampleCountFlagBits numSample = VK_SAMPLE_COUNT_1_BIT, VkImageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
 
 	int GetWidth() const {
 		return _width;

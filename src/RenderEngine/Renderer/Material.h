@@ -2,6 +2,7 @@
 #include "GraphicsPipeline.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Uniform.h"
 
 #include <map>
 

@@ -78,31 +78,6 @@ void StaticMesh::Update(float deltaTime) {
 
 	World* world = World::GetActiveWorld();
 
-	MVP mvp;
-
-	glm::vec3 pos = world->GetLights().lights.lights[0].position;
-
-	mvp.model = _ubo.model;
-
-	glm::vec3 dir = world->GetLights().lights.directionalLights[0].direction;
-	dir = glm::normalize(dir);
-
-	Camera c = world->GetCamera();
-	glm::vec3 auxPosition = c.position+c.lookAt*20.0f;
-
-	auxPosition += -dir * 50.0f;
-
-
-
-
-	mvp.view = glm::lookAt(-dir*100.0f, { 0,0,0 }, { 0,0,1 });
-	mvp.proj = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,-1000.0f,1000.0f);
-
-
-	std::vector<MVP> uniformDepth = { mvp };
-
-	//_uniformsShadowMap.at("MVP")->GetBuffer()->Fill(uniformDepth);
-
 	if (world != nullptr) {
 		std::vector<AmbientLight> ambient = { world->GetLights().ambient };
 		_uniforms.at("AmbientLight")->GetBuffer()->Fill(ambient);
@@ -124,8 +99,16 @@ void StaticMesh::Update(float deltaTime) {
 
 		for (int i = 0; i < l.num_directional; i++) {
 			l.directionalLights[i].direction = (_ubo.view * glm::vec4(-l.directionalLights[i].direction, 0));
+			
+			glm::vec3 dir = world->GetLights().lights.directionalLights[i].direction;
+			dir = glm::normalize(dir);
+
+
+			glm::mat4 view = glm::lookAt(-dir * 100.0f, { 0,0,0 }, { 0,0,1 });
+			glm::mat4 proj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1000.0f, 1000.0f);
+
 			l.directionalLights[i].depthBiasMVP = biasMatrix * 
-				mvp.proj * mvp.view;
+				proj * view;
 
 		}
 		/*

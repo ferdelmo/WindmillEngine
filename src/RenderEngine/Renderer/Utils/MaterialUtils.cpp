@@ -84,10 +84,10 @@ MaterialInstance* GetBasicColorMaterial(const Camera& cam, const PhongShading& p
             3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
         fragmentDescriptor.push_back(phongUniform);
 
-        UniformInfo* shadowMap = UniformInfo::GenerateInfoImage(
-            SingleThreadRenderer::GetInstance().GetDepthRenderPass()->GetDepthImage(),
+        UniformInfo* shadowMap = UniformInfo::GenerateInfoImageVector(
+            SingleThreadRenderer::GetInstance().depthImages,
             &SingleThreadRenderer::GetInstance().depthSampler,
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             "ShadowMap",
             4, VK_SHADER_STAGE_FRAGMENT_BIT);
 

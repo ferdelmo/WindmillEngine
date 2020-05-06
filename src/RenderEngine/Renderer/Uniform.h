@@ -102,6 +102,10 @@ struct UniformImage : public UniformInterface {
 		//delete obj;
 	}
 
+	UniformImage() {
+
+	}
+
 	UniformImage(Image* obj, VkSampler* sampler, VkImageLayout imageLayout) {
 		size = 0;
 		this->obj = obj;
@@ -217,7 +221,7 @@ struct PhongShading {
 
 struct UniformInfo {
 	// Need a safer method
-	UniformInterface* obj;
+	std::vector<UniformInterface*> obj;
 	std::string name;
 
 	/*
@@ -233,14 +237,16 @@ struct UniformInfo {
 	UniformTypes uniformType = UniformTypes::UNIFORM;
 
 	~UniformInfo() {
-		delete obj;
+		for(auto aux : obj){
+			delete aux;
+		}
 	}
 
 
 	static UniformInfo* GenerateInfoTexture(Texture* obj, std::string name, uint16_t binding,
 		VkShaderStageFlags stageFlags) {
 		UniformInfo* info = new UniformInfo();
-		info->obj = new UniformTexture(obj);
+		info->obj = std::vector<UniformInterface*>(1,new UniformTexture(obj));
 		info->name = name;
 		info->binding = binding;
 		info->type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -256,7 +262,7 @@ struct UniformInfo {
 		VkShaderStageFlags stageFlags) {
 		UniformInfo* info = new UniformInfo();
 		std::vector<T> aux = { obj };
-		info->obj = new UniformType<T>(aux);
+		info->obj = std::vector<UniformInterface*>(1, new UniformType<T>(aux));
 		info->name = name;
 		info->binding = binding;
 		info->type = type;
@@ -271,7 +277,7 @@ struct UniformInfo {
 		VkDescriptorType type,
 		VkShaderStageFlags stageFlags) {
 		UniformInfo* info = new UniformInfo();
-		info->obj = new UniformType<T>(objs);
+		info->obj = std::vector<UniformInterface*>(1, new UniformType<T>(objs));
 		info->name = name;
 		info->binding = binding;
 		info->type = type;
@@ -284,7 +290,7 @@ struct UniformInfo {
 	static UniformInfo* GenerateInfoImage(Image* obj, VkSampler* sampler, VkImageLayout imageLayout,
 		std::string name, uint16_t binding, VkShaderStageFlags stageFlags) {
 		UniformInfo* info = new UniformInfo();
-		info->obj = new UniformImage(obj, sampler, imageLayout);
+		info->obj = std::vector<UniformInterface*>(1, new UniformImage(obj, sampler, imageLayout));
 		info->name = name;
 		info->binding = binding;
 		info->type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -294,10 +300,28 @@ struct UniformInfo {
 		return info;
 	}
 
+	static UniformInfo* GenerateInfoImageVector(const std::vector<Image*>& obj, VkSampler* sampler, 
+		VkImageLayout imageLayout,
+		std::string name, uint16_t binding, VkShaderStageFlags stageFlags) {
+		UniformInfo* info = new UniformInfo();
+		info->obj = std::vector<UniformInterface*>(obj.size());
+
+		for (int i = 0; i < obj.size(); i++) {
+			info->obj[i] = new UniformImage(obj[i], sampler, imageLayout);
+		}
+		info->name = name;
+		info->binding = binding;
+		info->type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		info->descriptorCount = obj.size();
+		info->stageFlags = stageFlags;
+		info->uniformType = UniformTypes::TEXTURE;
+		return info;
+	}
+
 	static UniformInfo* GenerateConstantInfo(std::string name, uint16_t size, uint16_t offset,
 		VkShaderStageFlags stageFlags) {
 		UniformInfo* info = new UniformInfo();
-		info->obj = nullptr;
+		info->obj = std::vector<UniformInterface*>();
 		info->name = name;
 		info->descriptorCount = 1;
 		info->stageFlags = stageFlags;

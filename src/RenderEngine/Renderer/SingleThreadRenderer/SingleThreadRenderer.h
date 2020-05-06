@@ -68,6 +68,8 @@ public:
 	std::vector<DeleteInfo> deleteInfoVector;
 
 
+	std::vector<Image*> depthImages;
+
 	// USE FOR DEPTH INFO, RETHINK THE DECLARATION
 	VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSet _descriptorSet = VK_NULL_HANDLE;

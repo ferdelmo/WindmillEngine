@@ -41,7 +41,7 @@ void RenderPass::Initialize() {
     depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkAttachmentDescription colorAttachmentResolve = {};
     colorAttachmentResolve.format = SingleThreadRenderer::GetInstance().GetFormat();
@@ -155,7 +155,7 @@ RenderPass* RenderPass::GenerateOnlyDepthRenderPass() {
 
     // higher resolution for the depth image
     rp->_depthImage = Image::CreateImage(SingleThreadRenderer::GetInstance().GetExtent().width*2, SingleThreadRenderer::GetInstance().GetExtent().height*2, depthFormat,
-        VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         VK_IMAGE_ASPECT_DEPTH_BIT, VK_SAMPLE_COUNT_1_BIT);
 
     VkAttachmentDescription attachmentDescription{};
@@ -165,8 +165,8 @@ RenderPass* RenderPass::GenerateOnlyDepthRenderPass() {
     attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;						// We will read from depth, so it's important to store the depth attachment results
     attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;					// We don't care about initial layout of the attachment
-    attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;// Attachment will be transitioned to shader read at render pass end
+    attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;					// We don't care about initial layout of the attachment
+    attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;// Attachment will be transitioned to shader read at render pass end
 
     VkAttachmentReference depthReference = {};
     depthReference.attachment = 0;
@@ -201,8 +201,8 @@ RenderPass* RenderPass::GenerateOnlyDepthRenderPass() {
     renderPassInfo.pAttachments = &attachmentDescription;
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpass;
-    renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
-    renderPassInfo.pDependencies = dependencies.data();
+    //renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
+    //renderPassInfo.pDependencies = dependencies.data();
 
     if (vkCreateRenderPass(VulkanInstance::GetInstance().device, &renderPassInfo, nullptr, &rp->_renderPass) != VK_SUCCESS) {
         throw std::runtime_error("RenderPass::Initialize: failed to create render pass!");
