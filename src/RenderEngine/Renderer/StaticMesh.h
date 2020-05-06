@@ -38,10 +38,6 @@ private:
 	MaterialInstance* _materialInstance = nullptr;
 
 	MaterialInstance* _shadowMap = nullptr;
-	MapUniforms _uniformsShadowMap;
-
-	VkDescriptorPool _descriptorPoolShadowMap = VK_NULL_HANDLE;
-	VkDescriptorSet _descriptorSetShadowMap = VK_NULL_HANDLE;
 
 public:
 	/*
@@ -87,7 +83,7 @@ public:
 	/*
 		Bind to a command the draw orders
 	*/
-	void BindCommandsToBufferShadow(VkCommandBuffer& cmd);
+	void BindCommandsToBufferShadow(VkCommandBuffer& cmd, int directionalLight);
 
 	std::vector<Index>& GetIndices();
 

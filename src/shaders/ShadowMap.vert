@@ -1,11 +1,10 @@
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
 
-layout(binding = 0) uniform MVP {
-    mat4 model;
-    mat4 view;
-    mat4 proj;
-} mvpDepth;
+layout(push_constant) uniform PushConsts 
+{
+	mat4 view;
+} pushConsts;
 
 
 // Input vertex data, different for all executions of this shader.
@@ -17,5 +16,5 @@ layout(location = 4) in vec3 tangent_modelspace;
 layout(location = 5) in vec3 bitangent_modelspace;
 
 void main() {
-	 gl_Position = mvpDepth.proj * mvpDepth.view * mvpDepth.model * vec4(vertexPosition_modelspace, 1.0);
+	 gl_Position = pushConsts.view * vec4(vertexPosition_modelspace, 1.0);
 }

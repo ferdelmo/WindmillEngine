@@ -51,11 +51,15 @@ void Material::Initialize(const std::string vert, std::vector<UniformInfo*> vert
 	//_texture.Initialize("../resources/textures/texture.jpg");
 
 	for (auto info : vertBinds) {
-		AddUniformBuffer(info->name, info);
+		if (info->uniformType != UniformTypes::CONSTANT) {
+			AddUniformBuffer(info->name, info);
+		}
 	}
 
 	for (auto info : fragBinds) {
-		AddUniformBuffer(info->name, info);
+		if (info->uniformType != UniformTypes::CONSTANT) {
+			AddUniformBuffer(info->name, info);
+		}
 	}
 }
 
@@ -75,6 +79,9 @@ void Material::AddUniformBuffer(std::string name, UniformInfo* value) {
 
 MapUniforms Material::GenerateDescriptorSet(VkDescriptorPool& descriptorPool, VkDescriptorSet& descriptorSet) {
 	/* Create the descrtiptor pool */
+	if (_uniforms.size() <= 0) {
+		return MapUniforms();
+	}
 	std::vector<VkDescriptorPoolSize> poolSizes = {};
 	for (auto entry : _uniforms) {
 		VkDescriptorPoolSize aux = {};

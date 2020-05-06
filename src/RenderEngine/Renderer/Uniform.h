@@ -12,7 +12,8 @@
 
 typedef enum class UniformTypes {
 	UNIFORM,
-	TEXTURE
+	TEXTURE,
+	CONSTANT
 };
 
 
@@ -219,10 +220,17 @@ struct UniformInfo {
 	UniformInterface* obj;
 	std::string name;
 
+	/*
+		binding and descriptorCount are reused for size and offset when a constant
+		is created
+	*/
+
 	uint16_t binding = 0;
 	VkDescriptorType type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	uint16_t descriptorCount = 1;
 	VkShaderStageFlags stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	UniformTypes uniformType = UniformTypes::UNIFORM;
 
 	~UniformInfo() {
 		delete obj;
@@ -238,6 +246,7 @@ struct UniformInfo {
 		info->type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		info->descriptorCount = 1;
 		info->stageFlags = stageFlags;
+		info->uniformType = UniformTypes::TEXTURE;
 		return info;
 	}
 
@@ -253,6 +262,7 @@ struct UniformInfo {
 		info->type = type;
 		info->descriptorCount = 1;
 		info->stageFlags = stageFlags;
+		info->uniformType = UniformTypes::UNIFORM;
 		return info;
 	}
 
@@ -267,6 +277,7 @@ struct UniformInfo {
 		info->type = type;
 		info->descriptorCount = objs.size();
 		info->stageFlags = stageFlags;
+		info->uniformType = UniformTypes::UNIFORM;
 		return info;
 	}
 
@@ -279,6 +290,21 @@ struct UniformInfo {
 		info->type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		info->descriptorCount = 1;
 		info->stageFlags = stageFlags;
+		info->uniformType = UniformTypes::TEXTURE;
+		return info;
+	}
+
+	static UniformInfo* GenerateConstantInfo(std::string name, uint16_t size, uint16_t offset,
+		VkShaderStageFlags stageFlags) {
+		UniformInfo* info = new UniformInfo();
+		info->obj = nullptr;
+		info->name = name;
+		info->descriptorCount = 1;
+		info->stageFlags = stageFlags;
+		info->uniformType = UniformTypes::CONSTANT;
+
+		info->binding = size;
+		info->descriptorCount = offset;
 		return info;
 	}
 };

@@ -153,7 +153,8 @@ RenderPass* RenderPass::GenerateOnlyDepthRenderPass() {
         VK_IMAGE_TILING_OPTIMAL,
         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
-    rp->_depthImage = Image::CreateImage(SingleThreadRenderer::GetInstance().GetExtent().width, SingleThreadRenderer::GetInstance().GetExtent().height, depthFormat,
+    // higher resolution for the depth image
+    rp->_depthImage = Image::CreateImage(SingleThreadRenderer::GetInstance().GetExtent().width*2, SingleThreadRenderer::GetInstance().GetExtent().height*2, depthFormat,
         VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         VK_IMAGE_ASPECT_DEPTH_BIT, VK_SAMPLE_COUNT_1_BIT);
 

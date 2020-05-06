@@ -169,40 +169,6 @@ MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const st
     }
 
 
-MaterialInstance* GetBasicLightMaterialNormalMapping() {
-    std::string materialName = "GetQuadMaterial";
-    Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
-    if (resul == nullptr) {
-        std::vector<UniformInfo*> vertexDescriptor(0);
-
-
-        std::vector<UniformInfo*> fragmentDescriptor(0);
-
-        UniformInfo* shadowMap = UniformInfo::GenerateInfoImage(
-            SingleThreadRenderer::GetInstance().GetDepthRenderPass()->GetDepthImage(),
-            &SingleThreadRenderer::GetInstance().depthSampler,
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-            "ShadowMap",
-            0, VK_SHADER_STAGE_FRAGMENT_BIT);
-
-        fragmentDescriptor.push_back(shadowMap);
-
-        Material* resul = new Material(materialName);
-        resul->Initialize("../resources/shaders/Quad.vert.spv", vertexDescriptor,
-            "../resources/shaders/Quad.frag.spv", fragmentDescriptor,
-            SingleThreadRenderer::GetInstance().GetRenderPass(),
-            VertexNormalMapping::getBindingDescription(),
-            VertexNormalMapping::getAttributeDescriptions());
-
-        MaterialManager::GetInstance().AddMaterial(materialName, resul);
-    }
-
-    MaterialInstance* aux = new MaterialInstance(materialName);
-
-    return aux;
-}
-
-
 MaterialInstance* GetShadowMapMaterial() {
     std::string materialName = "ShadowMapMaterial";
     Material* resul = MaterialManager::GetInstance().GetMaterial(materialName);
@@ -213,7 +179,9 @@ MaterialInstance* GetShadowMapMaterial() {
         aux.model = glm::mat4(1.0f);
         aux.proj = World::GetActiveWorld()->GetCamera().GetProjection();
         aux.view = World::GetActiveWorld()->GetCamera().GetView();
-        UniformInfo* vertexInfo = UniformInfo::GenerateInfo(aux, "MVP", 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+        UniformInfo* vertexInfo = 
+            UniformInfo::GenerateConstantInfo("MVP", sizeof(glm::mat4),
+                0, VK_SHADER_STAGE_VERTEX_BIT);
         vertexDescriptor.push_back(vertexInfo);
 
 

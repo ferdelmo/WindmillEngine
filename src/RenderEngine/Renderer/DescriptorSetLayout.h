@@ -26,17 +26,21 @@ public:
     
 	void Initialize(std::vector<UniformInfo*> bindingsVector) {
         int count = bindingsVector.size();
-        std::vector<VkDescriptorSetLayoutBinding> bindings(count);
+        std::vector<VkDescriptorSetLayoutBinding> bindings(0);
         for (int i = 0; i < count; i++) {
-            bindings[i].binding = bindingsVector[i]->binding;
-            bindings[i].descriptorType = bindingsVector[i]->type;
-            bindings[i].descriptorCount = bindingsVector[i]->descriptorCount;
-            bindings[i].stageFlags = bindingsVector[i]->stageFlags;
-            bindings[i].pImmutableSamplers = nullptr; // Optional
+            if (bindingsVector[i]->uniformType != UniformTypes::CONSTANT) {
+                VkDescriptorSetLayoutBinding aux = {};
+                aux.binding = bindingsVector[i]->binding;
+                aux.descriptorType = bindingsVector[i]->type;
+                aux.descriptorCount = bindingsVector[i]->descriptorCount;
+                aux.stageFlags = bindingsVector[i]->stageFlags;
+                aux.pImmutableSamplers = nullptr; // Optional
+                bindings.push_back(aux);
+            }
         }
         VkDescriptorSetLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = count;
+        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
         layoutInfo.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(VulkanInstance::GetInstance().device, &layoutInfo, nullptr, &_descriptorSetLayout) != VK_SUCCESS) {

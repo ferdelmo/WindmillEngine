@@ -119,6 +119,23 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, Shader
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout->GetDescriptor();
 
+    std::vector<VkPushConstantRange> constants(0);
+
+    for (int i = 0; i < bindings.size(); i++) {
+         if(bindings[i]->uniformType == UniformTypes::CONSTANT) {
+             VkPushConstantRange aux = {};
+
+             // binding and descriptorcount are reused
+             aux.stageFlags = bindings[i]->stageFlags;
+             aux.size = bindings[i]->binding;
+             aux.offset = bindings[i]->descriptorCount;
+         }
+    }
+
+    pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(constants.size());
+    pipelineLayoutInfo.pPushConstantRanges =  constants.data();
+           
+
     if (vkCreatePipelineLayout(VulkanInstance::GetInstance().device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("GraphicsPipeline::Initialize: failed to create pipeline layout!");
     }
@@ -243,6 +260,23 @@ void GraphicsPipeline::Initialize(RenderPass* renderPass, Shader* vertex, VkForm
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout->GetDescriptor();
+
+    std::vector<VkPushConstantRange> constants(0);
+
+    for (int i = 0; i < bindings.size(); i++) {
+        if (bindings[i]->uniformType == UniformTypes::CONSTANT) {
+            VkPushConstantRange aux = {};
+
+            // binding and descriptorcount are reused
+            aux.stageFlags = bindings[i]->stageFlags;
+            aux.size = bindings[i]->binding;
+            aux.offset = bindings[i]->descriptorCount;
+            constants.push_back(aux);
+        }
+    }
+
+    pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(constants.size());
+    pipelineLayoutInfo.pPushConstantRanges = constants.data();
 
     if (vkCreatePipelineLayout(VulkanInstance::GetInstance().device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("GraphicsPipeline::Initialize: failed to create pipeline layout!");

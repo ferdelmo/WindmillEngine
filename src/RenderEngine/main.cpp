@@ -407,7 +407,7 @@ int main() {
         objs[i] = new GameObject();
         world.AddObject(objs[i]);
 
-        objs[i]->transform.scale = glm::vec3(1, 1, 1);
+        objs[i]->transform.scale = glm::vec3(.25f, .25f, .25f);
         objs[i]->transform.rotation = glm::quat();
 
         objs[i]->transform.position = glm::vec3(-7.5 + i * 2, 0, 2);
@@ -419,7 +419,7 @@ int main() {
                 { glm::vec3{1, 1, 1}, 0.4f, colorsSpecular[i], 0.2f, 10 }));
         */
 
-        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj",
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Ball.obj",
             GetBasicColorMaterial(world.GetCamera(),
                 { colors[i], 0.4f, colorsSpecular[i], 0.4f, 100 }));
         

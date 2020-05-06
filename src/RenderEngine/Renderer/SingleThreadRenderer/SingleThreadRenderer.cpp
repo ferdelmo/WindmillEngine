@@ -323,7 +323,7 @@ void SingleThreadRenderer::UpdateCommandBuffer(size_t i) {
         StaticMesh* mesh = (StaticMesh*)obj;
         VkDeviceSize offsets[] = { 0 };
         
-        mesh->BindCommandsToBufferShadow(commandBuffers[i]);
+        mesh->BindCommandsToBufferShadow(commandBuffers[i], 0);
     }
     /*
     vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &scenes[sceneIndex].vertices.buffer, offsets);

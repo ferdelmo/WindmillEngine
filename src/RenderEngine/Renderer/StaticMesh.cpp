@@ -31,8 +31,7 @@ StaticMesh::StaticMesh(std::string path, std::string materialName)
 	_uniforms = _material->GenerateDescriptorSet(_descriptorPool, _descriptorSet);
 
 	_shadowMap = GetShadowMapMaterial();
-	_uniformsShadowMap = _shadowMap->GetMaterial()->GenerateDescriptorSet(_descriptorPoolShadowMap, _descriptorSetShadowMap);
-}
+	}
 
 StaticMesh::StaticMesh(std::string path, MaterialInstance* mat)
 	: _mesh(MeshManager::GetInstance().LoadMesh(path)), _materialInstance(mat), 
@@ -58,7 +57,6 @@ StaticMesh::StaticMesh(std::string path, MaterialInstance* mat)
 
 
 	_shadowMap = GetShadowMapMaterial();
-	_uniformsShadowMap = _shadowMap->GetMaterial()->GenerateDescriptorSet(_descriptorPoolShadowMap, _descriptorSetShadowMap);
 }
 
 StaticMesh::~StaticMesh() {
@@ -69,12 +67,6 @@ StaticMesh::~StaticMesh() {
 	}
 
 	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
-
-	for (auto& entry : _uniformsShadowMap) {
-		delete entry.second;
-	}
-
-	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPoolShadowMap, nullptr);
 }
 
 void StaticMesh::Update(float deltaTime) {
@@ -109,7 +101,7 @@ void StaticMesh::Update(float deltaTime) {
 
 	std::vector<MVP> uniformDepth = { mvp };
 
-	_uniformsShadowMap.at("MVP")->GetBuffer()->Fill(uniformDepth);
+	//_uniformsShadowMap.at("MVP")->GetBuffer()->Fill(uniformDepth);
 
 	if (world != nullptr) {
 		std::vector<AmbientLight> ambient = { world->GetLights().ambient };
@@ -203,14 +195,31 @@ void StaticMesh::BindCommandsToBuffer(VkCommandBuffer& cmd) {
 }
 
 
-void StaticMesh::BindCommandsToBufferShadow(VkCommandBuffer& cmd) {
+void StaticMesh::BindCommandsToBufferShadow(VkCommandBuffer& cmd, int directionalLight) {
 	VkDeviceSize offsets[] = { 0 };
+
+	World* world = World::GetActiveWorld();
+	glm::vec3 dir = world->GetLights().lights.directionalLights[directionalLight].direction;
+	dir = glm::normalize(dir);
+
+	glm::mat4 view = glm::lookAt(-dir * 100.0f, { 0,0,0 }, { 0,0,1 });
+	glm::mat4 proj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1000.0f, 1000.0f);
+
+	glm::mat4 matrix = proj * view * _ubo.model;
 
 
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _shadowMap->GetMaterial()->GetPipeline().GetPipeline());
 
-	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-		_shadowMap->GetMaterial()->GetPipeline().GetPipelineLayout(), 0, 1, &_descriptorSetShadowMap, 0, nullptr);
+	// Update shader push constant block
+	// Contains current face view matrix
+	vkCmdPushConstants(
+		cmd,
+		_shadowMap->GetMaterial()->GetPipeline().GetPipelineLayout(),
+		VK_SHADER_STAGE_VERTEX_BIT,
+		0,
+		sizeof(glm::mat4),
+		&matrix);
+
 
 	vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh->vertex.GetBuffer(), offsets);
 
