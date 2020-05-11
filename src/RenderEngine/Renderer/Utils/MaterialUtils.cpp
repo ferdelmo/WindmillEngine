@@ -148,6 +148,15 @@ MaterialInstance* GetBasicLightMaterialNormalMapping(const Camera& cam, const st
                 5, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
             fragmentDescriptor.push_back(phongUniform);
 
+            UniformInfo* shadowMap = UniformInfo::GenerateInfoImageVector(
+                SingleThreadRenderer::GetInstance().depthImages,
+                &SingleThreadRenderer::GetInstance().depthSampler,
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                "ShadowMap",
+                6, VK_SHADER_STAGE_FRAGMENT_BIT);
+
+            fragmentDescriptor.push_back(shadowMap);
+
             Material* resul = new Material(materialName);
             resul->Initialize("../resources/shaders/BasicLightNormalMapping.vert.spv", vertexDescriptor,
                 "../resources/shaders/BasicLightNormalMapping.frag.spv", fragmentDescriptor,

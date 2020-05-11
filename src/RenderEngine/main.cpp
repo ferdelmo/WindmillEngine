@@ -289,12 +289,12 @@ int main() {
 
     DirectionalLight dl;
     dl.color = { 1,1,1 };
-    dl.power = 2;
+    dl.power = 1;
     dl.direction = { 1,1,-1 };
 
     DirectionalLight dl2;
     dl2.color = { 1,1,1 };
-    dl2.power = .5f;
+    dl2.power = 1.0f;
     dl2.direction = { -1,1,-1 };
 
     lights.directionalLights[0] = dl;
@@ -345,14 +345,16 @@ int main() {
 
     GameObject* floor = new GameObject();
 
-    /* StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
+    StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
         GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
             "../resources/textures/Brick_Tile_normal.png",
-            { glm::vec3{1, 1, 1}, 0.2f, glm::vec3{0, 1, 1}, 0.1f, 20 }));*/
-
+            { glm::vec3{1, 1, 1}, 0.2f, glm::vec3{0, 1, 1}, 0.1f, 20 }));
+    /*
     StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
         GetBasicColorMaterial(world.GetCamera(),
             { {1, 1, 1}, 0.4f, {1, 1, 1}, 0.15f, 5 }));
+            */
+            
 
     floor->transform.scale = glm::vec3(20, 20, 1);
     floor->transform.rotation = glm::quat(0,0,0,0);
@@ -413,21 +415,22 @@ int main() {
         objs[i] = new GameObject();
         world.AddObject(objs[i]);
 
-        objs[i]->transform.scale = glm::vec3(.25f, .25f, .25f);
+        objs[i]->transform.scale = glm::vec3(3.0f, 3.0f, 3.0f);
         objs[i]->transform.rotation = glm::quat();
 
-        objs[i]->transform.position = glm::vec3(-7.5 + i * 2, 0, 2);
+        objs[i]->transform.position = glm::vec3(-7.5 + i * 5, 0, 2);
 
-        /*
+        
         StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj",
-            GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/texture.jpg",
-                "../resources/textures/normalMap.jpg", 
-                { glm::vec3{1, 1, 1}, 0.4f, colorsSpecular[i], 0.2f, 10 }));
-        */
-
+            GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
+                "../resources/textures/Brick_Tile_normal.png",
+                { glm::vec3{1, 1, 1}, 0.4f, glm::vec3{1, 1, 1}, 0.2f, 10 }));
+        
+        /*
         StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Ball.obj",
             GetBasicColorMaterial(world.GetCamera(),
                 { colors[i], 0.4f, colorsSpecular[i], 0.4f, 10 }));
+                */
         
                 
         //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);

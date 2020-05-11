@@ -69,6 +69,15 @@ StaticMesh::~StaticMesh() {
 	vkDestroyDescriptorPool(VulkanInstance::GetInstance().device, _descriptorPool, nullptr);
 }
 
+glm::mat4 GenerateMatrixFromDirectionalLight(const DirectionalLight& dl) {
+	glm::vec3 dir = dl.direction;
+	dir = glm::normalize(dir);
+
+	glm::mat4 view = glm::lookAt(-dir * 100.0f, { 0,0,0 }, { 0,0,1 });
+	glm::mat4 proj = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -1000.0f, 1000.0f);
+	return proj * view;
+}
+
 void StaticMesh::Update(float deltaTime) {
 	_ubo.view = World::GetActiveWorld()->GetCamera().GetView();
 	_ubo.proj = World::GetActiveWorld()->GetCamera().GetProjection();
@@ -98,17 +107,11 @@ void StaticMesh::Update(float deltaTime) {
 		);
 
 		for (int i = 0; i < l.num_directional; i++) {
+
+			l.directionalLights[i].depthBiasMVP = biasMatrix *
+				GenerateMatrixFromDirectionalLight(l.directionalLights[i]);
+
 			l.directionalLights[i].direction = (_ubo.view * glm::vec4(-l.directionalLights[i].direction, 0));
-			
-			glm::vec3 dir = world->GetLights().lights.directionalLights[i].direction;
-			dir = glm::normalize(dir);
-
-
-			glm::mat4 view = glm::lookAt(-dir * 100.0f, { 0,0,0 }, { 0,0,1 });
-			glm::mat4 proj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1000.0f, 1000.0f);
-
-			l.directionalLights[i].depthBiasMVP = biasMatrix * 
-				proj * view;
 
 		}
 		/*
@@ -182,13 +185,9 @@ void StaticMesh::BindCommandsToBufferShadow(VkCommandBuffer& cmd, int directiona
 	VkDeviceSize offsets[] = { 0 };
 
 	World* world = World::GetActiveWorld();
-	glm::vec3 dir = world->GetLights().lights.directionalLights[directionalLight].direction;
-	dir = glm::normalize(dir);
+	DirectionalLight dl = world->GetLights().lights.directionalLights[directionalLight];
 
-	glm::mat4 view = glm::lookAt(-dir * 100.0f, { 0,0,0 }, { 0,0,1 });
-	glm::mat4 proj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1000.0f, 1000.0f);
-
-	glm::mat4 matrix = proj * view * _ubo.model;
+	glm::mat4 matrix =	GenerateMatrixFromDirectionalLight(dl) * _ubo.model;
 
 
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _shadowMap->GetMaterial()->GetPipeline().GetPipeline());

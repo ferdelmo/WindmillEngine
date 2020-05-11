@@ -55,7 +55,53 @@ layout(binding = 5) uniform PhongShading {
 	vec3 aux;
 } phong;
 
+layout(binding = 6) uniform sampler2D shadowMaps[10];
+
 layout(location = 0) out vec4 outColor;
+
+
+
+
+
+float textureProj(sampler2D shadowMap, vec4 shadowCoord, vec2 off)
+{
+	float shadow = 1.0;
+	if ( shadowCoord.z > -1.0 && shadowCoord.z < 1.0 ) 
+	{
+		float dist = texture( shadowMap, shadowCoord.st + off ).r;
+		if ( shadowCoord.w > 0.0 && dist < shadowCoord.z ) 
+		{
+			shadow = 0;
+		}
+	}
+	return shadow;
+}
+
+float filterPCF(sampler2D shadowMap, vec4 sc)
+{
+	ivec2 texDim = textureSize(shadowMap, 0);
+	float scale = 1.5;
+	float dx = scale * 1.0 / float(texDim.x);
+	float dy = scale * 1.0 / float(texDim.y);
+
+	float shadowFactor = 0.0;
+	int count = 0;
+	int range = 1;
+	
+	for (int x = -range; x <= range; x++)
+	{
+		for (int y = -range; y <= range; y++)
+		{
+			shadowFactor += textureProj(shadowMap, sc, vec2(dx*x, dy*y));
+			count++;
+		}
+	
+	}
+	return shadowFactor / count;
+}
+
+
+
 
 void main() {
 
@@ -116,16 +162,18 @@ void main() {
 		lightSum += kd*diffuse*texColor*phong.difusseColor + ks*specular*phong.specularColor;
 	}
 
-
-
-	float visibility = 1.0;
-
 	vec3 directionalSum = {0, 0, 0};
 	// directional light
 	for(int i = 0; i < lightsStruct.num_directional; i++) {
 		DirectionalLight dl = lightsStruct.directional[i];
 		
 		vec3 LightDirection_cameraspace = normalize(dl.direction);
+
+		vec4 ShadowCoord = dl.depthBiasMVP * vec4(worldPos, 1.0);
+
+
+		float visibility = textureProj(shadowMaps[i], ShadowCoord/ShadowCoord.w, vec2(0,0));
+		visibility = filterPCF(shadowMaps[i], ShadowCoord/ShadowCoord.w);
 
 		// Direction of the light (from the fragment to the light)
 		vec3 l = TBN * LightDirection_cameraspace;
