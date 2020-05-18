@@ -173,7 +173,7 @@ void main() {
 
 
 		float visibility = textureProj(shadowMaps[i], ShadowCoord/ShadowCoord.w, vec2(0,0));
-		visibility = filterPCF(shadowMaps[i], ShadowCoord/ShadowCoord.w);
+		//visibility = filterPCF(shadowMaps[i], ShadowCoord/ShadowCoord.w);
 
 		// Direction of the light (from the fragment to the light)
 		vec3 l = TBN * LightDirection_cameraspace;

@@ -302,9 +302,9 @@ int main() {
 
 
     lights.num_lights = 0;
-    lights.num_directional = 2;
+    lights.num_directional = 1;
 
-    AmbientLight ambient = { {1,1,1}, .1f };
+    AmbientLight ambient = { {1,1,1}, .05f };
 
     SceneLight l = { lights, ambient };
     World world;
@@ -344,16 +344,17 @@ int main() {
     world.Start();
 
     GameObject* floor = new GameObject();
-
+    /*
     StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
         GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
             "../resources/textures/Brick_Tile_normal.png",
             { glm::vec3{1, 1, 1}, 0.2f, glm::vec3{0, 1, 1}, 0.1f, 20 }));
-    /*
+            */
+  
     StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/cube.obj",
         GetBasicColorMaterial(world.GetCamera(),
             { {1, 1, 1}, 0.4f, {1, 1, 1}, 0.15f, 5 }));
-            */
+            
             
 
     floor->transform.scale = glm::vec3(20, 20, 1);
@@ -410,27 +411,43 @@ int main() {
     }
 
     */
+
+    GameObject* wall = new GameObject();
+
+    StaticMeshComponent* meshWall = new StaticMeshComponent("../resources/objs/cube.obj",
+        GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
+            "../resources/textures/Brick_Tile_normal.png",
+            { glm::vec3{1, 1, 1}, 0.5f, glm::vec3{1, 1, 1}, 0.1f, 20 }));
+
+
+
+    wall->transform.scale = glm::vec3(20, 1, 20);
+    wall->transform.rotation = glm::quat(0, 0, 0, 0);
+
+    wall->transform.position = glm::vec3(0, 10, 0);
+    world.AddObject(wall);
+
+    wall->AddComponent(meshWall);
+
    
-    for (int i = 0; i < 5; i++) {
+    for (int i = 1; i < 3; i++) {
         objs[i] = new GameObject();
         world.AddObject(objs[i]);
 
-        objs[i]->transform.scale = glm::vec3(3.0f, 3.0f, 3.0f);
-        objs[i]->transform.rotation = glm::quat();
+        objs[i]->transform.scale = glm::vec3(.5f,.5f,.5f);
+        objs[i]->transform.rotation = glm::quat(glm::vec3(glm::radians(90.0f),0,0));;
 
-        objs[i]->transform.position = glm::vec3(-7.5 + i * 5, 0, 2);
+        objs[i]->transform.position = glm::vec3(-10 + i * 6, i*3, 2.5);
 
-        
-        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Cube.obj",
+        /*
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/.obj",
             GetBasicLightMaterialNormalMapping(world.GetCamera(), "../resources/textures/Brick_Tile_basecolor.png",
                 "../resources/textures/Brick_Tile_normal.png",
                 { glm::vec3{1, 1, 1}, 0.4f, glm::vec3{1, 1, 1}, 0.2f, 10 }));
-        
-        /*
-        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/Ball.obj",
+        */
+        StaticMeshComponent* mesh = new StaticMeshComponent("../resources/objs/chinesedragon.obj",
             GetBasicColorMaterial(world.GetCamera(),
-                { colors[i], 0.4f, colorsSpecular[i], 0.4f, 10 }));
-                */
+                { colors[i], 0.5f, {1.0f, 1.0f, 1.0f}, 0.2f, 1 }));
         
                 
         //SphereColliderComponent* col = new SphereColliderComponent(objs[i]->transform.position, 1.0f);
@@ -498,6 +515,7 @@ int main() {
     }
 
     delete floor;
+    delete wall;
 
 
     renderer.CleanUp();

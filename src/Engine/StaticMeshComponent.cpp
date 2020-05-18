@@ -63,7 +63,7 @@ void StaticMeshComponent::Update(float deltaTime) {
 	obj.model = glm::mat4(1);
 
 	Transform trans = _owner->transform;
-	glm::normalize(trans.rotation);
+	trans.rotation = glm::normalize(trans.rotation);
 
 	glm::mat4 rot = glm::toMat4(trans.rotation);
 		/*

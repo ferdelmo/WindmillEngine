@@ -16,6 +16,7 @@ bool FindSimilarVertex(
     int& found) {
 
     bool foundIndex = false;
+    return false;
     for (int i = 0; i < vertices.size() && !foundIndex; i++) {
         if (vertices[i] == vertice &&
             uvs[i] == uv &&
@@ -59,11 +60,18 @@ Mesh* Mesh::LoadMesh(std::string path) {
                 attrib.vertices[3 * index.vertex_index + 1],
                 attrib.vertices[3 * index.vertex_index + 2]
             });
-
-            uvs.push_back({
-                attrib.texcoords[2 * index.texcoord_index + 0],
-                1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-                });
+            if (index.texcoord_index != -1) {
+                uvs.push_back({
+                    attrib.texcoords[2 * index.texcoord_index + 0],
+                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                    });
+            }
+            else {
+                uvs.push_back({
+                   0,
+                  0
+                    });
+            }
 
             normals.push_back({
                 attrib.normals[3 * index.normal_index + 0],
