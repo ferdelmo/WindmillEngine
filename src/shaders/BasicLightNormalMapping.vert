@@ -36,7 +36,7 @@ void main() {
     // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 
 	normal_cameraspace = normalize((mv * vec4(normal_modelspace,0)).xyz); 
-    tangent_cameraspace = normalize((mv * vec4(tangent_modelspace,0)).xyz); 
+    tangent_cameraspace = normalize((mv * vec4(-tangent_modelspace,0)).xyz); 
     bitangent_cameraspace = normalize((mv * vec4(bitangent_modelspace,0)).xyz); 
 
     fragColor = inColor;

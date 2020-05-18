@@ -16,7 +16,6 @@ bool FindSimilarVertex(
     int& found) {
 
     bool foundIndex = false;
-    return false;
     for (int i = 0; i < vertices.size() && !foundIndex; i++) {
         if (vertices[i] == vertice &&
             uvs[i] == uv &&
@@ -53,6 +52,8 @@ Mesh* Mesh::LoadMesh(std::string path) {
     std::vector<glm::vec3> tangents;
     std::vector<glm::vec3> bitangents;
 
+    bool lookForSimilar = true;
+
     for (const auto& shape : shapes) {
         for (const auto& index : shape.mesh.indices) {
             vertices.push_back({
@@ -71,6 +72,7 @@ Mesh* Mesh::LoadMesh(std::string path) {
                    0,
                   0
                     });
+                lookForSimilar = false;
             }
 
             normals.push_back({
@@ -94,7 +96,7 @@ Mesh* Mesh::LoadMesh(std::string path) {
 
     for(int i=0; i<vertices.size(); i++) {
         int index = 0;
-        if (FindSimilarVertex(out_vertices, out_uvs, out_normals,
+        if (lookForSimilar && FindSimilarVertex(out_vertices, out_uvs, out_normals,
             vertices[i], uvs[i], normals[i], index)) {
 
             out_indices.push_back(index);
