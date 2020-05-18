@@ -1,5 +1,8 @@
 # Windmill Engine
 Personal project to build a game engine from scratch, using vulkan as graphic APi.
+
+![](/screenshots/DragonsWall.png)
+
 ## Render Engine
 The render engine is the most worked part. The main features that are implemented are:
 - Basic Shading: phong shading with difuse and specular parts with a color for each part and an alpha for the specular component. This ilumination model take into account the direction of the light and the normal of the surface to calculate the ilumination of each fragment. This also include basic color (the same color for the whole object) or textures, an object with only one texture for now.
